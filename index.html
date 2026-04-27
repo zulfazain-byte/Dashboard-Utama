@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cibitung Frozen - Advanced Core System v3.0</title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js">
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web">
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
+        :root {
+            --bg: #f1f5f9;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --danger: #e11d48;
+            --success: #059669;
+            --warning: #d97706;
+            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --nav-bg: #ffffff;
+            --input-bg: #f8fafc;
+            --hover-row: #f8fafc;
+        }
+        .dark {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --border: #334155;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-light: #1e3a5f;
+            --danger: #f43f5e;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+            --nav-bg: #1e293b;
+            --input-bg: #1e293b;
+            --hover-row: #1a2332;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.25s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .toggle-checkbox {
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 9999px;
+            border: 2px solid #cbd5e1;
+            background: white;
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            transition: all 0.25s;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .toggle-checkbox:checked {
+            left: 1.25rem;
+            border-color: var(--accent);
+            background: white;
+        }
+        .toggle-label {
+            display: block;
+            width: 2.75rem;
+            height: 1.4rem;
+            background: #cbd5e1;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: background 0.25s;
+            position: relative;
+        }
+        .toggle-checkbox:checked+.toggle-label {
+            background: var(--accent);
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s;
+        }
+        input,
+        select {
+            background: var(--input-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+        input:focus,
+        select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+        .skeleton {
+            animation: shimmer 1.5s infinite;
+            background: linear-gradient(90deg, var(--border) 25%, transparent 50%, var(--border) 75%);
+            background-size: 200% 100%;
+        }
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+        .slide-in {
+            animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .pulse-dot {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.4;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen antialiased">
+
+    <!-- Top Navigation -->
+    <nav class="sticky top-0 z-50 border-b shadow-sm" style="background:var(--nav-bg);border-color:var(--border);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/25">
+                        <i class="ph-fill ph-fish-simple text-2xl"></i>
+                    </div>
+                    <div>
+                        <span class="font-extrabold text-xl tracking-tight" style="color:var(--text);">Cibitung<span class="text-blue-600">Frozen</span></span>
+                        <p class="text-[10px] uppercase font-bold tracking-widest opacity-50 -mt-1" style="color:var(--text-secondary);">Advanced Core v3.0</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <button onclick="toggleDarkMode()" class="w-9 h-9 rounded-xl flex items-center justify-center transition border" style="background:var(--surface);border-color:var(--border);color:var(--text-secondary);" title="Toggle Dark Mode" id="darkToggle">
+                        <i class="ph ph-moon text-lg" id="darkIcon"></i>
+                    </button>
+                    <div class="hidden md:block text-right">
+                        <p class="text-sm font-semibold" style="color:var(--text);">Dhiya'Ulhag Zulfa Zain</p>
+                        <p class="text-xs" style="color:var(--text-secondary);">System Administrator</p>
+                    </div>
+                    <div class="w-9 h-9 rounded-full border flex items-center justify-center" style="background:var(--input-bg);border-color:var(--border);color:var(--text-secondary);">
+                        <i class="ph ph-user text-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1 flex flex-col lg:flex-row gap-6">
+
+        <!-- Sidebar -->
+        <aside class="lg:w-72 flex-shrink-0">
+            <div class="card sticky top-24 overflow-hidden">
+                <div class="p-5 border-b" style="border-color:var(--border);">
+                    <h3 class="font-bold text-sm uppercase tracking-wider" style="color:var(--text);">Modul Operasional</h3>
+                </div>
+                <div class="p-2 space-y-1" id="tabs">
+                    <button onclick="switchTab('tab-dashboard')" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition font-medium text-sm active" data-tab="tab-dashboard" style="color:var(--text);">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 text-slate-500 tab-icon"><i class="ph ph-chart-bar text-lg"></i></div>
+                        <span>Dashboard</span>
+                    </button>
+                    <button onclick="switchTab('tab-settings')" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition font-medium text-sm" data-tab="tab-settings" style="color:var(--text-secondary);">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 text-slate-500 tab-icon"><i class="ph ph-gear text-lg"></i></div>
+                        <span>1. Variabel Bisnis</span>
+                    </button>
+                    <button onclick="switchTab('tab-supply')" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition font-medium text-sm" data-tab="tab-supply" style="color:var(--text-secondary);">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 text-slate-500 tab-icon"><i class="ph ph-truck text-lg"></i></div>
+                        <span>2. HPP & Multi-SKU</span>
+                    </button>
+                    <button onclick="switchTab('tab-pricing')" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition font-medium text-sm" data-tab="tab-pricing" style="color:var(--text-secondary);">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 text-slate-500 tab-icon"><i class="ph ph-storefront text-lg"></i></div>
+                        <span>3. Saluran Penjualan</span>
+                    </button>
+                    <button onclick="switchTab('tab-finance')" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition font-medium text-sm" data-tab="tab-finance" style="color:var(--text-secondary);">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 text-slate-500 tab-icon"><i class="ph ph-wallet text-lg"></i></div>
+                        <span>4. Laporan Finansial</span>
+                    </button>
+                    <button onclick="switchTab('tab-history')" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition font-medium text-sm" data-tab="tab-history" style="color:var(--text-secondary);">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 text-slate-500 tab-icon"><i class="ph ph-clock-counter-clockwise text-lg"></i></div>
+                        <span>5. Riwayat Transaksi</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Content -->
+        <main class="flex-1 min-w-0 space-y-6">
+
+            <!-- TAB: DASHBOARD -->
+            <div id="tab-dashboard" class="tab-content active space-y-6">
+                <div class="card p-6 sm:p-8">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="p-3 bg-blue-100 text-blue-600 rounded-xl"><i class="ph ph-chart-bar text-2xl"></i></div>
+                        <div>
+                            <h2 class="text-xl font-bold" style="color:var(--text);">Dashboard Analitik</h2>
+                            <p class="text-sm" style="color:var(--text-secondary);">Ringkasan performa bisnis secara real-time.</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="dashboardCards">
+                        <div class="card p-4 text-center"><p class="text-xs opacity-60 uppercase tracking-wider font-semibold">Total Transaksi</p><p class="text-2xl font-black text-blue-600 mt-1" id="dash_total_trx">0</p></div>
+                        <div class="card p-4 text-center"><p class="text-xs opacity-60 uppercase tracking-wider font-semibold">Total Revenue</p><p class="text-2xl font-black text-emerald-600 mt-1" id="dash_total_rev">Rp 0</p></div>
+                        <div class="card p-4 text-center"><p class="text-xs opacity-60 uppercase tracking-wider font-semibold">Net Profit</p><p class="text-2xl font-black text-violet-600 mt-1" id="dash_net_profit">Rp 0</p></div>
+                        <div class="card p-4 text-center"><p class="text-xs opacity-60 uppercase tracking-wider font-semibold">Avg Margin</p><p class="text-2xl font-black text-amber-600 mt-1" id="dash_avg_margin">0%</p></div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="card p-4"><canvas id="chartRevenue" height="220"></canvas></div>
+                        <div class="card p-4"><canvas id="chartProfit" height="220"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 1: SETTINGS -->
+            <div id="tab-settings" class="tab-content space-y-6">
+                <div class="card p-6 sm:p-8 slide-in">
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="p-3 bg-slate-100 text-slate-600 rounded-xl"><i class="ph ph-sliders text-2xl"></i></div>
+                        <div><h2 class="text-xl font-bold" style="color:var(--text);">Pengaturan Variabel Bisnis</h2><p class="text-sm" style="color:var(--text-secondary);">Parameter dasar, pajak, dan bagi hasil.</p></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-5">
+                            <h3 class="font-semibold flex items-center gap-2 border-b pb-2" style="border-color:var(--border);color:var(--text);"><i class="ph ph-scales opacity-50"></i> Ambang Batas</h3>
+                            <div><label class="block text-xs font-semibold opacity-60 uppercase tracking-wider mb-2">Minimal Grosir (Kg)</label><input type="number" id="set_grosir" value="10" class="input-trigger w-full px-4 py-3 rounded-xl text-sm font-medium"></div>
+                            <div><label class="block text-xs font-semibold opacity-60 uppercase tracking-wider mb-2">Minimal Partai Besar (Kg)</label><input type="number" id="set_partai" value="500" class="input-trigger w-full px-4 py-3 rounded-xl text-sm font-medium"></div>
+                            <div><label class="block text-xs font-semibold opacity-60 uppercase tracking-wider mb-2">Term of Payment (hari)</label><input type="number" id="set_top" value="7" class="input-trigger w-full px-4 py-3 rounded-xl text-sm font-medium"></div>
+                        </div>
+                        <div class="space-y-5">
+                            <h3 class="font-semibold flex items-center gap-2 border-b pb-2" style="border-color:var(--border);color:var(--text);"><i class="ph ph-chart-pie-slice opacity-50"></i> Pajak & Bagi Hasil</h3>
+                            <div class="grid grid-cols-3 gap-3">
+                                <div><label class="block text-xs font-semibold opacity-60 mb-2">PPN (%)</label><input type="number" id="set_ppn" value="12" class="input-trigger w-full px-3 py-2.5 rounded-lg text-sm"></div>
+                                <div><label class="block text-xs font-semibold opacity-60 mb-2">PPh 25 (%)</label><input type="number" id="set_pph25" value="2" class="input-trigger w-full px-3 py-2.5 rounded-lg text-sm"></div>
+                                <div><label class="block text-xs font-semibold opacity-60 mb-2">PPh 21 (%)</label><input type="number" id="set_pph21" value="5" class="input-trigger w-full px-3 py-2.5 rounded-lg text-sm"></div>
+                            </div>
+                            <div class="card p-4" style="background:var(--accent-light);border-color:var(--accent);">
+                                <label class="block text-xs font-bold uppercase tracking-wider mb-3" style="color:var(--accent);">Distribusi Profit Bersih</label>
+                                <div class="flex gap-4">
+                                    <div class="w-1/2"><span class="text-[10px] font-bold opacity-70">PT Share</span><input type="number" id="set_pt_share" value="60" class="input-trigger w-full px-3 py-2.5 rounded-lg text-sm font-semibold"></div>
+                                    <div class="w-1/2"><span class="text-[10px] font-bold opacity-70">Investor</span><input type="number" id="set_inv_share" value="40" class="input-trigger w-full px-3 py-2.5 rounded-lg text-sm font-semibold"></div>
+                                </div>
+                                <div class="mt-3" id="multiInvestorContainer">
+                                    <button onclick="addInvestor()" class="text-xs font-semibold flex items-center gap-1 opacity-70 hover:opacity-100 transition" style="color:var(--accent);"><i class="ph ph-plus-circle"></i> Tambah Investor</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: SUPPLY CHAIN MULTI-SKU -->
+            <div id="tab-supply" class="tab-content space-y-6">
+                <div class="card p-6 sm:p-8 slide-in">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="p-3 bg-indigo-100 text-indigo-600 rounded-xl"><i class="ph ph-package text-2xl"></i></div>
+                        <div><h2 class="text-xl font-bold" style="color:var(--text);">Manajemen Multi-SKU & Landed Cost</h2><p class="text-sm" style="color:var(--text-secondary);">Kelola beberapa produk sekaligus.</p></div>
+                    </div>
+                    <div id="skuList" class="space-y-4 mb-6"></div>
+                    <button onclick="addSKU()" class="w-full py-3 rounded-xl border-2 border-dashed font-semibold text-sm transition flex items-center justify-center gap-2 hover:border-blue-500 hover:text-blue-600" style="border-color:var(--border);color:var(--text-secondary);">
+                        <i class="ph ph-plus-circle text-lg"></i> Tambah SKU / Produk
+                    </button>
+                    <div class="mt-6 p-5 rounded-2xl text-white flex flex-col sm:flex-row justify-between items-center gap-4" style="background:linear-gradient(135deg,#1e3a5f,#0f172a);">
+                        <div><p class="text-indigo-200 text-sm font-medium uppercase tracking-wider">Total HPP Gabungan</p><p class="text-xs opacity-70" id="supply_total_info">0 SKU | 0 Kg bersih</p></div>
+                        <span class="text-4xl font-extrabold tracking-tight" id="res_hpp_avg">Rp 0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: PRICING -->
+            <div id="tab-pricing" class="tab-content space-y-6">
+                <div class="card p-6 sm:p-8 slide-in">
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl"><i class="ph ph-tag text-2xl"></i></div>
+                        <div><h2 class="text-xl font-bold" style="color:var(--text);">Strategi Harga & Diskon</h2><p class="text-sm" style="color:var(--text-secondary);">Tentukan harga jual, diskon, dan biaya channel.</p></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                        <div class="md:col-span-7 space-y-5">
+                            <div class="flex gap-4"><div class="w-2/3"><label class="block text-xs font-semibold opacity-60 uppercase tracking-wider mb-2">Nama Klien</label><input type="text" id="trx_klien" placeholder="PT / Perorangan" class="input-trigger w-full p-3 rounded-xl text-sm"></div><div class="w-1/3"><label class="block text-xs font-semibold opacity-60 uppercase tracking-wider mb-2">Qty Total (Kg)</label><input type="number" id="trx_qty" value="1" class="input-trigger w-full p-3 rounded-xl text-sm font-bold text-center"></div></div>
+                            <div>
+                                <h3 class="font-semibold mb-3 border-b pb-2" style="border-color:var(--border);color:var(--text);">Saluran</h3>
+                                <div class="flex gap-3 mb-3">
+                                    <label class="flex-1 cursor-pointer"><input type="radio" name="channel" value="offline" class="peer sr-only input-trigger" checked><div class="p-3 border-2 rounded-xl peer-checked:bg-blue-50 peer-checked:border-blue-500 transition text-center font-bold text-sm">Offline</div></label>
+                                    <label class="flex-1 cursor-pointer"><input type="radio" name="channel" value="online" class="peer sr-only input-trigger"><div class="p-3 border-2 rounded-xl peer-checked:bg-orange-50 peer-checked:border-orange-500 transition text-center font-bold text-sm">Marketplace</div></label>
+                                </div>
+                                <div id="panel_offline" class="card p-4" style="background:var(--accent-light);"><div class="flex justify-between items-center"><span class="text-sm font-semibold">Tipe: <span id="disp_tier" class="font-black">Ecer</span></span></div>
+                                    <label class="flex items-center justify-between cursor-pointer mt-3"><span class="text-sm">Biaya Kurir</span><div class="relative inline-block w-10"><input type="checkbox" id="trx_kurir_toggle" class="toggle-checkbox input-trigger"><div class="toggle-label"></div></div></label><input type="number" id="trx_kurir_val" placeholder="Rp" class="input-trigger hidden w-full mt-2 p-2 rounded-lg text-sm">
+                                </div>
+                                <div id="panel_online" class="card p-4 hidden" style="background:#fff7ed;"><select id="trx_mp_admin" class="input-trigger w-full p-2.5 rounded-lg text-sm"><option value="0">Pilih Platform</option><option value="6.5">Shopee ~6.5%</option><option value="5.5">Tokopedia ~5.5%</option><option value="4.5">TikTok Shop ~4.5%</option><option value="custom">Manual</option></select><input type="number" id="trx_mp_custom" placeholder="%" class="input-trigger hidden w-full mt-2 p-2 rounded-lg text-sm">
+                                    <label class="flex items-center justify-between cursor-pointer mt-3"><span class="text-sm">Biaya Ads</span><div class="relative inline-block w-10"><input type="checkbox" id="trx_ads_toggle" class="toggle-checkbox input-trigger"><div class="toggle-label"></div></div></label><div id="trx_ads_wrap" class="hidden mt-2 flex gap-2"><select id="trx_ads_type" class="input-trigger p-2 rounded-lg text-sm w-1/3"><option value="percent">%</option><option value="unit">Rp/Unit</option></select><input type="number" id="trx_ads_val" class="input-trigger w-full p-2 rounded-lg text-sm"></div>
+                                </div>
+                            </div>
+                            <div><label class="block text-xs font-semibold opacity-60 uppercase tracking-wider mb-2">Diskon untuk Klien (%)</label><input type="number" id="trx_diskon" value="0" class="input-trigger w-full p-3 rounded-xl text-sm"></div>
+                        </div>
+                        <div class="md:col-span-5 card p-5" style="background:#ecfdf5;border-color:#a7f3d0;">
+                            <h3 class="font-bold text-emerald-900 mb-3">Target Keuntungan</h3>
+                            <div class="relative mb-4"><span class="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-emerald-600">Rp</span><input type="number" id="trx_margin_kg" value="15000" class="input-trigger w-full pl-12 pr-4 py-4 border-2 border-emerald-300 rounded-xl text-xl font-bold"></div>
+                            <div class="space-y-2 text-sm"><div class="flex justify-between"><span class="opacity-60">HPP /Kg</span><span id="sum_hpp_kg" class="font-medium">Rp 0</span></div><div class="flex justify-between"><span class="opacity-60">Biaya Channel /Kg</span><span id="sum_cost_kg" class="font-medium text-red-500">Rp 0</span></div><div class="flex justify-between"><span class="opacity-60">Target Profit /Kg</span><span id="sum_margin_kg" class="font-medium text-emerald-600">Rp 0</span></div><hr><span class="text-xs opacity-50">HARGA JUAL REKOMENDASI (DPP/Kg)</span><span class="text-2xl font-black block" id="sum_dpp_kg" style="color:var(--text);">Rp 0</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: FINANCE -->
+            <div id="tab-finance" class="tab-content space-y-6">
+                <div class="card p-6 sm:p-8 slide-in">
+                    <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
+                        <div class="flex items-center gap-3"><div class="p-3 bg-blue-100 text-blue-600 rounded-xl"><i class="ph ph-receipt text-2xl"></i></div><div><h2 class="text-xl font-bold" style="color:var(--text);">Finalisasi & Invoice</h2><p class="text-sm" style="color:var(--text-secondary);">Ringkasan tagihan dan alokasi pajak.</p></div></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+                        <div class="card p-5"><p class="text-xs opacity-50 font-bold uppercase tracking-wider">DPP Total <span id="fin_qty_info" class="lowercase font-normal">(0 Kg)</span></p><p class="text-2xl font-bold" id="fin_dpp_total">Rp 0</p></div>
+                        <div class="card p-5" style="background:#fff1f2;border-color:#fecdd3;"><p class="text-xs text-rose-500 font-bold uppercase tracking-wider">PPN (<span id="lbl_ppn">12</span>%)</p><p class="text-2xl font-bold text-rose-700" id="fin_ppn">Rp 0</p></div>
+                        <div class="p-5 rounded-2xl text-white shadow-lg transform md:-translate-y-2" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);"><p class="text-xs text-blue-200 font-bold uppercase tracking-wider">TOTAL INVOICE</p><p class="text-3xl font-black tracking-tight" id="fin_invoice">Rp 0</p></div>
+                    </div>
+                    <div class="rounded-3xl p-1 border overflow-hidden shadow-2xl" style="background:#0f172a;border-color:#1e293b;">
+                        <div class="grid grid-cols-1 lg:grid-cols-2">
+                            <div class="p-6 lg:p-8"><h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Financial Waterfall</h3><div class="space-y-4 text-sm"><div class="flex justify-between"><span class="text-slate-300">Pendapatan DPP</span><span class="text-white" id="wf_dpp">Rp 0</span></div><div class="flex justify-between"><span class="text-slate-400">HPP & Biaya</span><span class="text-rose-400" id="wf_modal">- Rp 0</span></div><hr class="border-slate-700"><div class="flex justify-between font-bold text-white"><span>Profit Kotor</span><span class="text-emerald-400" id="wf_gross">Rp 0</span></div><div class="flex justify-between"><span class="text-slate-400">PPh 25 (<span id="lbl_pph25">2</span>%)</span><span class="text-rose-400" id="wf_pph25">- Rp 0</span></div><hr class="border-slate-700"><div class="flex justify-between"><span class="text-sm font-semibold text-slate-300 uppercase">Net Profit</span><span class="text-2xl font-black text-white" id="wf_net">Rp 0</span></div></div></div>
+                            <div class="rounded-2xl p-6 lg:p-8" style="background:#1e293b;"><h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Distribusi Profit</h3><div class="space-y-4" id="distribusiContainer"><div class="p-4 rounded-xl border border-slate-700 flex justify-between"><div><p class="text-sm font-semibold text-slate-200">PT Cibitung (<span id="lbl_pt">60</span>%)</p></div><p class="font-bold text-emerald-400 text-xl" id="wf_pt">Rp 0</p></div><div id="investorDistContainer"></div></div></div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4 mt-6">
+                        <button onclick="generateKwitansiPDF()" class="flex-1 card py-4 rounded-2xl font-semibold transition flex items-center justify-center gap-2 hover:shadow-md"><i class="ph ph-file-pdf text-2xl text-rose-500"></i>Download PDF Invoice</button>
+                        <button onclick="saveTransaction()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-4 rounded-2xl shadow-lg transition flex items-center justify-center gap-2"><i class="ph ph-floppy-disk text-2xl"></i>Simpan Transaksi</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: HISTORY -->
+            <div id="tab-history" class="tab-content space-y-6">
+                <div class="card p-6 sm:p-8 slide-in">
+                    <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+                        <div class="flex items-center gap-3"><div class="p-3 bg-amber-100 text-amber-600 rounded-xl"><i class="ph ph-clock-counter-clockwise text-2xl"></i></div><div><h2 class="text-xl font-bold" style="color:var(--text);">Riwayat Transaksi</h2><p class="text-sm" style="color:var(--text-secondary);">Data tersimpan di localStorage.</p></div></div>
+                        <button onclick="clearHistory()" class="text-sm font-semibold text-rose-500 hover:text-rose-700 transition flex items-center gap-1"><i class="ph ph-trash"></i>Hapus Semua</button>
+                    </div>
+                    <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="border-b" style="border-color:var(--border);"><th class="text-left p-3 opacity-60">Tanggal</th><th class="text-left p-3 opacity-60">Klien</th><th class="text-left p-3 opacity-60">Produk</th><th class="text-right p-3 opacity-60">Qty</th><th class="text-right p-3 opacity-60">Invoice</th><th class="text-right p-3 opacity-60">Profit</th><th class="text-center p-3 opacity-60">Aksi</th></tr></thead><tbody id="historyTableBody"><tr><td colspan="7" class="text-center p-6 opacity-40">Belum ada riwayat transaksi.</td></tr></tbody></table></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 card p-4 flex items-center z-50 max-w-sm pointer-events-none shadow-xl" style="border-color:var(--border);">
+        <div id="toastIcon" class="w-10 h-10 rounded-full flex items-center justify-center mr-3 flex-shrink-0"></div>
+        <div><h4 id="toastTitle" class="text-sm font-bold">Title</h4><p id="toastMsg" class="text-xs opacity-60 mt-0.5">Message</p></div>
+    </div>
+
+    <script>
+        // --- STATE & INVESTORS ---
+        let investors = [{ id: 'inv1', name: 'Investor Utama', share: 40 }];
+        let skuList = [];
+        let skuIdCounter = 0;
+        let transactionHistory = JSON.parse(localStorage.getItem('cfs_history') || '[]');
+        let chartRevenueInstance = null;
+        let chartProfitInstance = null;
+
+        const rp = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR',
+            minimumFractionDigits: 0 }).format(num);
+        const $ = (id) => document.getElementById(id);
+
+        // --- DARK MODE ---
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDark = html.classList.toggle('dark');
+            localStorage.setItem('cfs_dark', isDark ? '1' : '0');
+            const icon = $('#darkIcon');
+            if (isDark) { icon.className = 'ph ph-sun text-lg text-yellow-400'; } else { icon.className =
+                    'ph ph-moon text-lg'; }
+            updateChartColors();
+        }
+        if (localStorage.getItem('cfs_dark') === '1') {
+            document.documentElement.classList.add('dark');
+            $('#darkIcon').className = 'ph ph-sun text-lg text-yellow-400';
+        }
+
+        // --- TOAST ---
+        let toastTimeout;
+
+        function showToast(title, msg, type = 'success') {
+            const t = $('#toast');
+            const icon = $('#toastIcon');
+            $('#toastTitle').innerText = title;
+            $('#toastMsg').innerText = msg;
+            if (type === 'success') { icon.className =
+                    'w-10 h-10 rounded-full flex items-center justify-center mr-3 bg-emerald-100 text-emerald-600';
+                icon.innerHTML = '<i class="ph ph-check text-xl"></i>'; } else { icon.className =
+                    'w-10 h-10 rounded-full flex items-center justify-center mr-3 bg-rose-100 text-rose-600';
+                icon.innerHTML = '<i class="ph ph-warning-circle text-xl"></i>'; }
+            t.classList.remove('translate-y-20', 'opacity-0');
+            t.classList.add('translate-y-0', 'opacity-100');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => { t.classList.add('translate-y-20', 'opacity-0'); }, 3000);
+        }
+
+        // --- TAB SWITCHING ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById(tabId);
+            if (target) { target.classList.add('active');
+                target.classList.add('slide-in'); }
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                const isActive = btn.dataset.tab === tabId;
+                btn.style.color = isActive ? 'var(--accent)' : 'var(--text-secondary)';
+                btn.style.background = isActive ? 'var(--accent-light)' : 'transparent';
+                btn.style.fontWeight = isActive ? '600' : '500';
+                const iconEl = btn.querySelector('.tab-icon');
+                if (iconEl) {
+                    iconEl.style.background = isActive ? 'var(--accent)' : '#e2e8f0';
+                    iconEl.style.color = isActive ? 'white' : '#64748b';
+                }
+            });
+            if (tabId === 'tab-dashboard') updateDashboard();
+            if (tabId === 'tab-history') renderHistory();
+        }
+
+        // --- TOGGLE HELPERS ---
+        function setupToggle(toggleId, targetId, displayStyle = 'block') {
+            const toggle = $(toggleId);
+            const target = $(targetId);
+            if (!toggle || !target) return;
+            toggle.addEventListener('change', function() {
+                if (this.checked) { target.classList.remove('hidden'); if (displayStyle === 'flex') target
+                        .classList.add('flex'); } else { target.classList.add('hidden'); if (displayStyle ===
+                        'flex') target.classList.remove('flex'); }
+                recalculateAll();
+            });
+        }
+        setupToggle('sup_toggle_bongkar', 'sup_bongkar_wrap');
+        setupToggle('sup_toggle_shrink', 'sup_shrink_wrap');
+        setupToggle('trx_kurir_toggle', 'trx_kurir_val');
+        setupToggle('trx_ads_toggle', 'trx_ads_wrap', 'flex');
+
+        $('sup_storage_type')?.addEventListener('change', function() {
+            const wrap = $('sup_storage_wrap');
+            if (this.value !== '0') wrap?.classList.remove('hidden');
+            else wrap?.classList.add('hidden');
+            recalculateAll();
+        });
+        document.querySelectorAll('input[name="channel"]').forEach(r => r.addEventListener('change', function() {
+            if (this.value === 'offline') { $('panel_offline')?.classList.remove('hidden');
+                $('panel_online')?.classList.add('hidden'); } else { $('panel_offline')?.classList.add(
+                'hidden');
+                $('panel_online')?.classList.remove('hidden'); }
+            recalculateAll();
+        }));
+        $('trx_mp_admin')?.addEventListener('change', function() {
+            $('trx_mp_custom')?.classList.toggle('hidden', this.value !== 'custom');
+            recalculateAll();
+        });
+
+        // --- INVESTORS ---
+        function addInvestor(name = '', share = 0) {
+            const id = 'inv' + Date.now();
+            investors.push({ id, name: name || 'Investor ' + (investors.length), share: share || 0 });
+            renderInvestors();
+            recalculateAll();
+        }
+
+        function removeInvestor(id) {
+            if (investors.length <= 1) return showToast('Gagal', 'Minimal 1 investor.', 'error');
+            investors = investors.filter(i => i.id !== id);
+            renderInvestors();
+            recalculateAll();
+        }
+
+        function renderInvestors() {
+            const container = $('multiInvestorContainer');
+            if (!container) return;
+            let html = '';
+            investors.forEach((inv, idx) => {
+                html += `
+                <div class="flex gap-2 mt-2 items-center investor-row">
+                    <input type="text" value="${inv.name}" data-inv-id="${inv.id}" data-field="name" class="investor-input flex-1 px-3 py-2 rounded-lg text-sm border" style="border-color:var(--border);background:var(--input-bg);color:var(--text);">
+                    <input type="number" value="${inv.share}" data-inv-id="${inv.id}" data-field="share" class="investor-input w-20 px-3 py-2 rounded-lg text-sm border" style="border-color:var(--border);background:var(--input-bg);color:var(--text);" placeholder="%">
+                    <button onclick="removeInvestor('${inv.id}')" class="text-rose-500 hover:text-rose-700 px-2" title="Hapus"><i class="ph ph-trash"></i></button>
+                </div>`;
+            });
+            container.innerHTML = html + `
+                <button onclick="addInvestor()" class="text-xs font-semibold flex items-center gap-1 opacity-70 hover:opacity-100 transition mt-2" style="color:var(--accent);"><i class="ph ph-plus-circle"></i> Tambah Investor</button>`;
+            document.querySelectorAll('.investor-input').forEach(inp => {
+                inp.addEventListener('input', function() {
+                    const id = this.dataset.invId;
+                    const field = this.dataset.field;
+                    const inv = investors.find(i => i.id === id);
+                    if (inv) {
+                        if (field === 'name') inv.name = this.value;
+                        else inv.share = parseFloat(this.value) || 0;
+                        recalculateAll();
+                    }
+                });
+            });
+        }
+        renderInvestors();
+
+        // --- MULTI SKU ---
+        function addSKU(data = null) {
+            const id = 'sku_' + (++skuIdCounter);
+            const sku = {
+                id,
+                produk: data?.produk || '',
+                berat: data?.berat || 100,
+                hargaBeli: data?.hargaBeli || 50000,
+                ongkir: data?.ongkir || 150000,
+                bongkar: data?.bongkar || 0,
+                shrinkage: data?.shrinkage || 0,
+                storageType: data?.storageType || '0',
+                storageVal: data?.storageVal || 0,
+                toggleBongkar: data?.toggleBongkar || false,
+                toggleShrink: data?.toggleShrink || false,
+            };
+            skuList.push(sku);
+            renderSKUList();
+            recalculateAll();
+        }
+
+        function removeSKU(id) {
+            if (skuList.length <= 1) return showToast('Gagal', 'Minimal 1 SKU.', 'error');
+            skuList = skuList.filter(s => s.id !== id);
+            renderSKUList();
+            recalculateAll();
+        }
+
+        function renderSKUList() {
+            const container = $('skuList');
+            if (!container) return;
+            if (skuList.length === 0) addSKU();
+            let html = '';
+            skuList.forEach((sku, idx) => {
+                html += `
+            <div class="card p-4 relative" data-sku-id="${sku.id}">
+                <div class="absolute top-3 right-3 flex gap-1">
+                    ${skuList.length > 1 ? `<button onclick="removeSKU('${sku.id}')" class="text-rose-500 hover:text-rose-700 p-1" title="Hapus SKU"><i class="ph ph-x-circle text-lg"></i></button>` : ''}
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div><label class="text-xs font-semibold opacity-50 uppercase">Nama SKU</label><input type="text" value="${sku.produk}" data-sku-id="${sku.id}" data-field="produk" class="sku-input w-full px-3 py-2.5 rounded-lg text-sm mt-1"></div>
+                    <div><label class="text-xs font-semibold opacity-50 uppercase">Berat (Kg)</label><input type="number" value="${sku.berat}" data-sku-id="${sku.id}" data-field="berat" class="sku-input w-full px-3 py-2.5 rounded-lg text-sm mt-1"></div>
+                    <div><label class="text-xs font-semibold opacity-50 uppercase">Harga Beli/Kg</label><input type="number" value="${sku.hargaBeli}" data-sku-id="${sku.id}" data-field="hargaBeli" class="sku-input w-full px-3 py-2.5 rounded-lg text-sm mt-1"></div>
+                    <div><label class="text-xs font-semibold opacity-50 uppercase">Ongkir Total</label><input type="number" value="${sku.ongkir}" data-sku-id="${sku.id}" data-field="ongkir" class="sku-input w-full px-3 py-2.5 rounded-lg text-sm mt-1"></div>
+                    <div>
+                        <label class="text-xs font-semibold opacity-50 uppercase flex items-center gap-2">Bongkar <input type="checkbox" ${sku.toggleBongkar?'checked':''} data-sku-id="${sku.id}" data-field="toggleBongkar" class="sku-toggle w-4 h-4"></label>
+                        <input type="number" value="${sku.bongkar}" data-sku-id="${sku.id}" data-field="bongkar" class="sku-input w-full px-3 py-2.5 rounded-lg text-sm mt-1 ${sku.toggleBongkar?'':'hidden'}" placeholder="Rp">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold opacity-50 uppercase flex items-center gap-2">Shrinkage <input type="checkbox" ${sku.toggleShrink?'checked':''} data-sku-id="${sku.id}" data-field="toggleShrink" class="sku-toggle w-4 h-4"></label>
+                        <input type="number" value="${sku.shrinkage}" data-sku-id="${sku.id}" data-field="shrinkage" class="sku-input w-full px-3 py-2.5 rounded-lg text-sm mt-1 ${sku.toggleShrink?'':'hidden'}" placeholder="%">
+                    </div>
+                </div>
+                <div class="mt-2 text-xs opacity-50" id="sku-hpp-${sku.id}">HPP: Rp 0/Kg</div>
+            </div>`;
+            });
+            container.innerHTML = html;
+            // Bind events
+            document.querySelectorAll('.sku-input').forEach(inp => {
+                inp.addEventListener('input', function() {
+                    const id = this.dataset.skuId;
+                    const field = this.dataset.field;
+                    const sku = skuList.find(s => s.id === id);
+                    if (sku) {
+                        sku[field] = field === 'produk' ? this.value : (parseFloat(this.value) || 0);
+                        recalculateAll();
+                    }
+                });
+            });
+            document.querySelectorAll('.sku-toggle').forEach(tog => {
+                tog.addEventListener('change', function() {
+                    const id = this.dataset.skuId;
+                    const field = this.dataset.field;
+                    const sku = skuList.find(s => s.id === id);
+                    if (sku) {
+                        sku[field] = this.checked;
+                        renderSKUList();
+                        recalculateAll();
+                    }
+                });
+            });
+        }
+
+        function calculateSKUHPP(sku) {
+            const beratAwal = sku.berat || 1;
+            const hargaBeli = sku.hargaBeli || 0;
+            const ongkir = sku.ongkir || 0;
+            const bongkar = sku.toggleBongkar ? (sku.bongkar || 0) : 0;
+            const shrinkRate = sku.toggleShrink ? (sku.shrinkage || 0) : 0;
+            const beratBersih = beratAwal - (beratAwal * (shrinkRate / 100));
+            const totalModal = (hargaBeli * beratAwal) + ongkir + bongkar;
+            const hppKg = beratBersih > 0 ? totalModal / beratBersih : 0;
+            return { beratBersih, totalModal, hppKg };
+        }
+
+        // --- MAIN RECALCULATION ---
+        let currentState = {};
+
+        function recalculateAll() {
+            // Settings
+            const setGrosir = parseFloat($('set_grosir')?.value) || 10;
+            const setPartai = parseFloat($('set_partai')?.value) || 500;
+            const ppnRate = parseFloat($('set_ppn')?.value) || 12;
+            const pph25Rate = parseFloat($('set_pph25')?.value) || 2;
+            const pph21Rate = parseFloat($('set_pph21')?.value) || 5;
+            const ptShare = parseFloat($('set_pt_share')?.value) || 60;
+            const invTotalShare = investors.reduce((sum, i) => sum + (i.share || 0), 0);
+
+            // Supply - gabungan semua SKU
+            let totalBeratBersih = 0;
+            let totalModalGabungan = 0;
+            skuList.forEach(sku => {
+                const { beratBersih, totalModal } = calculateSKUHPP(sku);
+                totalBeratBersih += beratBersih;
+                totalModalGabungan += totalModal;
+                const hppEl = document.getElementById('sku-hpp-' + sku.id);
+                if (hppEl) hppEl.innerText =
+                    `HPP: ${rp(beratBersih>0?totalModal/beratBersih:0)}/Kg | Bersih: ${beratBersih.toFixed(1)} Kg`;
+            });
+            const hppAvgKg = totalBeratBersih > 0 ? totalModalGabungan / totalBeratBersih : 0;
+            if ($('res_hpp_avg')) $('res_hpp_avg').innerText = rp(hppAvgKg);
+            if ($('supply_total_info')) $('supply_total_info').innerText =
+                `${skuList.length} SKU | ${totalBeratBersih.toFixed(1)} Kg bersih`;
+            if ($('sum_hpp_kg')) $('sum_hpp_kg').innerText = rp(hppAvgKg);
+
+            // Pricing
+            const qty = parseFloat($('trx_qty')?.value) || 1;
+            const targetMarginKg = parseFloat($('trx_margin_kg')?.value) || 0;
+            const channel = document.querySelector('input[name="channel"]:checked')?.value || 'offline';
+            const diskonPct = parseFloat($('trx_diskon')?.value) || 0;
+            let biayaSaluranPerKg = 0;
+            let adminPercent = 0;
+
+            if (channel === 'offline') {
+                let tier = 'Ecer';
+                if (qty >= setPartai) tier = 'Partai Besar';
+                else if (qty >= setGrosir) tier = 'Grosir';
+                if ($('disp_tier')) $('disp_tier').innerText = tier;
+                if ($('trx_kurir_toggle')?.checked) {
+                    const totalKurir = parseFloat($('trx_kurir_val')?.value) || 0;
+                    biayaSaluranPerKg = qty > 0 ? totalKurir / qty : 0;
+                }
+            } else {
+                const mpSelect = $('trx_mp_admin')?.value || '0';
+                adminPercent = mpSelect === 'custom' ? (parseFloat($('trx_mp_custom')?.value) || 0) : parseFloat(
+                    mpSelect);
+                if ($('trx_ads_toggle')?.checked) {
+                    const adsType = $('trx_ads_type')?.value || 'percent';
+                    const adsVal = parseFloat($('trx_ads_val')?.value) || 0;
+                    if (adsType === 'unit') biayaSaluranPerKg += qty > 0 ? (adsVal / qty) : 0;
+                    else adminPercent += adsVal;
+                }
+            }
+            const adminDecimal = adminPercent / 100;
+            let dppPerKg = 0;
+            if (adminDecimal < 1) dppPerKg = (hppAvgKg + biayaSaluranPerKg + targetMarginKg) / (1 - adminDecimal);
+            const biayaAdminKg = dppPerKg * adminDecimal;
+            const totalBiayaSaluranKg = biayaSaluranPerKg + biayaAdminKg;
+            const dppPerKgAfterDiskon = dppPerKg * (1 - diskonPct / 100);
+
+            if ($('sum_cost_kg')) $('sum_cost_kg').innerText = rp(totalBiayaSaluranKg);
+            if ($('sum_margin_kg')) $('sum_margin_kg').innerText = rp(targetMarginKg);
+            if ($('sum_dpp_kg')) $('sum_dpp_kg').innerText = rp(dppPerKgAfterDiskon);
+
+            // Finance
+            const dppTotal = dppPerKgAfterDiskon * qty;
+            const ppnAmount = dppTotal * (ppnRate / 100);
+            const totalInvoice = dppTotal + ppnAmount;
+            const totalHppDanBiaya = (hppAvgKg + totalBiayaSaluranKg) * qty;
+            const profitKotor = dppTotal - totalHppDanBiaya;
+            const pph25Amount = profitKotor > 0 ? profitKotor * (pph25Rate / 100) : 0;
+            const profitBersih = profitKotor - pph25Amount;
+            const ptTakeHome = profitBersih > 0 ? profitBersih * (ptShare / 100) : 0;
+            const sisaProfit = profitBersih - ptTakeHome;
+
+            if ($('fin_dpp_total')) $('fin_dpp_total').innerText = rp(dppTotal);
+            if ($('fin_qty_info')) $('fin_qty_info').innerText = `(${qty} Kg)`;
+            if ($('fin_ppn')) $('fin_ppn').innerText = rp(ppnAmount);
+            if ($('fin_invoice')) $('fin_invoice').innerText = rp(totalInvoice);
+            if ($('lbl_ppn')) $('lbl_ppn').innerText = ppnRate;
+            if ($('lbl_pph25')) $('lbl_pph25').innerText = pph25Rate;
+            if ($('lbl_pph21')) $('lbl_pph21').innerText = pph21Rate;
+            if ($('lbl_pt')) $('lbl_pt').innerText = ptShare;
+            if ($('wf_dpp')) $('wf_dpp').innerText = rp(dppTotal);
+            if ($('wf_modal')) $('wf_modal').innerText = `- ${rp(totalHppDanBiaya)}`;
+            if ($('wf_gross')) $('wf_gross').innerText = rp(profitKotor);
+            if ($('wf_pph25')) $('wf_pph25').innerText = `- ${rp(pph25Amount)}`;
+            if ($('wf_net')) $('wf_net').innerText = rp(profitBersih);
+            if ($('wf_pt')) $('wf_pt').innerText = rp(ptTakeHome);
+
+            // Investor distribution
+            const invContainer = $('investorDistContainer');
+            if (invContainer && investors.length > 0) {
+                let invHtml = '';
+                const totalInvShare = investors.reduce((s, i) => s + (i.share || 0), 0);
+                investors.forEach(inv => {
+                    const invGross = totalInvShare > 0 ? sisaProfit * ((inv.share || 0) / totalInvShare) : 0;
+                    const pph21Amt = invGross * (pph21Rate / 100);
+                    const invNet = invGross - pph21Amt;
+                    invHtml += `
+                <div class="p-3 rounded-xl border border-slate-700 mt-2">
+                    <div class="flex justify-between text-sm"><span class="text-slate-200">${inv.name} (${inv.share||0}%)</span><span class="text-slate-300">${rp(invGross)}</span></div>
+                    <div class="flex justify-between text-xs text-slate-400"><span>PPh 21 (${pph21Rate}%)</span><span class="text-rose-400">- ${rp(pph21Amt)}</span></div>
+                    <div class="pt-2 border-t border-slate-700 flex justify-between"><span class="text-[10px] text-emerald-400 uppercase font-bold">Transfer Bersih</span><span class="font-bold text-emerald-400">${rp(invNet)}</span></div>
+                </div>`;
+                });
+                invContainer.innerHTML = invHtml;
+            }
+
+            // Save state
+            currentState = {
+                klien: $('trx_klien')?.value || 'Pelanggan Umum',
+                produk: skuList.map(s => s.produk).filter(Boolean).join(', ') || 'Produk Frozen',
+                qty,
+                dppTotal,
+                ppnAmount,
+                totalInvoice,
+                profitBersih,
+                hppAvgKg,
+                diskonPct,
+                channel,
+                tanggal: new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }),
+                skuList: JSON.parse(JSON.stringify(skuList)),
+                investors: JSON.parse(JSON.stringify(investors)),
+                ppnRate,
+                pph25Rate,
+                pph21Rate,
+                ptShare,
+            };
+            updateDashboardMini();
+        }
+
+        function updateDashboardMini() {
+            if ($('dash_total_rev')) $('dash_total_rev').innerText = rp(currentState.dppTotal || 0);
+            if ($('dash_net_profit')) $('dash_net_profit').innerText = rp(currentState.profitBersih || 0);
+        }
+
+        // --- EVENT BINDING ---
+        document.querySelectorAll('.input-trigger').forEach(el => el.addEventListener('input', recalculateAll));
+        document.querySelectorAll('.input-trigger').forEach(el => el.addEventListener('change', recalculateAll));
+
+        // --- SAVE TRANSACTION ---
+        function saveTransaction() {
+            if (!currentState.totalInvoice || currentState.totalInvoice <= 0) return showToast('Gagal',
+                'Hitung transaksi dulu.', 'error');
+            const record = { ...currentState, id: Date.now(), timestamp: new Date().toISOString() };
+            transactionHistory.unshift(record);
+            if (transactionHistory.length > 100) transactionHistory = transactionHistory.slice(0, 100);
+            localStorage.setItem('cfs_history', JSON.stringify(transactionHistory));
+            showToast('Tersimpan!', 'Transaksi disimpan ke riwayat.', 'success');
+            updateDashboard();
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const tbody = $('historyTableBody');
+            if (!tbody) return;
+            if (transactionHistory.length === 0) {
+                tbody.innerHTML =
+                    '<tr><td colspan="7" class="text-center p-6 opacity-40">Belum ada riwayat transaksi.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = transactionHistory.map((t, i) => `
+            <tr class="border-b hover:bg-opacity-50 transition" style="border-color:var(--border);background:${i%2===0?'var(--hover-row)':'transparent'};">
+                <td class="p-3 text-xs">${new Date(t.timestamp).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}</td>
+                <td class="p-3 font-medium">${t.klien}</td>
+                <td class="p-3 text-xs">${t.produk}</td>
+                <td class="p-3 text-right">${t.qty} Kg</td>
+                <td class="p-3 text-right font-semibold">${rp(t.totalInvoice)}</td>
+                <td class="p-3 text-right text-emerald-600 font-semibold">${rp(t.profitBersih||0)}</td>
+                <td class="p-3 text-center"><button onclick="loadTransaction(${t.id})" class="text-blue-600 hover:text-blue-800 text-xs font-semibold">Muat</button> <button onclick="deleteTransaction(${t.id})" class="text-rose-500 hover:text-rose-700 text-xs font-semibold ml-2">Hapus</button></td>
+            </tr>`).join('');
+        }
+
+        function loadTransaction(id) {
+            const trx = transactionHistory.find(t => t.id === id);
+            if (!trx) return;
+            if (trx.skuList) { skuList = trx.skuList;
+                renderSKUList(); }
+            if (trx.investors) { investors = trx.investors;
+                renderInvestors(); }
+            if ($('trx_klien')) $('trx_klien').value = trx.klien || '';
+            if ($('trx_qty')) $('trx_qty').value = trx.qty || 1;
+            if ($('set_ppn')) $('set_ppn').value = trx.ppnRate || 12;
+            if ($('set_pph25')) $('set_pph25').value = trx.pph25Rate || 2;
+            if ($('set_pph21')) $('set_pph21').value = trx.pph21Rate || 5;
+            if ($('set_pt_share')) $('set_pt_share').value = trx.ptShare || 60;
+            if ($('trx_diskon')) $('trx_diskon').value = trx.diskonPct || 0;
+            recalculateAll();
+            switchTab('tab-finance');
+            showToast('Dimuat', 'Data transaksi berhasil dimuat.', 'success');
+        }
+
+        function deleteTransaction(id) {
+            transactionHistory = transactionHistory.filter(t => t.id !== id);
+            localStorage.setItem('cfs_history', JSON.stringify(transactionHistory));
+            renderHistory();
+            updateDashboard();
+            showToast('Dihapus', 'Transaksi dihapus dari riwayat.', 'success');
+        }
+
+        function clearHistory() {
+            if (confirm('Hapus semua riwayat transaksi?')) {
+                transactionHistory = [];
+                localStorage.setItem('cfs_history', '[]');
+                renderHistory();
+                updateDashboard();
+                showToast('Dihapus', 'Semua riwayat dibersihkan.', 'success');
+            }
+        }
+
+        // --- DASHBOARD ---
+        function updateDashboard() {
+            if ($('dash_total_trx')) $('dash_total_trx').innerText = transactionHistory.length;
+            const totalRev = transactionHistory.reduce((s, t) => s + (t.dppTotal || 0), 0);
+            const totalProfit = transactionHistory.reduce((s, t) => s + (t.profitBersih || 0), 0);
+            if ($('dash_total_rev')) $('dash_total_rev').innerText = rp(totalRev);
+            if ($('dash_net_profit')) $('dash_net_profit').innerText = rp(totalProfit);
+            const avgMargin = totalRev > 0 ? ((totalProfit / totalRev) * 100) : 0;
+            if ($('dash_avg_margin')) $('dash_avg_margin').innerText = avgMargin.toFixed(1) + '%';
+            renderCharts();
+        }
+
+        function renderCharts() {
+            const labels = transactionHistory.slice(0, 12).reverse().map(t => new Date(t.timestamp).toLocaleDateString(
+                'id-ID', { day: 'numeric', month: 'short' }));
+            const revData = transactionHistory.slice(0, 12).reverse().map(t => t.dppTotal || 0);
+            const profitData = transactionHistory.slice(0, 12).reverse().map(t => t.profitBersih || 0);
+            const isDark = document.documentElement.classList.contains('dark');
+            const gridColor = isDark ? '#334155' : '#e2e8f0';
+            const textColor = isDark ? '#94a3b8' : '#64748b';
+
+            const ctx1 = document.getElementById('chartRevenue')?.getContext('2d');
+            if (ctx1) {
+                if (chartRevenueInstance) chartRevenueInstance.destroy();
+                chartRevenueInstance = new Chart(ctx1, {
+                    type: 'bar',
+                    data: { labels, datasets: [{ label: 'Revenue (DPP)', data: revData,
+                            backgroundColor: '#3b82f6', borderRadius: 8 }] },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { labels: { color: textColor } } },
+                        scales: { x: { ticks: { color: textColor },
+                                grid: { color: gridColor } }, y: { ticks: { color: textColor,
+                                    callback: v => rp(v) },
+                                grid: { color: gridColor } } }
+                    }
+                });
+            }
+            const ctx2 = document.getElementById('chartProfit')?.getContext('2d');
+            if (ctx2) {
+                if (chartProfitInstance) chartProfitInstance.destroy();
+                chartProfitInstance = new Chart(ctx2, {
+                    type: 'line',
+                    data: { labels, datasets: [{ label: 'Net Profit', data: profitData, borderColor: '#10b981',
+                            backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.4,
+                            pointRadius: 5 }] },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { labels: { color: textColor } } },
+                        scales: { x: { ticks: { color: textColor },
+                                grid: { color: gridColor } }, y: { ticks: { color: textColor,
+                                    callback: v => rp(v) },
+                                grid: { color: gridColor } } }
+                    }
+                });
+            }
+        }
+
+        function updateChartColors() { renderCharts(); }
+
+        // --- PDF EXPORT ---
+        function generateKwitansiPDF() {
+            if (!currentState.totalInvoice || currentState.totalInvoice <= 0) return showToast('Gagal',
+                'Tidak ada data invoice.', 'error');
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const invNo = 'INV-CFS-' + Math.floor(Math.random() * 999999);
+            doc.setFillColor(37, 99, 235);
+            doc.rect(0, 0, 210, 45, 'F');
+            doc.setFontSize(26);
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.text('INVOICE', 20, 25);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Cibitung Frozen Seafood', 145, 20);
+            doc.text('Jl. Industri No.1, Jawa Barat', 145, 26);
+            doc.setTextColor(50, 50, 50);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Kepada:', 20, 60);
+            doc.setFont('helvetica', 'normal');
+            doc.text(currentState.klien, 20, 67);
+            doc.setFont('helvetica', 'bold');
+            doc.text('No. Invoice:', 145, 60);
+            doc.text('Tanggal:', 145, 67);
+            doc.setFont('helvetica', 'normal');
+            doc.text(invNo, 175, 60);
+            doc.text(currentState.tanggal, 175, 67);
+            doc.setFillColor(248, 250, 252);
+            doc.rect(20, 80, 170, 12, 'F');
+            doc.rect(20, 80, 170, 12, 'S');
+            doc.setFont('helvetica', 'bold');
+            doc.text('Deskripsi', 25, 88);
+            doc.text('Qty (Kg)', 115, 88);
+            doc.text('Subtotal', 160, 88);
+            doc.rect(20, 92, 170, 15, 'S');
+            doc.setFont('helvetica', 'normal');
+            doc.text(currentState.produk.substring(0, 40), 25, 102);
+            doc.text(currentState.qty.toString(), 120, 102);
+            doc.text(rp(currentState.dppTotal), 160, 102);
+            doc.line(110, 120, 190, 120);
+            doc.text('Total DPP:', 110, 128);
+            doc.text(rp(currentState.dppTotal), 160, 128);
+            doc.setTextColor(225, 29, 72);
+            doc.text(`PPN (${currentState.ppnRate||12}%):`, 110, 136);
+            doc.text(rp(currentState.ppnAmount), 160, 136);
+            doc.setFillColor(37, 99, 235);
+            doc.rect(108, 142, 82, 12, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.text('TOTAL TAGIHAN:', 110, 150);
+            doc.text(rp(currentState.totalInvoice), 160, 150);
+            doc.setTextColor(100, 100, 100);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Jatuh tempo: ${currentState.klien?currentState.klien:'Klien'} - ${$('set_top')?.value||7} hari.`,
+                20, 180);
+            doc.save(`Invoice_${(currentState.klien||'Klien').replace(/\s+/g,'_')}_${invNo}.pdf`);
+            showToast('Berhasil', 'PDF Invoice telah diunduh.', 'success');
+        }
+
+        // --- INIT ---
+        function init() {
+            if (skuList.length === 0) addSKU();
+            renderSKUList();
+            recalculateAll();
+            updateDashboard();
+            renderHistory();
+            // Auto-save state every 30 seconds
+            setInterval(() => {
+                if (currentState.totalInvoice > 0) {
+                    localStorage.setItem('cfs_current_state', JSON.stringify(currentState));
+                }
+            }, 30000);
+            // Restore state
+            const saved = localStorage.getItem('cfs_current_state');
+            if (saved) {
+                try {
+                    const st = JSON.parse(saved);
+                    if (st.skuList) { skuList = st.skuList;
+                        renderSKUList(); }
+                    if (st.investors) { investors = st.investors;
+                        renderInvestors(); }
+                    if ($('trx_klien')) $('trx_klien').value = st.klien || '';
+                    if ($('trx_qty')) $('trx_qty').value = st.qty || 1;
+                    recalculateAll();
+                } catch (e) {}
+            }
+        }
+        init();
+    </script>
+</body>
+</html>
