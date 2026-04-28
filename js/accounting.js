@@ -75,4 +75,42 @@ CFS.Accounting = {
         const labaBersih = labaKotor - beban - pajak;
         return { pendapatan, hpp, beban, pajak, labaKotor, labaBersih };
     }
+    // js/accounting.js - tambahkan setelah fungsi getProfitLoss
+
+    // Mencatat beban operasional (listrik, sewa, dll.)
+    async recordExpense(akun, jumlah, deskripsi) {
+        const entry = {
+            id: Date.now(),
+            tanggal: new Date().toISOString(),
+            deskripsi: deskripsi || `Beban ${akun}`,
+            entries: [
+                { akun: akun, debet: jumlah, kredit: 0 },
+                { akun: 'Kas', debet: 0, kredit: jumlah }
+            ]
+        };
+        await this.addJournalEntry(entry);
+    },
+
+    // Ekspor semua jurnal ke format array untuk SheetJS
+    async exportToExcel(startDate, endDate) {
+        const journals = await this.getJournals();
+        const filtered = journals.filter(j => {
+            const d = new Date(j.tanggal);
+            return d >= startDate && d <= endDate;
+        });
+        // Flatten entries
+        const rows = [];
+        filtered.forEach(j => {
+            j.entries.forEach(e => {
+                rows.push({
+                    Tanggal: new Date(j.tanggal).toLocaleDateString('id-ID'),
+                    Deskripsi: j.deskripsi,
+                    Akun: e.akun,
+                    Debet: e.debet,
+                    Kredit: e.kredit
+                });
+            });
+        });
+        return rows;
+    }
 };
