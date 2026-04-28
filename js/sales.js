@@ -80,4 +80,62 @@ CFS.Sales = {
         transactions.unshift(trx);
         await CFS.Storage.set(CFS.Storage.TRANSACTIONS_KEY, transactions);
     }
+    // js/sales.js - tambahkan setelah fungsi processSale
+
+    // Preview harga tanpa memotong stok (untuk ditampilkan di form)
+    async previewPricing(productName, qty, tier, manualHarga = null) {
+        if (!productName || qty <= 0) return null;
+        const settings = await CFS.Settings.get();
+        const summary = await CFS.Inventory.getStockSummary();
+        const available = summary[productName] || 0;
+        if (qty > available) {
+            return { error: `Stok tidak cukup! Tersedia ${available.toFixed(1)} kg.` };
+        }
+        // Ambil batch kandidat untuk menghitung HPP rata-rata
+        const batches = await CFS.Inventory.getBatches();
+        const now = new Date();
+        const candidates = batches
+            .filter(b => b.produk === productName && b.berat_sisa > 0 && new Date(b.tgl_kadaluarsa) > now)
+            .sort((a,b) => new Date(a.tgl_kadaluarsa) - new Date(b.tgl_kadaluarsa));
+        let remaining = qty;
+        let totalHPP = 0;
+        for (let b of candidates) {
+            if (remaining <= 0) break;
+            const take = Math.min(b.berat_sisa, remaining);
+            totalHPP += take * b.hpp_per_kg;
+            remaining -= take;
+        }
+        const hppAvg = totalHPP / qty;
+        const hargaEcer = hppAvg + settings.marginDefault;
+        let hargaJual;
+        if (tier === 'grosir') {
+            hargaJual = hargaEcer - settings.selisihGrosir;
+            if (hargaJual < hppAvg) hargaJual = hppAvg;
+        } else if (tier === 'partai') {
+            hargaJual = manualHarga || hargaEcer;
+        } else {
+            hargaJual = hargaEcer;
+        }
+        if (manualHarga && tier !== 'partai') hargaJual = manualHarga;
+        const dppTotal = hargaJual * qty;
+        const ppn = dppTotal * (settings.ppn / 100);
+        return {
+            hargaJual,
+            dppTotal,
+            ppn,
+            totalInvoice: dppTotal + ppn,
+            hppAvg,
+            available
+        };
+    },
+
+    // Mendapatkan semua transaksi (dengan filter opsional)
+    async getFilteredTransactions(filters = {}) {
+        let trx = await CFS.Storage.get(CFS.Storage.TRANSACTIONS_KEY) || [];
+        if (filters.produk) trx = trx.filter(t => t.produk === filters.produk);
+        if (filters.klien) trx = trx.filter(t => t.klien.toLowerCase().includes(filters.klien.toLowerCase()));
+        if (filters.startDate) trx = trx.filter(t => new Date(t.tanggal) >= new Date(filters.startDate));
+        if (filters.endDate) trx = trx.filter(t => new Date(t.tanggal) <= new Date(filters.endDate));
+        return trx;
+    }
 };
