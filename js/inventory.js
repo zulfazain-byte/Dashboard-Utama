@@ -15,6 +15,25 @@ CFS.Inventory = {
         await CFS.Storage.set(CFS.Storage.STOCK_KEY, batches);
     },
 
+    // Hitung biaya penyimpanan untuk sejumlah qty dari batch tertentu
+async getStorageCostForBatch(batch, qty, settings) {
+    if (!settings || settings.storageMethod === 'none') return 0;
+    const now = new Date();
+    const masuk = new Date(batch.created_at);
+    const hariDisimpan = Math.ceil((now - masuk) / (1000 * 3600 * 24));
+    if (settings.storageMethod === 'per_kg_day') {
+        return qty * hariDisimpan * (settings.storagePerKgPerDay || 0);
+    } else if (settings.storageMethod === 'flat_monthly') {
+        // Hitung total stok saat ini untuk alokasi flat
+        const summary = await this.getStockSummary();
+        const totalStok = Object.values(summary).reduce((a,b) => a + b, 0);
+        if (totalStok > 0 && settings.storageFlatMonthly) {
+            const biayaPerKg = settings.storageFlatMonthly / totalStok;
+            return qty * biayaPerKg;
+        }
+    }
+    return 0;
+    }
     async addBatch(batchData) {
         const batches = await this.getBatches();
         const totalModal = (batchData.hargaBeli * batchData.berat) + (batchData.ongkir || 0);
