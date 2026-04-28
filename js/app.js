@@ -13,6 +13,12 @@ CFS.App = {
         this.loadSettingsToForm();
         CFS.Dashboard.refreshAll();
         CFS.Inventory.renderStockTable(); // fungsi render akan kita tambahkan di inventory.js nanti
+        // Di dalam CFS.App.init(), setelah this.setupForms() tambahkan:
+        this.setupDashboardToggles();
+        this.setupExpenseForm();
+        this.setupTransactionFilter();
+        CFS.Dashboard.applyWidgetVisibility();
+        CFS.Dashboard.renderRevenueChart();
     },
 
     setupTabs() {
