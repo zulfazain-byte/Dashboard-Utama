@@ -175,6 +175,78 @@ CFS.App.restorePrompt = () => {
     };
     input.click();
 };
+// js/app.js - tambahkan di dalam CFS.App setelah function restorePrompt
+
+    setupDashboardToggles() {
+        document.querySelectorAll('.widget-toggle').forEach(checkbox => {
+            checkbox.addEventListener('change', async (e) => {
+                const key = e.target.dataset.widget;
+                await CFS.Dashboard.setWidgetVisibility(key, e.target.checked);
+                CFS.Dashboard.applyWidgetVisibility();
+                if (key === 'revenueChart' && e.target.checked) {
+                    CFS.Dashboard.renderRevenueChart();
+                }
+            });
+        });
+    },
+
+    // Tombol ekspor Excel
+    async exportFinanceExcel() {
+        const today = new Date();
+        const start = new Date(today.getFullYear(), today.getMonth(), 1);
+        const rows = await CFS.Accounting.exportToExcel(start, today);
+        if (rows.length === 0) return alert('Tidak ada data jurnal di bulan ini.');
+        const ws = XLSX.utils.json_to_sheet(rows);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Jurnal');
+        XLSX.writeFile(wb, `jurnal_${start.toISOString().slice(0,7)}.xlsx`);
+    },
+
+    // Form beban operasional
+    setupExpenseForm() {
+        document.getElementById('expenseForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const akun = document.getElementById('expenseAkun').value;
+            const jumlah = parseFloat(document.getElementById('expenseJumlah').value);
+            const deskripsi = document.getElementById('expenseDeskripsi').value;
+            await CFS.Accounting.recordExpense(akun, jumlah, deskripsi);
+            alert('Beban tercatat.');
+            e.target.reset();
+            CFS.Dashboard.refreshAll();
+        });
+    },
+
+    // Filter riwayat transaksi
+    setupTransactionFilter() {
+        document.getElementById('filterTransaksi')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const produk = document.getElementById('filterProduk').value;
+            const klien = document.getElementById('filterKlien').value;
+            const start = document.getElementById('filterStart').value;
+            const end = document.getElementById('filterEnd').value;
+            const trx = await CFS.Sales.getFilteredTransactions({ produk, klien, startDate: start, endDate: end });
+            this.renderTransactionTable(trx);
+        });
+    },
+
+    async renderTransactionTable(transactions) {
+        const tbody = document.getElementById('historyTableBody');
+        if (!tbody) return;
+        if (transactions.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center">Tidak ada transaksi.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = transactions.map(t => `
+            <tr class="border-b">
+                <td class="p-2">${new Date(t.tanggal).toLocaleDateString('id-ID')}</td>
+                <td class="p-2">${t.klien}</td>
+                <td class="p-2">${t.produk}</td>
+                <td class="p-2 text-right">${t.qty} kg</td>
+                <td class="p-2 text-right">${CFS.Utils.formatRupiah(t.totalInvoice)}</td>
+                <td class="p-2 text-center"><span class="text-xs bg-slate-100 px-2 py-1 rounded">${t.tier}</span></td>
+            </tr>
+        `).join('');
+    }
 
 // Jalankan setelah semua siap
 window.addEventListener('DOMContentLoaded', () => {
