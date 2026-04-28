@@ -37,6 +37,41 @@ CFS.Inventory = {
         return batch;
     },
 
+    async addBatch(batchData) {
+    const batches = await this.getBatches();
+    // Hitung total biaya pembelian
+    let totalModal = (batchData.hargaBeli * batchData.berat) + (batchData.ongkir || 0) + (batchData.biayaBensin || 0);
+    // Tambahkan biaya bongkar jika toggle aktif
+    if (batchData.toggleBongkar && batchData.bongkarNominal) {
+        totalModal += batchData.bongkarNominal;
+    }
+    // Pajak pembelian
+    if (batchData.pajakPersen) {
+        totalModal += totalModal * (batchData.pajakPersen / 100);
+    } else if (batchData.pajakNominal) {
+        totalModal += batchData.pajakNominal;
+    }
+    const hppPerKg = totalModal / batchData.berat;
+    const batch = {
+        id: 'BATCH_' + Date.now(),
+        produk: batchData.produk,
+        berat_awal: batchData.berat,
+        berat_sisa: batchData.berat,
+        harga_beli: batchData.hargaBeli,
+        ongkir: batchData.ongkir || 0,
+        biaya_bensin: batchData.biayaBensin || 0,
+        bongkar: batchData.toggleBongkar ? (batchData.bongkarNominal || 0) : 0,
+        pajak: batchData.pajakPersen ? { type: 'persen', value: batchData.pajakPersen } : (batchData.pajakNominal ? { type: 'nominal', value: batchData.pajakNominal } : null),
+        tgl_produksi: batchData.tglProduksi,
+        tgl_kadaluarsa: batchData.tglKadaluarsa,
+        hpp_per_kg: hppPerKg,
+        status: 'aktif',
+        created_at: new Date().toISOString()
+    };
+    batches.push(batch);
+    await this.saveBatches(batches);
+    return batch;
+    }
     // Alokasi FEFO untuk penjualan
     async allocateStock(productName, qtyNeeded) {
         const batches = await this.getBatches();
