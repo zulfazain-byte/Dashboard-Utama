@@ -1,23 +1,14 @@
 // js/accounting.js
 CFS.Accounting = {
     CHART_OF_ACCOUNTS: [
-        'Kas',
-        'Piutang Dagang',
-        'Persediaan',
-        'PPN Keluaran',
-        'Hutang PPh',
-        'Modal Owner',
-        'Penjualan',
-        'HPP',
-        'Beban Operasional',
-        'PPh 25',
-        'PPh 21'
+        'Kas', 'Piutang Dagang', 'Persediaan', 'PPN Keluaran', 'Hutang PPh',
+        'Modal Owner', 'Penjualan', 'HPP', 'Beban Operasional', 'Beban Listrik',
+        'Beban Sewa', 'Beban Gaji', 'PPh 25', 'PPh 21'
     ],
 
     async getJournals() {
         let j = await CFS.Storage.get(CFS.Storage.JOURNALS_KEY);
-        if (!j) j = [];
-        return j;
+        return j || [];
     },
 
     async addJournalEntry(entry) {
@@ -26,7 +17,6 @@ CFS.Accounting = {
         await CFS.Storage.set(CFS.Storage.JOURNALS_KEY, journals);
     },
 
-    // Mencatat penjualan dengan double-entry
     async recordSale(klien, produk, qty, dpp, ppn, hpp) {
         const entry = {
             id: Date.now(),
@@ -43,7 +33,6 @@ CFS.Accounting = {
         await this.addJournalEntry(entry);
     },
 
-    // Mencatat pembelian stok (opsional, saat tambah batch)
     async recordPurchase(produk, totalBiaya, qty) {
         const entry = {
             id: Date.now(),
@@ -57,27 +46,6 @@ CFS.Accounting = {
         await this.addJournalEntry(entry);
     },
 
-    // Menghitung laba rugi sederhana dari jurnal
-    async getProfitLoss(startDate, endDate) {
-        const journals = await this.getJournals();
-        let pendapatan = 0, hpp = 0, beban = 0, pajak = 0;
-        journals.forEach(j => {
-            if (new Date(j.tanggal) >= startDate && new Date(j.tanggal) <= endDate) {
-                j.entries.forEach(e => {
-                    if (e.akun === 'Penjualan') pendapatan += e.kredit - e.debet;
-                    if (e.akun === 'HPP') hpp += e.debet - e.kredit;
-                    if (e.akun === 'Beban Operasional') beban += e.debet - e.kredit;
-                    if (e.akun === 'PPh 25' || e.akun === 'PPh 21') pajak += e.debet - e.kredit;
-                });
-            }
-        });
-        const labaKotor = pendapatan - hpp;
-        const labaBersih = labaKotor - beban - pajak;
-        return { pendapatan, hpp, beban, pajak, labaKotor, labaBersih };
-    }
-    // js/accounting.js - tambahkan setelah fungsi getProfitLoss
-
-    // Mencatat beban operasional (listrik, sewa, dll.)
     async recordExpense(akun, jumlah, deskripsi) {
         const entry = {
             id: Date.now(),
@@ -91,14 +59,50 @@ CFS.Accounting = {
         await this.addJournalEntry(entry);
     },
 
-    // Ekspor semua jurnal ke format array untuk SheetJS
+    async getProfitLoss(startDate, endDate) {
+        const journals = await this.getJournals();
+        let pendapatan = 0, hpp = 0, beban = 0, pajak = 0;
+        journals.forEach(j => {
+            const d = new Date(j.tanggal);
+            if (d >= startDate && d <= endDate) {
+                j.entries.forEach(e => {
+                    if (e.akun === 'Penjualan') pendapatan += e.kredit - e.debet;
+                    if (e.akun === 'HPP') hpp += e.debet - e.kredit;
+                    if (e.akun.includes('Beban')) beban += e.debet - e.kredit;
+                    if (e.akun === 'PPh 25' || e.akun === 'PPh 21') pajak += e.debet - e.kredit;
+                });
+            }
+        });
+        const labaKotor = pendapatan - hpp;
+        const labaBersih = labaKotor - beban - pajak;
+        return { pendapatan, hpp, beban, pajak, labaKotor, labaBersih };
+    },
+
+    async getNeraca() {
+        const journals = await this.getJournals();
+        const saldo = {};
+        journals.forEach(j => {
+            j.entries.forEach(e => {
+                if (!saldo[e.akun]) saldo[e.akun] = 0;
+                saldo[e.akun] += (e.debet || 0) - (e.kredit || 0);
+            });
+        });
+        const aset = ['Kas', 'Piutang Dagang', 'Persediaan'];
+        const kewajiban = ['PPN Keluaran', 'Hutang PPh'];
+        const ekuitas = ['Modal Owner', 'Penjualan', 'HPP', ...this.CHART_OF_ACCOUNTS.filter(a => a.startsWith('Beban')), 'PPh 25', 'PPh 21'];
+        let totalAset = 0, totalKewajiban = 0, totalEkuitas = 0;
+        aset.forEach(a => totalAset += saldo[a] || 0);
+        kewajiban.forEach(k => totalKewajiban += saldo[k] || 0);
+        ekuitas.forEach(e => totalEkuitas += saldo[e] || 0);
+        return { aset: totalAset, kewajiban: totalKewajiban, ekuitas: totalEkuitas, detail: saldo };
+    },
+
     async exportToExcel(startDate, endDate) {
         const journals = await this.getJournals();
         const filtered = journals.filter(j => {
             const d = new Date(j.tanggal);
             return d >= startDate && d <= endDate;
         });
-        // Flatten entries
         const rows = [];
         filtered.forEach(j => {
             j.entries.forEach(e => {
