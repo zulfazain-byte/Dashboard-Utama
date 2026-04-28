@@ -7,8 +7,15 @@ CFS.Settings = {
         ptShare: 60,
         minGrosir: 10,
         minPartai: 500,
-        selisihGrosir: 5000,  // ecer = grosir + selisih ini (grosir lebih murah)
-        marginDefault: 15000   // margin keuntungan per kg untuk ecer
+        selisihGrosir: 5000,   // ecer = grosir + selisih (grosir lebih murah)
+        marginDefault: 15000,
+        widgetVisibility: {
+            stockSummary: true,
+            expiringBatches: true,
+            revenueChart: true,
+            profitLoss: true,
+            quickActions: true
+        }
     },
 
     async get() {
