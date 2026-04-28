@@ -1,6 +1,4 @@
 // js/storage.js
-// Inisialisasi localForage dan fungsi-fungsi dasar CRUD
-
 localforage.config({
     name: 'CibitungFrozen',
     storeName: 'main'
@@ -21,7 +19,6 @@ CFS.Storage = {
     async clearAll() {
         return await localforage.clear();
     },
-    // Kunci utama
     STOCK_KEY: 'stock_batches',
     JOURNALS_KEY: 'journals',
     SETTINGS_KEY: 'settings',
