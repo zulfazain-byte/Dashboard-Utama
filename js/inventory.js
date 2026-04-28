@@ -95,4 +95,44 @@ CFS.Inventory = {
             return b.berat_sisa > 0 && (exp - now) / (1000 * 3600 * 24) <= daysThreshold;
         });
     }
+    // js/inventory.js - tambahkan setelah fungsi getExpiringBatches()
+
+    // Render tabel batch untuk suatu produk (panggil dari modal)
+    async renderBatchDetail(produk, containerId) {
+        const batches = await this.getBatches();
+        const filtered = batches.filter(b => b.produk === produk);
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        const now = new Date();
+        container.innerHTML = filtered.length === 0 
+            ? '<p class="text-slate-500">Tidak ada batch untuk produk ini.</p>'
+            : `<table class="w-full text-sm mt-2">
+                <thead><tr class="bg-slate-50">
+                    <th class="p-2 text-left">ID Batch</th>
+                    <th class="p-2 text-right">Berat Awal</th>
+                    <th class="p-2 text-right">Sisa</th>
+                    <th class="p-2 text-right">HPP/kg</th>
+                    <th class="p-2 text-center">Expired</th>
+                </tr></thead>
+                <tbody>
+                ${filtered.map(b => {
+                    const daysLeft = Math.ceil((new Date(b.tgl_kadaluarsa) - now) / (1000*3600*24));
+                    const rowClass = daysLeft <= 7 ? 'bg-red-50' : (daysLeft <= 30 ? 'bg-yellow-50' : '');
+                    return `<tr class="${rowClass} border-b">
+                        <td class="p-2">${b.id}</td>
+                        <td class="p-2 text-right">${b.berat_awal.toFixed(1)}</td>
+                        <td class="p-2 text-right font-semibold">${b.berat_sisa.toFixed(1)}</td>
+                        <td class="p-2 text-right">${CFS.Utils.formatRupiah(b.hpp_per_kg)}</td>
+                        <td class="p-2 text-center text-xs">${b.tgl_kadaluarsa} (${daysLeft} hari)</td>
+                    </tr>`;
+                }).join('')}
+                </tbody></table>`;
+    },
+
+    // Hapus batch tertentu (jika diperlukan)
+    async deleteBatch(batchId) {
+        let batches = await this.getBatches();
+        batches = batches.filter(b => b.id !== batchId);
+        await this.saveBatches(batches);
+    }
 };
