@@ -3,21 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cibitung Frozen - ERP v4.0 Ultimate</title>
+    <title>Cibitung Frozen — ERP Ultimate v5.0</title>
+    <meta name="description" content="Sistem ERP manajemen inventori, penjualan, dan akuntansi Cibitung Frozen.">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐟</text></svg>">
 
-    <!-- Tailwind CSS & Icons -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-    <!-- Libraries: DB, Chart, Excel -->
+    <!-- Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 
-    <!-- Custom Styles -->
+    <!-- Tailwind Configuration for Custom Theme -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        accent: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+
+    <!-- Custom CSS for Rich UI -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-
         :root {
             --bg: #f8fafc;
             --surface: #ffffff;
@@ -26,12 +68,12 @@
             --text-secondary: #475569;
             --accent: #2563eb;
             --accent-light: #eff6ff;
-            --danger: #e11d48;
-            --success: #059669;
+            --danger: #dc2626;
+            --success: #16a34a;
             --warning: #d97706;
-            --card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         .dark {
             --bg: #0f172a;
             --surface: #1e293b;
@@ -40,66 +82,118 @@
             --text-secondary: #94a3b8;
             --accent: #3b82f6;
             --accent-light: #1e3a5f;
-            --danger: #f43f5e;
-            --success: #10b981;
+            --danger: #ef4444;
+            --success: #22c55e;
             --warning: #f59e0b;
-            --card-shadow: 0 1px 3px rgba(0,0,0,0.4);
+            --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
         }
-
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg);
             color: var(--text);
-            transition: background-color 0.3s, color 0.3s;
-            margin: 0;
+            transition: background-color 0.3s ease, color 0.3s ease;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            line-height: 1.6;
+            letter-spacing: -0.01em;
         }
-
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        /* Container responsiveness */
+        .container-main {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        /* Tab transitions */
         .tab-content {
             display: none;
             opacity: 0;
-            transition: opacity 0.25s ease-in-out;
+            transform: translateY(4px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
         }
         .tab-content.active {
             display: block;
             opacity: 1;
+            transform: translateY(0);
         }
-
+        /* Card styling */
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 1rem;
             box-shadow: var(--card-shadow);
+            transition: var(--transition-base);
         }
-
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -4px rgba(0,0,0,0.05);
+        }
+        /* Input & Select */
         input, select, textarea {
             background: var(--surface);
             color: var(--text);
             border: 1px solid var(--border);
             border-radius: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            padding: 0.625rem 0.75rem;
+            transition: var(--transition-base);
             outline: none;
+            font-family: inherit;
+            font-size: 0.875rem;
         }
         input:focus, select:focus, textarea:focus {
             border-color: var(--accent);
             box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
         }
-
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            font-weight: 600;
+            border-radius: 0.75rem;
+            transition: var(--transition-base);
+            cursor: pointer;
+            border: none;
+            font-size: 0.875rem;
+            letter-spacing: -0.01em;
+        }
         .btn-primary {
             background-color: var(--accent);
             color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            transition: background-color 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
         .btn-primary:hover {
             background-color: #1d4ed8;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
-
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        .btn-secondary:hover {
+            background-color: var(--bg);
+        }
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        /* Toggle Switch */
         .toggle-checkbox {
             width: 1.25rem;
             height: 1.25rem;
@@ -111,185 +205,245 @@
             top: 0;
             left: 0;
             z-index: 10;
-            transition: all 0.25s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             appearance: none;
+            -webkit-appearance: none;
         }
         .toggle-checkbox:checked {
             left: 1.25rem;
             border-color: var(--accent);
+            background: white;
         }
         .toggle-label {
             display: block;
             width: 2.75rem;
-            height: 1.4rem;
+            height: 1.6rem;
             background: #cbd5e1;
             border-radius: 9999px;
             cursor: pointer;
             position: relative;
+            transition: background 0.3s;
         }
         .toggle-checkbox:checked + .toggle-label {
             background: var(--accent);
         }
-
-        .progress-bar {
+        /* Progress bar */
+        .progress {
             height: 0.5rem;
-            background: #e2e8f0;
+            background: var(--border);
             border-radius: 9999px;
             overflow: hidden;
         }
         .progress-fill {
             height: 100%;
             border-radius: 9999px;
-            transition: width 0.3s ease;
+            transition: width 0.4s ease;
         }
-
+        /* Toast Notification */
         .toast {
             position: fixed;
             bottom: 1.5rem;
             right: 1.5rem;
-            background: white;
+            background: var(--surface);
             border: 1px solid var(--border);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border-radius: 0.75rem;
-            padding: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 1rem;
+            padding: 1rem 1.25rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            transform: translateY(100%);
+            transform: translateY(120%);
             opacity: 0;
-            transition: transform 0.3s, opacity 0.3s;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
             z-index: 9999;
             pointer-events: none;
+            max-width: 380px;
         }
         .toast.show {
             transform: translateY(0);
             opacity: 1;
             pointer-events: auto;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        /* Modal Backdrop */
+        .modal-backdrop {
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        /* Shimmer animation */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .loading-skeleton {
+            background: linear-gradient(90deg, var(--border) 25%, transparent 50%, var(--border) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 0.5rem;
+        }
+        /* Fade in */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in {
-            animation: fadeIn 0.3s ease forwards;
+            animation: fadeInUp 0.35s ease forwards;
         }
-
-        /* Scrollbar */
+        /* Scrollbar custom */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+        /* Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.125rem 0.625rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+        /* Hover scale */
+        .hover-scale {
+            transition: transform 0.2s;
+        }
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
     </style>
 </head>
-<body>
+<body class="antialiased">
 
-<!-- Top Navigation Bar -->
-<nav class="sticky top-0 z-40 border-b shadow-sm" style="background: var(--surface); border-color: var(--border);">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+<!-- ========== NAVIGATION BAR ========== -->
+<nav class="sticky top-0 z-40 border-b shadow-sm backdrop-blur-md" style="background: var(--surface); border-color: var(--border);">
+    <div class="container-main flex items-center justify-between h-16">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+            <div class="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-600/20">
                 <i class="ph-fill ph-fish-simple text-2xl"></i>
             </div>
             <div>
-                <span class="font-extrabold text-xl tracking-tight" style="color: var(--text);">Cibitung<span class="text-blue-600">Frozen</span></span>
-                <p class="text-[10px] uppercase font-bold tracking-widest opacity-50 -mt-1" style="color: var(--text-secondary);">ERP Ultimate v4.0</p>
+                <span class="font-extrabold text-xl tracking-tight" style="color: var(--text);">Cibitung<span class="text-primary-600">Frozen</span></span>
+                <p class="text-[10px] uppercase font-bold tracking-widest opacity-50 -mt-1" style="color: var(--text-secondary);">ERP Ultimate v5.0</p>
             </div>
         </div>
         <div class="flex items-center gap-2 sm:gap-3">
-            <button onclick="CFS.App.backupData()" class="text-sm font-medium opacity-70 hover:opacity-100 transition flex items-center gap-1 px-3 py-1.5 rounded-lg border" style="border-color: var(--border);"><i class="ph ph-download-simple"></i> Backup</button>
-            <button onclick="CFS.App.restorePrompt()" class="text-sm font-medium opacity-70 hover:opacity-100 transition flex items-center gap-1 px-3 py-1.5 rounded-lg border" style="border-color: var(--border);"><i class="ph ph-upload-simple"></i> Restore</button>
-            <button onclick="toggleDarkMode()" class="p-2 rounded-lg border" style="border-color: var(--border);" title="Toggle Dark Mode">
+            <button onclick="CFS.App.backupData()" class="btn btn-secondary text-sm py-2 px-3 hidden sm:flex"><i class="ph ph-download-simple"></i> Backup</button>
+            <button onclick="CFS.App.restorePrompt()" class="btn btn-secondary text-sm py-2 px-3 hidden sm:flex"><i class="ph ph-upload-simple"></i> Restore</button>
+            <button onclick="toggleDarkMode()" class="p-2 rounded-xl border" style="border-color: var(--border);" title="Ganti Tema">
                 <i class="ph ph-moon text-lg" id="darkIcon"></i>
             </button>
         </div>
     </div>
 </nav>
 
-<!-- Toast Notification -->
+<!-- Toast -->
 <div id="toast" class="toast">
-    <div id="toastIcon" class="w-8 h-8 rounded-full flex items-center justify-center"></div>
+    <div id="toastIcon" class="w-9 h-9 rounded-full flex items-center justify-center text-white"></div>
     <div>
         <h4 id="toastTitle" class="text-sm font-bold"></h4>
-        <p id="toastMsg" class="text-xs opacity-70"></p>
+        <p id="toastMsg" class="text-xs opacity-70 mt-0.5"></p>
     </div>
 </div>
 
-<!-- Main Layout -->
-<div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full flex-1 flex flex-col lg:flex-row gap-6">
+<!-- ========== MAIN LAYOUT ========== -->
+<div class="container-main py-6 flex-1 flex flex-col lg:flex-row gap-6">
 
-    <!-- Sidebar Navigation -->
+    <!-- ========== SIDEBAR ========== -->
     <aside class="lg:w-72 flex-shrink-0">
         <div class="card sticky top-24 overflow-hidden">
             <div class="p-5 border-b" style="border-color: var(--border);">
-                <h3 class="font-bold text-sm uppercase tracking-wider opacity-70">Modul</h3>
+                <h3 class="font-bold text-sm uppercase tracking-wider opacity-70" style="color: var(--text-secondary);">Modul</h3>
             </div>
-            <div class="p-2 space-y-1" id="tabs">
-                <button onclick="switchTab('tab-dashboard')" data-tab="tab-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition active bg-blue-50 text-blue-700 font-semibold"><i class="ph ph-chart-bar text-lg"></i> Dashboard</button>
-                <button onclick="switchTab('tab-stock')" data-tab="tab-stock" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-package text-lg"></i> Stok & Batch</button>
-                <button onclick="switchTab('tab-sales')" data-tab="tab-sales" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-shopping-cart text-lg"></i> Penjualan</button>
-                <button onclick="switchTab('tab-finance')" data-tab="tab-finance" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-wallet text-lg"></i> Keuangan & Akuntansi</button>
-                <button onclick="switchTab('tab-history')" data-tab="tab-history" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-clock-counter-clockwise text-lg"></i> Riwayat</button>
-                <button onclick="switchTab('tab-reports')" data-tab="tab-reports" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-file-text text-lg"></i> Laporan</button>
-                <button onclick="switchTab('tab-settings')" data-tab="tab-settings" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-gear text-lg"></i> Pengaturan</button>
-            </div>
+            <nav class="p-2 space-y-1" id="tabs">
+                <button onclick="switchTab('tab-dashboard')" data-tab="tab-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition active bg-primary-50 text-primary-700 font-semibold">
+                    <i class="ph ph-chart-bar text-lg"></i> Dashboard
+                </button>
+                <button onclick="switchTab('tab-stock')" data-tab="tab-stock" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-package text-lg"></i> Stok & Batch
+                </button>
+                <button onclick="switchTab('tab-sales')" data-tab="tab-sales" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-shopping-cart text-lg"></i> Penjualan
+                </button>
+                <button onclick="switchTab('tab-finance')" data-tab="tab-finance" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-wallet text-lg"></i> Keuangan
+                </button>
+                <button onclick="switchTab('tab-history')" data-tab="tab-history" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-clock-counter-clockwise text-lg"></i> Riwayat
+                </button>
+                <button onclick="switchTab('tab-reports')" data-tab="tab-reports" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-file-text text-lg"></i> Laporan
+                </button>
+                <button onclick="switchTab('tab-settings')" data-tab="tab-settings" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-gear text-lg"></i> Pengaturan
+                </button>
+            </nav>
         </div>
     </aside>
 
-    <!-- Main Content Area -->
+    <!-- ========== MAIN CONTENT ========== -->
     <main class="flex-1 min-w-0">
 
         <!-- ==================== TAB DASHBOARD ==================== -->
         <div id="tab-dashboard" class="tab-content active space-y-6">
-            <!-- Widget Toggle Bar -->
-            <div class="card p-4 flex flex-wrap items-center gap-4">
-                <h2 class="text-lg font-bold flex items-center gap-2"><i class="ph ph-chart-bar text-blue-600"></i> Dashboard</h2>
-                <div class="flex flex-wrap gap-2 text-sm ml-auto">
-                    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="stockSummary" checked> Stok</label>
-                    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="expiringBatches" checked> Expired</label>
-                    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="revenueChart" checked> Chart</label>
-                    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="profitLoss" checked> Laba</label>
-                    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="quickActions" checked> Aksi</label>
+            <!-- Header -->
+            <div class="card p-5 flex flex-wrap items-center gap-4">
+                <div>
+                    <h2 class="text-xl font-bold" style="color: var(--text);">Selamat Datang, Owner</h2>
+                    <p class="text-sm opacity-70">Ringkasan operasional hari ini.</p>
+                </div>
+                <div class="flex flex-wrap gap-2 ml-auto">
+                    <span class="badge bg-primary-100 text-primary-700"><i class="ph ph-calendar mr-1"></i> <span id="dashDate"></span></span>
                 </div>
             </div>
 
-            <!-- Widget: Ringkasan Stok -->
+            <!-- Widget Toggles -->
+            <div class="card p-4 flex flex-wrap items-center gap-3 text-sm">
+                <span class="font-medium opacity-60">Widget aktif:</span>
+                <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="stockSummary" checked> Stok</label>
+                <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="expiringBatches" checked> Expired</label>
+                <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="revenueChart" checked> Chart</label>
+                <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="profitLoss" checked> Laba</label>
+                <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="quickActions" checked> Cepat</label>
+            </div>
+
+            <!-- Widget 1: Stok Summary -->
             <div id="widget-stockSummary" class="card p-6 animate-fade-in">
-                <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-fish"></i> Stok Ikan Saat Ini</h3>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="dashboardSummaryCards">
-                    <!-- Diisi oleh JS -->
-                </div>
+                <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-fish text-primary-600"></i> Stok Ikan Saat Ini</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="dashboardSummaryCards"></div>
             </div>
 
-            <!-- Widget: Batch Hampir Kadaluarsa -->
+            <!-- Widget 2: Batch Expired -->
             <div id="widget-expiringBatches" class="card p-6 animate-fade-in">
-                <h3 class="font-semibold mb-3 flex items-center gap-2 text-red-600"><i class="ph ph-warning"></i> Batch Hampir Kadaluarsa (≤ 7 hari)</h3>
-                <div id="expiringBatches" class="space-y-2 text-sm">
-                    <!-- Diisi oleh JS -->
-                </div>
+                <h3 class="font-semibold mb-3 flex items-center gap-2 text-red-600"><i class="ph ph-warning"></i> Batch Hampir Kadaluarsa (≤7 hari)</h3>
+                <div id="expiringBatches" class="space-y-2 text-sm"></div>
             </div>
 
-            <!-- Widget: Chart Pendapatan -->
+            <!-- Widget 3: Revenue Chart -->
             <div id="widget-revenueChart" class="card p-6 animate-fade-in">
                 <h3 class="font-semibold mb-4">Pendapatan 7 Hari Terakhir</h3>
-                <canvas id="chartRevenue" height="200"></canvas>
+                <canvas id="chartRevenue" height="220"></canvas>
             </div>
 
-            <!-- Widget: Laba Rugi Bulan Ini -->
+            <!-- Widget 4: Laba Rugi -->
             <div id="widget-profitLoss" class="card p-6 animate-fade-in">
                 <h3 class="font-semibold mb-4">Laba Rugi Bulan Ini</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="financeSummary">
-                    <!-- Diisi oleh JS -->
-                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="financeSummary"></div>
             </div>
 
-            <!-- Widget: Quick Actions -->
+            <!-- Widget 5: Quick Actions -->
             <div id="widget-quickActions" class="card p-6 animate-fade-in">
                 <h3 class="font-semibold mb-4">Aksi Cepat</h3>
                 <div class="flex flex-wrap gap-3">
-                    <button onclick="switchTab('tab-stock')" class="btn-primary flex items-center gap-2"><i class="ph ph-plus-circle"></i> Tambah Stok</button>
-                    <button onclick="switchTab('tab-sales')" class="btn-primary flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700"><i class="ph ph-shopping-cart"></i> Catat Penjualan</button>
-                    <button onclick="switchTab('tab-finance')" class="btn-primary flex items-center gap-2 bg-slate-600 hover:bg-slate-700"><i class="ph ph-wallet"></i> Catat Beban</button>
-                    <button onclick="CFS.App.backupData()" class="btn-primary flex items-center gap-2 bg-amber-600 hover:bg-amber-700"><i class="ph ph-download-simple"></i> Backup Data</button>
+                    <button onclick="switchTab('tab-stock')" class="btn btn-primary"><i class="ph ph-plus-circle"></i> Tambah Stok</button>
+                    <button onclick="switchTab('tab-sales')" class="btn btn-success"><i class="ph ph-shopping-cart"></i> Catat Penjualan</button>
+                    <button onclick="switchTab('tab-finance')" class="btn btn-secondary"><i class="ph ph-wallet"></i> Catat Beban</button>
+                    <button onclick="CFS.App.backupData()" class="btn btn-secondary"><i class="ph ph-download-simple"></i> Backup</button>
                 </div>
             </div>
         </div>
@@ -297,55 +451,53 @@
         <!-- ==================== TAB STOK & BATCH ==================== -->
         <div id="tab-stock" class="tab-content space-y-6">
             <div class="card p-6">
-                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-package text-indigo-600"></i> Stok & Batch</h2>
-                <!-- Tabel Stok -->
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-package text-primary-600"></i> Manajemen Batch & Stok</h2>
+                <!-- Tabel ringkasan stok -->
                 <div class="overflow-x-auto mb-6">
                     <table class="w-full text-sm">
                         <thead class="bg-slate-50 dark:bg-slate-800">
-                            <tr>
-                                <th class="p-3 text-left">Produk</th>
-                                <th class="p-3 text-right">Total Stok (kg)</th>
-                                <th class="p-3 text-right">Batch Aktif</th>
-                                <th class="p-3 text-center">Aksi</th>
-                            </tr>
+                            <tr><th class="p-3 text-left">Produk</th><th class="p-3 text-right">Total Stok (kg)</th><th class="p-3 text-right">Batch Aktif</th><th class="p-3 text-center">Aksi</th></tr>
                         </thead>
-                        <tbody id="stockTableBody">
-                            <!-- Diisi oleh JS -->
-                        </tbody>
+                        <tbody id="stockTableBody"></tbody>
                     </table>
                 </div>
 
-                <!-- Form Tambah Batch -->
-                <h3 class="font-semibold mb-3">Tambah Batch Baru</h3>
-                <form id="addStockForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <select id="stockProduk" class="w-full" required>
-                        <option value="">Pilih Produk</option>
-                        <!-- Diisi oleh JS -->
+                <h3 class="font-semibold mb-3">Tambah Batch Baru (Landed Cost Lengkap)</h3>
+                <form id="addStockForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <select id="stockProduk" required><option value="">Pilih Produk</option></select>
+                    <input type="number" id="stockBerat" placeholder="Berat (kg)" required>
+                    <input type="number" id="stockHargaBeli" placeholder="Harga Beli per kg" required>
+                    <input type="number" id="stockOngkir" placeholder="Ongkir Total (Rp)" value="0">
+                    <input type="number" id="stockBensin" placeholder="Biaya Bensin Self-pickup (Rp)" value="0">
+                    <!-- Bongkar Muat -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm">Bongkar Muat</label>
+                        <div class="relative inline-block w-10">
+                            <input type="checkbox" id="stockToggleBongkar" class="toggle-checkbox"><div class="toggle-label"></div>
+                        </div>
+                    </div>
+                    <input type="number" id="stockBongkarNominal" placeholder="Biaya Bongkar (Rp)" class="hidden" value="0">
+                    <!-- Pajak Pembelian -->
+                    <select id="stockPajakType">
+                        <option value="none">Pajak Pembelian: Tidak Ada</option>
+                        <option value="persen">Persentase (%)</option>
+                        <option value="nominal">Nominal (Rp)</option>
                     </select>
-                    <input type="number" id="stockBerat" placeholder="Berat (kg)" class="w-full" required>
-                    <input type="number" id="stockHargaBeli" placeholder="Harga Beli per kg" class="w-full" required>
-                    <input type="number" id="stockOngkir" placeholder="Ongkir Total (opsional)" class="w-full" value="0">
-                    <input type="date" id="stockTglProduksi" class="w-full" required>
-                    <input type="date" id="stockTglKadaluarsa" class="w-full" required>
-                    <button type="submit" class="btn-primary col-span-full sm:col-span-2 lg:col-span-1">Simpan Batch</button>
+                    <input type="number" id="stockPajakValue" placeholder="Nilai Pajak" class="hidden" value="0">
+                    <input type="date" id="stockTglProduksi" required>
+                    <input type="date" id="stockTglKadaluarsa" required>
+                    <button type="submit" class="btn btn-primary col-span-full sm:col-span-1">Simpan Batch</button>
                 </form>
-
-                <!-- Tombol Lihat Semua Batch -->
-                <div class="mt-4">
-                    <button onclick="document.getElementById('batchDetailModal').classList.remove('hidden')" class="text-blue-600 text-sm underline">Lihat Semua Batch (Detail)</button>
-                </div>
+                <button onclick="document.getElementById('batchDetailModal').classList.remove('hidden')" class="text-blue-600 text-sm underline mt-3">Lihat Semua Batch (Detail)</button>
             </div>
         </div>
 
         <!-- Modal Detail Batch -->
-        <div id="batchDetailModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden p-4">
-            <div class="card w-full max-w-4xl max-h-[85vh] overflow-auto p-6 relative">
-                <button onclick="document.getElementById('batchDetailModal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800 text-xl">&times;</button>
+        <div id="batchDetailModal" class="modal-backdrop hidden">
+            <div class="card w-full max-w-5xl max-h-[85vh] overflow-auto p-6 relative">
+                <button onclick="document.getElementById('batchDetailModal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800 text-2xl">&times;</button>
                 <h3 class="font-bold text-lg mb-4">Detail Batch</h3>
-                <select id="batchProdukSelect" class="w-full mb-4">
-                    <option value="">Semua Produk</option>
-                    <!-- Diisi oleh JS -->
-                </select>
+                <select id="batchProdukSelect" class="w-full mb-4"><option value="">Semua Produk</option></select>
                 <div id="batchDetailContent"></div>
             </div>
         </div>
@@ -355,107 +507,71 @@
             <div class="card p-6">
                 <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-shopping-cart text-emerald-600"></i> Catat Penjualan</h2>
                 <form id="salesForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" id="salesKlien" placeholder="Nama Klien" class="w-full" required>
-                    <select id="salesProduk" class="w-full" required>
-                        <option value="">Pilih Produk</option>
-                    </select>
-                    <input type="number" id="salesQty" placeholder="Jumlah (kg)" class="w-full" required>
-                    <select id="salesTier" class="w-full">
+                    <input type="text" id="salesKlien" placeholder="Nama Klien" required>
+                    <select id="salesProduk" required><option value="">Pilih Produk</option></select>
+                    <input type="number" id="salesQty" placeholder="Jumlah (kg)" required>
+                    <select id="salesTier">
                         <option value="ecer">Ecer</option>
                         <option value="grosir">Grosir</option>
                         <option value="partai">Partai Besar</option>
                     </select>
-                    <input type="number" id="salesHargaManual" placeholder="Harga Jual/kg (opsional, untuk partai)" class="w-full">
-                    <div class="col-span-full flex flex-wrap gap-3">
-                        <button type="button" id="previewPriceBtn" class="btn-primary bg-slate-500 hover:bg-slate-600">Preview Harga</button>
-                        <button type="submit" class="btn-primary">Proses Penjualan</button>
+                    <input type="number" id="salesHargaManual" placeholder="Harga Jual/kg (opsional, override)">
+                    <div class="flex flex-wrap gap-2 col-span-full">
+                        <button type="button" id="previewPriceBtn" class="btn btn-secondary">Preview Harga</button>
+                        <button type="submit" class="btn btn-primary">Proses Penjualan</button>
                     </div>
                 </form>
-                <!-- Hasil Preview / Penjualan -->
-                <div id="salesResult" class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl hidden">
-                    <!-- Diisi oleh JS -->
-                </div>
+                <div id="salesResult" class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl hidden"></div>
             </div>
         </div>
 
-        <!-- ==================== TAB KEUANGAN & AKUNTANSI ==================== -->
+        <!-- ==================== TAB KEUANGAN ==================== -->
         <div id="tab-finance" class="tab-content space-y-6">
             <div class="card p-6">
-                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-wallet text-blue-600"></i> Keuangan & Akuntansi</h2>
-                <!-- Ringkasan Laba Rugi -->
-                <div id="financeSummaryContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <!-- Diisi sama dengan financeSummary di dashboard, tapi dibuat duplikat agar independen -->
-                </div>
-
+                <h2 class="text-xl font-bold mb-4"><i class="ph ph-wallet text-primary-600"></i> Keuangan & Akuntansi</h2>
+                <div id="financeSummaryContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"></div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Form Beban Operasional -->
                     <div class="card p-4">
                         <h3 class="font-semibold mb-3">Catat Beban Operasional</h3>
                         <form id="expenseForm" class="space-y-3">
-                            <select id="expenseAkun" class="w-full">
+                            <select id="expenseAkun">
                                 <option value="Beban Operasional">Beban Operasional</option>
                                 <option value="Beban Listrik">Beban Listrik</option>
                                 <option value="Beban Sewa">Beban Sewa</option>
                                 <option value="Beban Gaji">Beban Gaji</option>
                             </select>
-                            <input type="number" id="expenseJumlah" placeholder="Jumlah (Rp)" class="w-full" required>
-                            <input type="text" id="expenseDeskripsi" placeholder="Deskripsi (opsional)" class="w-full">
-                            <button type="submit" class="btn-primary w-full">Simpan Beban</button>
+                            <input type="number" id="expenseJumlah" placeholder="Jumlah (Rp)" required>
+                            <input type="text" id="expenseDeskripsi" placeholder="Deskripsi">
+                            <button type="submit" class="btn btn-primary w-full">Simpan Beban</button>
                         </form>
                     </div>
-                    <!-- Ekspor & Jurnal -->
                     <div class="card p-4">
                         <h3 class="font-semibold mb-3">Laporan & Ekspor</h3>
-                        <button id="exportExcelBtn" class="btn-primary bg-green-600 hover:bg-green-700 w-full mb-2"><i class="ph ph-file-xls"></i> Ekspor Jurnal Bulan Ini (Excel)</button>
-                        <button id="viewJournalBtn" class="btn-primary bg-slate-600 hover:bg-slate-700 w-full"><i class="ph ph-book-open"></i> Lihat Buku Besar</button>
+                        <button id="exportExcelBtn" class="btn btn-success w-full mb-2"><i class="ph ph-file-xls"></i> Ekspor Jurnal Bulan Ini (Excel)</button>
+                        <button id="viewJournalBtn" class="btn btn-secondary w-full"><i class="ph ph-book-open"></i> Lihat Buku Besar</button>
                     </div>
                 </div>
-
-                <!-- Buku Besar (akan ditampilkan secara inline atau modal) -->
                 <div id="journalViewer" class="mt-6 hidden">
                     <h3 class="font-semibold mb-2">Buku Besar (Jurnal)</h3>
                     <div class="overflow-x-auto max-h-64">
-                        <table class="w-full text-sm">
-                            <thead class="bg-slate-50 dark:bg-slate-800">
-                                <tr><th class="p-2 text-left">Tanggal</th><th class="p-2 text-left">Deskripsi</th><th class="p-2 text-left">Akun</th><th class="p-2 text-right">Debet</th><th class="p-2 text-right">Kredit</th></tr>
-                            </thead>
-                            <tbody id="journalTableBody"></tbody>
-                        </table>
+                        <table class="w-full text-sm"><thead><tr><th>Tanggal</th><th>Deskripsi</th><th>Akun</th><th>Debet</th><th>Kredit</th></tr></thead><tbody id="journalTableBody"></tbody></table>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ==================== TAB RIWAYAT TRANSAKSI ==================== -->
+        <!-- ==================== TAB RIWAYAT ==================== -->
         <div id="tab-history" class="tab-content space-y-6">
             <div class="card p-6">
-                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-clock-counter-clockwise text-amber-600"></i> Riwayat Transaksi</h2>
+                <h2 class="text-xl font-bold mb-4"><i class="ph ph-clock-counter-clockwise text-amber-600"></i> Riwayat Transaksi</h2>
                 <form id="filterTransaksi" class="flex flex-wrap gap-3 mb-4">
-                    <select id="filterProduk" class="w-full sm:w-auto">
-                        <option value="">Semua Produk</option>
-                        <!-- Diisi JS -->
-                    </select>
-                    <input type="text" id="filterKlien" placeholder="Nama Klien" class="w-full sm:w-auto">
-                    <input type="date" id="filterStart" class="w-full sm:w-auto">
-                    <input type="date" id="filterEnd" class="w-full sm:w-auto">
-                    <button type="submit" class="btn-primary">Filter</button>
+                    <select id="filterProduk"><option value="">Semua Produk</option></select>
+                    <input type="text" id="filterKlien" placeholder="Nama Klien">
+                    <input type="date" id="filterStart"> <input type="date" id="filterEnd">
+                    <button type="submit" class="btn btn-primary">Filter</button>
                 </form>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead class="bg-slate-50 dark:bg-slate-800">
-                            <tr>
-                                <th class="p-3 text-left">Tanggal</th>
-                                <th class="p-3 text-left">Klien</th>
-                                <th class="p-3 text-left">Produk</th>
-                                <th class="p-3 text-right">Qty (kg)</th>
-                                <th class="p-3 text-right">Invoice</th>
-                                <th class="p-3 text-center">Tier</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyTableBody">
-                            <tr><td colspan="6" class="p-4 text-center opacity-50">Belum ada transaksi.</td></tr>
-                        </tbody>
-                    </table>
+                    <table class="w-full text-sm"><thead><tr><th>Tanggal</th><th>Klien</th><th>Produk</th><th>Qty</th><th>Invoice</th><th>Tier</th></tr></thead><tbody id="historyTableBody"></tbody></table>
                 </div>
             </div>
         </div>
@@ -463,20 +579,10 @@
         <!-- ==================== TAB LAPORAN ==================== -->
         <div id="tab-reports" class="tab-content space-y-6">
             <div class="card p-6">
-                <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="ph ph-file-text text-violet-600"></i> Laporan Keuangan</h2>
+                <h2 class="text-xl font-bold mb-6"><i class="ph ph-file-text text-violet-600"></i> Laporan Keuangan</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h3 class="font-semibold mb-2">Laba Rugi</h3>
-                        <div id="reportLabaRugi" class="text-sm space-y-1 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
-                            <!-- Diisi oleh JS (pendapatan, HPP, beban, dll) -->
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold mb-2">Neraca (Mini)</h3>
-                        <div id="reportNeraca" class="text-sm space-y-1 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
-                            <!-- Diisi oleh JS (Aset, Kewajiban, Ekuitas) -->
-                        </div>
-                    </div>
+                    <div><h3 class="font-semibold mb-2">Laba Rugi</h3><div id="reportLabaRugi" class="text-sm p-4 bg-slate-50 dark:bg-slate-800 rounded-xl"></div></div>
+                    <div><h3 class="font-semibold mb-2">Neraca (Mini)</h3><div id="reportNeraca" class="text-sm p-4 bg-slate-50 dark:bg-slate-800 rounded-xl"></div></div>
                 </div>
             </div>
         </div>
@@ -484,81 +590,501 @@
         <!-- ==================== TAB PENGATURAN ==================== -->
         <div id="tab-settings" class="tab-content space-y-6">
             <div class="card p-6">
-                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-gear text-slate-600"></i> Pengaturan Bisnis</h2>
+                <h2 class="text-xl font-bold mb-6">Pengaturan Bisnis</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-3">
-                        <div><label class="text-sm font-medium">PPN (%)</label><input type="number" id="setPPN" class="w-full" value="12"></div>
-                        <div><label class="text-sm font-medium">PPh 25 (%)</label><input type="number" id="setPPh25" class="w-full" value="2"></div>
-                        <div><label class="text-sm font-medium">PPh 21 (%)</label><input type="number" id="setPPh21" class="w-full" value="5"></div>
-                        <div><label class="text-sm font-medium">PT Share (%)</label><input type="number" id="setPTShare" class="w-full" value="60"></div>
+                        <div><label>PPN (%)</label><input type="number" id="setPPN" value="12" class="w-full"></div>
+                        <div><label>PPh 25 (%)</label><input type="number" id="setPPh25" value="2" class="w-full"></div>
+                        <div><label>PPh 21 (%)</label><input type="number" id="setPPh21" value="5" class="w-full"></div>
+                        <div><label>PT Share (%)</label><input type="number" id="setPTShare" value="60" class="w-full"></div>
+                        <div><label>Min Grosir (kg)</label><input type="number" id="setMinGrosir" value="10" class="w-full"></div>
                     </div>
                     <div class="space-y-3">
-                        <div><label class="text-sm font-medium">Min Grosir (kg)</label><input type="number" id="setMinGrosir" class="w-full" value="10"></div>
-                        <div><label class="text-sm font-medium">Min Partai (kg)</label><input type="number" id="setMinPartai" class="w-full" value="500"></div>
-                        <div><label class="text-sm font-medium">Selisih Grosir dari Ecer (Rp)</label><input type="number" id="setSelisihGrosir" class="w-full" value="5000"></div>
-                        <div><label class="text-sm font-medium">Margin Keuntungan Default (Rp/kg)</label><input type="number" id="setMarginDefault" class="w-full" value="15000"></div>
+                        <div><label>Min Partai (kg)</label><input type="number" id="setMinPartai" value="500" class="w-full"></div>
+                        <div><label>Selisih Grosir dari Ecer (Rp)</label><input type="number" id="setSelisihGrosir" value="5000" class="w-full"></div>
+                        <div><label>Margin Default (Rp/kg)</label><input type="number" id="setMarginDefault" value="15000" class="w-full"></div>
+                        <div><label>Metode Penyimpanan</label><select id="setStorageMethod" class="w-full"><option value="none">Tidak Ada</option><option value="flat_monthly">Flat Bulanan</option><option value="per_kg_day">Harian per Kg</option></select></div>
+                        <div id="storageFlatInput"><label>Biaya Sewa Bulanan (Rp)</label><input type="number" id="setStorageFlat" value="0" class="w-full"></div>
+                        <div id="storagePerKgInput" class="hidden"><label>Biaya per Kg per Hari (Rp)</label><input type="number" id="setStoragePerKg" value="0" class="w-full"></div>
+                        <div><label>Alokasi Stok</label><select id="setFifoMethod" class="w-full"><option value="fefo">FEFO</option><option value="fifo">FIFO</option></select></div>
                     </div>
                 </div>
-                <button id="saveSettingsBtn" class="btn-primary mt-6">Simpan Pengaturan</button>
+                <button id="saveSettingsBtn" class="btn btn-primary mt-6">Simpan Pengaturan</button>
             </div>
         </div>
 
     </main>
 </div>
 
-<!-- Script Modules (akan dibuat nanti) -->
-<script src="js/storage.js"></script>
-<script src="js/settings.js"></script>
-<script src="js/inventory.js"></script>
-<script src="js/sales.js"></script>
-<script src="js/accounting.js"></script>
-<script src="js/dashboard.js"></script>
-<script src="js/app.js"></script>
-
-<!-- Inisialisasi Tambahan untuk Dark Mode & Navigasi -->
+<!-- ========== JAVASCRIPT LOGIC ========== -->
 <script>
-    // Toggle Dark Mode
-    function toggleDarkMode() {
-        document.documentElement.classList.toggle('dark');
-        const isDark = document.documentElement.classList.contains('dark');
-        localStorage.setItem('cfs_dark', isDark ? '1' : '0');
-        const icon = document.getElementById('darkIcon');
-        if (isDark) icon.className = 'ph ph-sun text-lg text-yellow-400';
-        else icon.className = 'ph ph-moon text-lg';
-    }
-    if (localStorage.getItem('cfs_dark') === '1') {
-        document.documentElement.classList.add('dark');
-        document.getElementById('darkIcon').className = 'ph ph-sun text-lg text-yellow-400';
-    }
+// Namespace global
+window.CFS = window.CFS || {};
 
-    // Global function for tab switching (to be extended by app.js)
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        document.querySelectorAll('.tab-btn').forEach(b => {
-            b.classList.remove('bg-blue-50', 'text-blue-700', 'font-semibold');
-            b.classList.add('opacity-70');
-            if (b.dataset.tab === tabId) {
-                b.classList.add('bg-blue-50', 'text-blue-700', 'font-semibold');
-                b.classList.remove('opacity-70');
+// ---------- Utilitas ----------
+CFS.Utils = {
+    formatRupiah: (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num),
+    formatDate: (iso) => new Date(iso).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })
+};
+
+// ---------- Storage Layer ----------
+localforage.config({ name: 'CibitungFrozen', storeName: 'main' });
+CFS.Storage = {
+    async get(key) { return await localforage.getItem(key); },
+    async set(key, value) { return await localforage.setItem(key, value); },
+    STOCK_KEY: 'stock_batches',
+    JOURNALS_KEY: 'journals',
+    SETTINGS_KEY: 'settings',
+    TRANSACTIONS_KEY: 'transactions'
+};
+
+// ---------- Settings ----------
+CFS.Settings = {
+    DEFAULTS: {
+        ppn: 12, pph25: 2, pph21: 5, ptShare: 60,
+        minGrosir: 10, minPartai: 500, selisihGrosir: 5000,
+        marginDefault: 15000,
+        storageMethod: 'none', storageFlatMonthly: 0, storagePerKgPerDay: 0,
+        fifoMethod: 'fefo',
+        widgetVisibility: { stockSummary: true, expiringBatches: true, revenueChart: true, profitLoss: true, quickActions: true }
+    },
+    async get() {
+        let s = await CFS.Storage.get(CFS.Storage.SETTINGS_KEY);
+        if (!s) { s = { ...this.DEFAULTS }; await CFS.Storage.set(CFS.Storage.SETTINGS_KEY, s); }
+        return s;
+    },
+    async save(s) { await CFS.Storage.set(CFS.Storage.SETTINGS_KEY, s); }
+};
+
+// ---------- Inventory (Stock, Batch, FEFO) ----------
+CFS.Inventory = {
+    PRODUCT_LIST: ['Ikan Banjar','Ikan Dori Fillet','Ikan Layang','Ikan Belo','Ikan Tongkol','Ikan Salem','Ikan Tenggiri','Ikan Bawal Laut','Cumi Cumi'],
+    async getBatches() { return (await CFS.Storage.get(CFS.Storage.STOCK_KEY)) || []; },
+    async saveBatches(b) { await CFS.Storage.set(CFS.Storage.STOCK_KEY, b); },
+    async addBatch(data) {
+        const batches = await this.getBatches();
+        let modal = (data.hargaBeli * data.berat) + (data.ongkir||0) + (data.biayaBensin||0);
+        if (data.toggleBongkar && data.bongkarNominal) modal += data.bongkarNominal;
+        if (data.pajakPersen) modal += modal * (data.pajakPersen/100);
+        else if (data.pajakNominal) modal += data.pajakNominal;
+        const hpp = modal / data.berat;
+        const batch = {
+            id: 'BATCH_'+Date.now(), produk: data.produk, berat_awal: data.berat, berat_sisa: data.berat,
+            harga_beli: data.hargaBeli, ongkir: data.ongkir||0, biaya_bensin: data.biayaBensin||0,
+            bongkar: data.toggleBongkar ? (data.bongkarNominal||0) : 0,
+            pajak: data.pajakPersen ? {type:'persen',value:data.pajakPersen} : (data.pajakNominal ? {type:'nominal',value:data.pajakNominal} : null),
+            tgl_produksi: data.tglProduksi, tgl_kadaluarsa: data.tglKadaluarsa, hpp_per_kg: hpp,
+            status:'aktif', created_at: new Date().toISOString()
+        };
+        batches.push(batch);
+        await this.saveBatches(batches);
+        return batch;
+    },
+    async allocateStock(productName, qty) {
+        const batches = await this.getBatches();
+        const now = new Date();
+        let candidates = batches.filter(b => b.produk===productName && b.berat_sisa>0 && new Date(b.tgl_kadaluarsa)>now);
+        const s = await CFS.Settings.get();
+        candidates.sort((a,b) => s.fifoMethod==='fifo' ? new Date(a.created_at)-new Date(b.created_at) : new Date(a.tgl_kadaluarsa)-new Date(b.tgl_kadaluarsa));
+        let remaining = qty;
+        const used = [];
+        for (let b of candidates) {
+            if (remaining<=0) break;
+            const take = Math.min(b.berat_sisa, remaining);
+            b.berat_sisa -= take;
+            remaining -= take;
+            used.push({id:b.id, nama_produk:b.produk, qty:take, harga_per_kg:b.hpp_per_kg});
+            if (b.berat_sisa===0) b.status='habis';
+        }
+        if (remaining>0) throw new Error(`Stok ${productName} kurang ${remaining.toFixed(1)} kg`);
+        await this.saveBatches(batches);
+        return used;
+    },
+    async getStockSummary() {
+        const batches = await this.getBatches();
+        const sum = {};
+        this.PRODUCT_LIST.forEach(p => sum[p]=0);
+        batches.forEach(b => { if(b.berat_sisa>0) sum[b.produk] += b.berat_sisa; });
+        return sum;
+    },
+    async getStorageCostForBatch(batch, qty, settings) {
+        if (!settings || settings.storageMethod==='none') return 0;
+        const now = new Date();
+        const days = Math.ceil((now - new Date(batch.created_at))/(1000*3600*24));
+        if (settings.storageMethod==='per_kg_day') return qty * days * (settings.storagePerKgPerDay||0);
+        if (settings.storageMethod==='flat_monthly') {
+            const summary = await this.getStockSummary();
+            const total = Object.values(summary).reduce((a,b)=>a+b,0);
+            if (total>0 && settings.storageFlatMonthly) return qty * (settings.storageFlatMonthly/total);
+        }
+        return 0;
+    }
+};
+
+// ---------- Sales ----------
+CFS.Sales = {
+    async calculatePricing(produk, qty, tier, manual=null) {
+        const settings = await CFS.Settings.get();
+        const used = await CFS.Inventory.allocateStock(produk, qty);
+        let totalHPP = used.reduce((s,b)=>s+b.qty*b.harga_per_kg,0);
+        for (let u of used) {
+            const batch = (await CFS.Inventory.getBatches()).find(b=>b.id===u.id);
+            if (batch) totalHPP += await CFS.Inventory.getStorageCostForBatch(batch, u.qty, settings);
+        }
+        const hppAvg = totalHPP/qty;
+        const ecer = hppAvg + settings.marginDefault;
+        let harga = ecer;
+        if (tier==='grosir') { harga = ecer - settings.selisihGrosir; if (harga<hppAvg) harga=hppAvg; }
+        else if (tier==='partai') harga = manual || ecer;
+        if (manual && tier!=='partai') harga = manual;
+        const dpp = harga*qty;
+        const ppn = dpp*(settings.ppn/100);
+        return { used, totalHPP, hppAvg, hargaJual: harga, dppTotal: dpp, ppn, totalInvoice: dpp+ppn };
+    },
+    async processSale(klien, produk, qty, tier, manual) {
+        const p = await this.calculatePricing(produk, qty, tier, manual);
+        await CFS.Accounting.recordSale(klien, produk, qty, p.dppTotal, p.ppn, p.totalHPP);
+        const trx = { id:Date.now(), klien, produk, qty, tier, hargaJual:p.hargaJual, totalInvoice:p.totalInvoice, hpp:p.totalHPP, usedBatches:p.used, tanggal:new Date().toISOString() };
+        const all = (await CFS.Storage.get(CFS.Storage.TRANSACTIONS_KEY)) || [];
+        all.unshift(trx);
+        await CFS.Storage.set(CFS.Storage.TRANSACTIONS_KEY, all);
+        return p;
+    }
+};
+
+// ---------- Accounting ----------
+CFS.Accounting = {
+    async getJournals() { return (await CFS.Storage.get(CFS.Storage.JOURNALS_KEY)) || []; },
+    async addJournal(e) { const j = await this.getJournals(); j.push(e); await CFS.Storage.set(CFS.Storage.JOURNALS_KEY, j); },
+    async recordSale(klien, produk, qty, dpp, ppn, hpp) {
+        await this.addJournal({ id:Date.now(), tanggal:new Date().toISOString(), deskripsi:`Penjualan ${produk} ${qty}kg ke ${klien}`,
+            entries: [
+                { akun:'Piutang Dagang', debet:dpp+ppn, kredit:0 },
+                { akun:'Penjualan', debet:0, kredit:dpp },
+                { akun:'PPN Keluaran', debet:0, kredit:ppn },
+                { akun:'HPP', debet:hpp, kredit:0 },
+                { akun:'Persediaan', debet:0, kredit:hpp }
+            ]});
+    },
+    async recordExpense(akun, jumlah, desk) {
+        await this.addJournal({ id:Date.now(), tanggal:new Date().toISOString(), deskripsi:desk||`Beban ${akun}`,
+            entries: [{ akun, debet:jumlah, kredit:0 }, { akun:'Kas', debet:0, kredit:jumlah }] });
+    },
+    async getProfitLoss(start, end) {
+        const journals = await this.getJournals();
+        let pendapatan=0, hpp=0, beban=0, pajak=0;
+        journals.forEach(j => {
+            const d = new Date(j.tanggal);
+            if (d>=start && d<=end) {
+                j.entries.forEach(e => {
+                    if (e.akun==='Penjualan') pendapatan += e.kredit - e.debet;
+                    if (e.akun==='HPP') hpp += e.debet - e.kredit;
+                    if (e.akun.includes('Beban')) beban += e.debet - e.kredit;
+                    if (e.akun==='PPh 25'||e.akun==='PPh 21') pajak += e.debet - e.kredit;
+                });
             }
         });
-        // Trigger dashboard refresh jika diperlukan (akan di handle app.js)
-        if (typeof CFS !== 'undefined' && CFS.App && CFS.App.onTabSwitch) CFS.App.onTabSwitch(tabId);
+        return { pendapatan, hpp, beban, pajak, labaKotor: pendapatan-hpp, labaBersih: pendapatan-hpp-beban-pajak };
+    },
+    async getNeraca() {
+        const journals = await this.getJournals();
+        const saldo = {};
+        journals.forEach(j => j.entries.forEach(e => { saldo[e.akun] = (saldo[e.akun]||0) + e.debet - e.kredit; }));
+        const aset = ['Kas','Piutang Dagang','Persediaan'];
+        const kewajiban = ['PPN Keluaran','Hutang PPh'];
+        const ekuitas = ['Modal Owner','Penjualan','HPP','Beban Operasional','Beban Listrik','Beban Sewa','Beban Gaji','PPh 25','PPh 21'];
+        let totalAset=0, totalKewajiban=0, totalEkuitas=0;
+        aset.forEach(a => totalAset += saldo[a]||0);
+        kewajiban.forEach(k => totalKewajiban += saldo[k]||0);
+        ekuitas.forEach(e => totalEkuitas += saldo[e]||0);
+        return { aset: totalAset, kewajiban: totalKewajiban, ekuitas: totalEkuitas };
     }
+};
 
-    // Placeholder for toast
-    window.showToast = (title, msg, type = 'success') => {
-        const toast = document.getElementById('toast');
-        const icon = document.getElementById('toastIcon');
-        document.getElementById('toastTitle').innerText = title;
-        document.getElementById('toastMsg').innerText = msg;
-        if (type === 'success') icon.innerHTML = '<i class="ph ph-check text-white text-lg"></i>';
-        else icon.innerHTML = '<i class="ph ph-warning text-white text-lg"></i>';
-        icon.className = `w-8 h-8 rounded-full flex items-center justify-center ${type === 'success' ? 'bg-emerald-500' : 'bg-red-500'}`;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
-    };
+// ---------- Dashboard ----------
+CFS.Dashboard = {
+    async refreshAll() {
+        await this.stockSummary(); await this.expiringBatches(); await this.revenueChart(); await this.financeSummary();
+        document.getElementById('reportLabaRugi') && await this.labaRugiReport();
+        document.getElementById('reportNeraca') && await this.neracaReport();
+    },
+    async stockSummary() {
+        const summary = await CFS.Inventory.getStockSummary();
+        const container = document.getElementById('dashboardSummaryCards');
+        if (!container) return;
+        container.innerHTML = CFS.Inventory.PRODUCT_LIST.map(p => {
+            const kg = summary[p]?.toFixed(1) || '0.0';
+            return `<div class="card p-4 text-center hover-scale"><p class="text-sm font-medium">${p}</p><p class="text-2xl font-bold mt-1">${kg} kg</p><div class="progress mt-2"><div class="progress-fill bg-primary-500" style="width:${Math.min((summary[p]/100)*100,100)}%"></div></div></div>`;
+        }).join('');
+    },
+    async expiringBatches() {
+        const batches = (await CFS.Inventory.getBatches()).filter(b => b.berat_sisa>0 && (new Date(b.tgl_kadaluarsa)-new Date())/(1000*3600*24) <= 7);
+        const c = document.getElementById('expiringBatches');
+        if (!c) return;
+        c.innerHTML = batches.length ? batches.map(b => `<div class="flex justify-between items-center bg-red-50 dark:bg-red-900/20 p-2 rounded-lg"><span>${b.produk} (${b.id})</span><span>${b.berat_sisa.toFixed(1)} kg</span><span class="text-red-600 font-semibold text-xs">${Math.ceil((new Date(b.tgl_kadaluarsa)-new Date())/(1000*3600*24))} hari</span></div>`).join('') : '<div class="text-green-600">✅ Aman</div>';
+    },
+    async revenueChart() {
+        const ctx = document.getElementById('chartRevenue')?.getContext('2d');
+        if (!ctx) return;
+        const trx = (await CFS.Storage.get(CFS.Storage.TRANSACTIONS_KEY)) || [];
+        const daily = {}; const today = new Date();
+        for (let i=6; i>=0; i--) { const d = new Date(today); d.setDate(d.getDate()-i); daily[d.toLocaleDateString('id-ID',{day:'numeric',month:'short'})] = 0; }
+        trx.forEach(t => { const key = new Date(t.tanggal).toLocaleDateString('id-ID',{day:'numeric',month:'short'}); if(daily[key]!==undefined) daily[key] += t.totalInvoice; });
+        if (window._chart) window._chart.destroy();
+        window._chart = new Chart(ctx, { type:'bar', data:{ labels:Object.keys(daily), datasets:[{label:'Pendapatan',data:Object.values(daily),backgroundColor:'#3b82f6',borderRadius:8}] }, options:{responsive:true, scales:{y:{ticks:{callback:v=>CFS.Utils.formatRupiah(v)}}}} });
+    },
+    async financeSummary() {
+        const today = new Date(); const start = new Date(today.getFullYear(), today.getMonth(), 1);
+        const pl = await CFS.Accounting.getProfitLoss(start, today);
+        const html = `<div class="card p-4"><p class="text-xs opacity-70">Pendapatan</p><p class="text-xl font-bold">${CFS.Utils.formatRupiah(pl.pendapatan)}</p></div>
+        <div class="card p-4"><p class="text-xs opacity-70">HPP</p><p class="text-xl font-bold">${CFS.Utils.formatRupiah(pl.hpp)}</p></div>
+        <div class="card p-4"><p class="text-xs opacity-70">Laba Kotor</p><p class="text-xl font-bold">${CFS.Utils.formatRupiah(pl.labaKotor)}</p></div>
+        <div class="card p-4"><p class="text-xs opacity-70">Laba Bersih</p><p class="text-xl font-bold text-emerald-600">${CFS.Utils.formatRupiah(pl.labaBersih)}</p></div>`;
+        document.getElementById('financeSummary').innerHTML = html;
+        const container2 = document.getElementById('financeSummaryContainer'); if(container2) container2.innerHTML = html;
+    },
+    async labaRugiReport() {
+        const today = new Date(); const start = new Date(today.getFullYear(), today.getMonth(), 1);
+        const pl = await CFS.Accounting.getProfitLoss(start, today);
+        document.getElementById('reportLabaRugi').innerHTML = `
+            <div class="flex justify-between"><span>Pendapatan</span><span>${CFS.Utils.formatRupiah(pl.pendapatan)}</span></div>
+            <div class="flex justify-between"><span>HPP</span><span>${CFS.Utils.formatRupiah(pl.hpp)}</span></div>
+            <div class="flex justify-between"><span>Beban</span><span>${CFS.Utils.formatRupiah(pl.beban)}</span></div>
+            <div class="flex justify-between"><span>Pajak</span><span>${CFS.Utils.formatRupiah(pl.pajak)}</span></div>
+            <hr class="my-1"><div class="flex justify-between font-bold"><span>Laba Bersih</span><span>${CFS.Utils.formatRupiah(pl.labaBersih)}</span></div>`;
+    },
+    async neracaReport() {
+        const n = await CFS.Accounting.getNeraca();
+        document.getElementById('reportNeraca').innerHTML = `
+            <div class="flex justify-between"><span>Aset</span><span>${CFS.Utils.formatRupiah(n.aset)}</span></div>
+            <div class="flex justify-between"><span>Kewajiban</span><span>${CFS.Utils.formatRupiah(n.kewajiban)}</span></div>
+            <div class="flex justify-between"><span>Ekuitas</span><span>${CFS.Utils.formatRupiah(n.ekuitas)}</span></div>
+            <hr class="my-2"><div class="flex justify-between font-bold"><span>Balance</span><span>${n.aset===n.kewajiban+n.ekuitas?'✅':'❌'}</span></div>`;
+    }
+};
+
+// ---------- App Controller ----------
+CFS.App = {
+    init() {
+        this.setupTabs(); this.setupForms(); this.populateDropdowns(); this.loadSettings(); this.setupToggles(); this.setupBackup(); this.setupBatchModal();
+        CFS.Dashboard.refreshAll(); CFS.Inventory.renderStockTable();
+        document.getElementById('dashDate').innerText = new Date().toLocaleDateString('id-ID', { weekday:'short', day:'numeric', month:'long', year:'numeric' });
+    },
+    setupTabs() { document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab))); },
+    onTabSwitch(tab) {
+        if (tab==='tab-stock') CFS.Inventory.renderStockTable();
+        if (tab==='tab-dashboard') CFS.Dashboard.refreshAll();
+        if (tab==='tab-finance') { CFS.Dashboard.financeSummary(); CFS.Dashboard.neracaReport(); }
+        if (tab==='tab-reports') { CFS.Dashboard.labaRugiReport(); CFS.Dashboard.neracaReport(); }
+    },
+    setupForms() {
+        document.getElementById('addStockForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                produk: document.getElementById('stockProduk').value,
+                berat: parseFloat(document.getElementById('stockBerat').value),
+                hargaBeli: parseFloat(document.getElementById('stockHargaBeli').value),
+                ongkir: parseFloat(document.getElementById('stockOngkir').value)||0,
+                biayaBensin: parseFloat(document.getElementById('stockBensin').value)||0,
+                toggleBongkar: document.getElementById('stockToggleBongkar').checked,
+                bongkarNominal: document.getElementById('stockToggleBongkar').checked ? parseFloat(document.getElementById('stockBongkarNominal').value)||0 : 0,
+                pajakPersen: document.getElementById('stockPajakType').value==='persen' ? parseFloat(document.getElementById('stockPajakValue').value)||0 : null,
+                pajakNominal: document.getElementById('stockPajakType').value==='nominal' ? parseFloat(document.getElementById('stockPajakValue').value)||0 : null,
+                tglProduksi: document.getElementById('stockTglProduksi').value,
+                tglKadaluarsa: document.getElementById('stockTglKadaluarsa').value
+            };
+            await CFS.Inventory.addBatch(data);
+            await CFS.Accounting.recordPurchase(data.produk, (data.hargaBeli*data.berat)+data.ongkir+data.biayaBensin+(data.toggleBongkar?data.bongkarNominal:0), data.berat);
+            showToast('Berhasil','Batch ditambahkan','success');
+            e.target.reset();
+            CFS.Dashboard.refreshAll(); CFS.Inventory.renderStockTable();
+        });
+        document.getElementById('salesForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const res = await CFS.Sales.processSale(
+                    document.getElementById('salesKlien').value,
+                    document.getElementById('salesProduk').value,
+                    parseFloat(document.getElementById('salesQty').value),
+                    document.getElementById('salesTier').value,
+                    parseFloat(document.getElementById('salesHargaManual').value)||null
+                );
+                document.getElementById('salesResult').classList.remove('hidden');
+                document.getElementById('salesResult').innerHTML = `✅ Invoice: ${CFS.Utils.formatRupiah(res.totalInvoice)}`;
+                showToast('Sukses','Penjualan tercatat','success');
+                CFS.Dashboard.refreshAll(); CFS.Inventory.renderStockTable();
+            } catch(err) { showToast('Gagal',err.message,'error'); }
+        });
+        document.getElementById('previewPriceBtn').addEventListener('click', async () => {
+            const produk = document.getElementById('salesProduk').value;
+            const qty = parseFloat(document.getElementById('salesQty').value);
+            const tier = document.getElementById('salesTier').value;
+            const manual = parseFloat(document.getElementById('salesHargaManual').value)||null;
+            const summary = await CFS.Inventory.getStockSummary();
+            const available = summary[produk]||0;
+            if (qty > available) return showToast('Gagal',`Stok hanya ${available.toFixed(1)} kg`,'error');
+            const pricing = await CFS.Sales.calculatePricing(produk, qty, tier, manual);
+            document.getElementById('salesResult').classList.remove('hidden');
+            document.getElementById('salesResult').innerHTML = `📊 Harga Jual: ${CFS.Utils.formatRupiah(pricing.hargaJual)}/kg | Estimasi Invoice: ${CFS.Utils.formatRupiah(pricing.totalInvoice)}`;
+        });
+        document.getElementById('expenseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await CFS.Accounting.recordExpense(document.getElementById('expenseAkun').value, parseFloat(document.getElementById('expenseJumlah').value), document.getElementById('expenseDeskripsi').value);
+            showToast('Tercatat','Beban ditambahkan','success');
+            e.target.reset(); CFS.Dashboard.refreshAll();
+        });
+        document.getElementById('filterTransaksi').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const filters = { produk: document.getElementById('filterProduk').value, klien: document.getElementById('filterKlien').value, startDate: document.getElementById('filterStart').value, endDate: document.getElementById('filterEnd').value };
+            const trx = (await CFS.Storage.get(CFS.Storage.TRANSACTIONS_KEY)||[]).filter(t => {
+                if (filters.produk && t.produk!==filters.produk) return false;
+                if (filters.klien && !t.klien.toLowerCase().includes(filters.klien.toLowerCase())) return false;
+                if (filters.startDate && new Date(t.tanggal) < new Date(filters.startDate)) return false;
+                if (filters.endDate && new Date(t.tanggal) > new Date(filters.endDate)) return false;
+                return true;
+            });
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = trx.length ? trx.map(t => `<tr><td>${new Date(t.tanggal).toLocaleDateString('id-ID')}</td><td>${t.klien}</td><td>${t.produk}</td><td>${t.qty} kg</td><td>${CFS.Utils.formatRupiah(t.totalInvoice)}</td><td>${t.tier}</td></tr>`).join('') : '<tr><td colspan="6" class="p-4 text-center">Tidak ada data</td></tr>';
+        });
+        document.getElementById('exportExcelBtn').addEventListener('click', async () => {
+            const today = new Date(); const start = new Date(today.getFullYear(), today.getMonth(), 1);
+            const journals = await CFS.Accounting.getJournals();
+            const filtered = journals.filter(j => new Date(j.tanggal)>=start && new Date(j.tanggal)<=today);
+            const rows = []; filtered.forEach(j => j.entries.forEach(e => rows.push({Tanggal:new Date(j.tanggal).toLocaleDateString('id-ID'), Deskripsi:j.deskripsi, Akun:e.akun, Debet:e.debet, Kredit:e.kredit})));
+            const ws = XLSX.utils.json_to_sheet(rows); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Jurnal');
+            XLSX.writeFile(wb, `jurnal_${start.toISOString().slice(0,7)}.xlsx`);
+            showToast('Sukses','Excel diunduh','success');
+        });
+        document.getElementById('viewJournalBtn').addEventListener('click', async () => {
+            const journals = await CFS.Accounting.getJournals();
+            const tbody = document.getElementById('journalTableBody');
+            const viewer = document.getElementById('journalViewer');
+            viewer.classList.toggle('hidden');
+            tbody.innerHTML = journals.map(j => j.entries.map(e => `<tr><td>${new Date(j.tanggal).toLocaleDateString('id-ID')}</td><td>${j.deskripsi}</td><td>${e.akun}</td><td>${e.debet||''}</td><td>${e.kredit||''}</td></tr>`).join('')).join('');
+        });
+        document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
+            const s = {
+                ppn: +document.getElementById('setPPN').value, pph25: +document.getElementById('setPPh25').value, pph21: +document.getElementById('setPPh21').value,
+                ptShare: +document.getElementById('setPTShare').value, minGrosir: +document.getElementById('setMinGrosir').value, minPartai: +document.getElementById('setMinPartai').value,
+                selisihGrosir: +document.getElementById('setSelisihGrosir').value, marginDefault: +document.getElementById('setMarginDefault').value,
+                storageMethod: document.getElementById('setStorageMethod').value,
+                storageFlatMonthly: +document.getElementById('setStorageFlat').value, storagePerKgPerDay: +document.getElementById('setStoragePerKg').value,
+                fifoMethod: document.getElementById('setFifoMethod').value
+            };
+            await CFS.Settings.save(s);
+            showToast('Tersimpan','Pengaturan diperbarui','success');
+        });
+        document.getElementById('stockToggleBongkar')?.addEventListener('change', function() { document.getElementById('stockBongkarNominal').classList.toggle('hidden',!this.checked); });
+        document.getElementById('stockPajakType')?.addEventListener('change', function() { const v = document.getElementById('stockPajakValue'); v.classList.toggle('hidden', this.value==='none'); v.placeholder = this.value==='persen'?'Persentase (%)':'Nominal (Rp)'; });
+    },
+    populateDropdowns() {
+        const opts = CFS.Inventory.PRODUCT_LIST.map(p => `<option value="${p}">${p}</option>`).join('');
+        document.querySelectorAll('#stockProduk, #salesProduk, #filterProduk, #batchProdukSelect').forEach(s => { s.innerHTML = '<option value="">Pilih</option>' + opts; });
+    },
+    async loadSettings() {
+        const s = await CFS.Settings.get();
+        ['setPPN','setPPh25','setPPh21','setPTShare','setMinGrosir','setMinPartai','setSelisihGrosir','setMarginDefault'].forEach(id => { const el = document.getElementById(id); if(el) el.value = s[id.replace('set','').toLowerCase()] || ''; });
+        document.getElementById('setStorageMethod').value = s.storageMethod||'none';
+        document.getElementById('setStorageFlat').value = s.storageFlatMonthly||0;
+        document.getElementById('setStoragePerKg').value = s.storagePerKgPerDay||0;
+        document.getElementById('setFifoMethod').value = s.fifoMethod||'fefo';
+        document.getElementById('storageFlatInput').classList.toggle('hidden', s.storageMethod!=='flat_monthly');
+        document.getElementById('storagePerKgInput').classList.toggle('hidden', s.storageMethod!=='per_kg_day');
+        document.querySelectorAll('.widget-toggle').forEach(cb => { const vis = s.widgetVisibility || CFS.Settings.DEFAULTS.widgetVisibility; if (vis[cb.dataset.widget] !== undefined) cb.checked = vis[cb.dataset.widget]; });
+    },
+    setupToggles() {
+        document.querySelectorAll('.widget-toggle').forEach(cb => cb.addEventListener('change', async () => {
+            const s = await CFS.Settings.get();
+            s.widgetVisibility[cb.dataset.widget] = cb.checked;
+            await CFS.Settings.save(s);
+            document.getElementById(`widget-${cb.dataset.widget}`).classList.toggle('hidden', !cb.checked);
+        }));
+    },
+    setupBackup() {
+        CFS.App.backupData = async () => {
+            const data = {
+                batches: await CFS.Storage.get(CFS.Storage.STOCK_KEY),
+                journals: await CFS.Storage.get(CFS.Storage.JOURNALS_KEY),
+                settings: await CFS.Storage.get(CFS.Storage.SETTINGS_KEY),
+                transactions: await CFS.Storage.get(CFS.Storage.TRANSACTIONS_KEY)
+            };
+            const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `cfs_backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
+            showToast('Backup','Data diekspor','success');
+        };
+        CFS.App.restorePrompt = () => {
+            const input = document.createElement('input'); input.type='file'; input.accept='.json';
+            input.onchange = async e => {
+                const text = await e.target.files[0].text();
+                const data = JSON.parse(text);
+                if (data.batches) await CFS.Storage.set(CFS.Storage.STOCK_KEY, data.batches);
+                if (data.journals) await CFS.Storage.set(CFS.Storage.JOURNALS_KEY, data.journals);
+                if (data.settings) await CFS.Storage.set(CFS.Storage.SETTINGS_KEY, data.settings);
+                if (data.transactions) await CFS.Storage.set(CFS.Storage.TRANSACTIONS_KEY, data.transactions);
+                alert('Data berhasil dipulihkan!'); location.reload();
+            };
+            input.click();
+        };
+    },
+    setupBatchModal() {
+        const select = document.getElementById('batchProdukSelect');
+        select.addEventListener('change', async () => {
+            const produk = select.value;
+            const batches = (await CFS.Inventory.getBatches()).filter(b => !produk || b.produk===produk);
+            const container = document.getElementById('batchDetailContent');
+            container.innerHTML = batches.length ? `<table class="w-full text-sm"><thead><tr><th>ID</th><th>Produk</th><th>Berat Awal</th><th>Sisa</th><th>HPP</th><th>Exp</th></tr></thead><tbody>${batches.map(b => `<tr><td>${b.id}</td><td>${b.produk}</td><td>${b.berat_awal.toFixed(1)}</td><td>${b.berat_sisa.toFixed(1)}</td><td>${CFS.Utils.formatRupiah(b.hpp_per_kg)}</td><td>${b.tgl_kadaluarsa}</td></tr>`).join('')}</tbody></table>` : '<p>Tidak ada batch</p>';
+        });
+        select.dispatchEvent(new Event('change'));
+    }
+};
+
+CFS.Inventory.renderStockTable = async function() {
+    const summary = await CFS.Inventory.getStockSummary();
+    const batches = await CFS.Inventory.getBatches();
+    document.getElementById('stockTableBody').innerHTML = CFS.Inventory.PRODUCT_LIST.map(p => {
+        const total = summary[p]?.toFixed(1)||'0.0';
+        const active = batches.filter(b => b.produk===p && b.berat_sisa>0).length;
+        return `<tr><td class="p-3">${p}</td><td class="p-3 text-right">${total} kg</td><td class="p-3 text-right">${active}</td><td class="p-3 text-center"><button onclick="CFS.App.lihatBatch('${p}')" class="text-blue-600 text-sm">Detail</button></td></tr>`;
+    }).join('');
+};
+CFS.App.lihatBatch = (produk) => {
+    document.getElementById('batchProdukSelect').value = produk;
+    document.getElementById('batchProdukSelect').dispatchEvent(new Event('change'));
+    document.getElementById('batchDetailModal').classList.remove('hidden');
+};
+
+// Toggle dark mode
+function toggleDarkMode() {
+    document.documentElement.classList.toggle('dark');
+    localStorage.setItem('cfs_dark', document.documentElement.classList.contains('dark')?'1':'0');
+    document.getElementById('darkIcon').className = document.documentElement.classList.contains('dark')?'ph ph-sun text-lg text-yellow-400':'ph ph-moon text-lg';
+}
+if (localStorage.getItem('cfs_dark')==='1') { document.documentElement.classList.add('dark'); document.getElementById('darkIcon').className='ph ph-sun text-lg text-yellow-400'; }
+
+// Global switch tab
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('bg-primary-50','text-primary-700','font-semibold'));
+    const activeBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+    if (activeBtn) { activeBtn.classList.add('bg-primary-50','text-primary-700','font-semibold'); }
+    if (CFS.App.onTabSwitch) CFS.App.onTabSwitch(tabId);
+}
+
+// Toast
+function showToast(title, msg, type='success') {
+    const toast = document.getElementById('toast');
+    const icon = document.getElementById('toastIcon');
+    document.getElementById('toastTitle').innerText = title;
+    document.getElementById('toastMsg').innerText = msg;
+    icon.className = `w-9 h-9 rounded-full flex items-center justify-center text-white ${type==='success'?'bg-emerald-500':'bg-red-500'}`;
+    icon.innerHTML = type==='success'?'<i class="ph ph-check text-lg"></i>':'<i class="ph ph-warning text-lg"></i>';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// Start app
+window.addEventListener('DOMContentLoaded', () => CFS.App.init());
 </script>
 
 </body>
