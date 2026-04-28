@@ -8,6 +8,11 @@ CFS.Settings = {
         minGrosir: 10,
         minPartai: 500,
         selisihGrosir: 5000,   // ecer = grosir + selisih (grosir lebih murah)
+        storageMethod: 'none',          // 'none', 'flat_monthly', 'per_kg_day'
+        storageFlatMonthly: 0,          // biaya sewa gudang per bulan (Rp)
+        storagePerKgPerDay: 0,          // biaya listrik+maintenance per kg per hari (Rp)
+        fifoMethod: 'fefo',             // 'fifo' atau 'fefo' (default fefo untuk frozen)
+        bongkarDefault: false,          // default toggle bongkar muat saat tambah batch
         marginDefault: 15000,
         widgetVisibility: {
             stockSummary: true,
