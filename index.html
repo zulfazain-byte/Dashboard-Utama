@@ -1,458 +1,512 @@
 <!DOCTYPE html>
 <html lang="id" class="light">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cibitung Frozen - ERP v4.0 (Stok + Akuntansi)</title>
-  <!-- Tailwind + Icons -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
-  <!-- Library IndexedDB -->
-  <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
-  <!-- Chart.js & SheetJS (siap pakai) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
-  <style>
-    /* Sama seperti sebelumnya (custom scroll, toggle, dll) – silakan salin dari kode sebelumnya */
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; }
-    .tab-content { display: none; opacity: 0; transition: opacity 0.3s; }
-    .tab-content.active { display: block; opacity: 1; }
-    /* Toggle switch */
-    .toggle-checkbox { width: 1.25rem; height: 1.25rem; border-radius: 9999px; border: 2px solid #cbd5e1; background: white; cursor: pointer; position: absolute; top: 0; left: 0; z-index: 10; transition: all 0.25s; appearance: none; }
-    .toggle-checkbox:checked { left: 1.25rem; border-color: #2563eb; }
-    .toggle-label { display: block; width: 2.75rem; height: 1.4rem; background: #cbd5e1; border-radius: 9999px; cursor: pointer; position: relative; }
-    .toggle-checkbox:checked + .toggle-label { background: #2563eb; }
-    /* dll... */
-  </style>
-</head>
-<body class="text-slate-800 flex flex-col min-h-screen">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cibitung Frozen - ERP v4.0 Ultimate</title>
 
-<!-- Top Navigation -->
-<nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
-  <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">
-        <i class="ph-fill ph-fish-simple text-2xl"></i>
-      </div>
-      <div>
-        <span class="font-bold text-xl text-slate-900">Cibitung<span class="text-blue-600">Frozen</span></span>
-        <p class="text-[10px] uppercase font-bold tracking-widest text-slate-400 -mt-1">ERP v4.0</p>
-      </div>
+    <!-- Tailwind CSS & Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Libraries: DB, Chart, Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
+    <!-- Custom Styles -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --danger: #e11d48;
+            --success: #059669;
+            --warning: #d97706;
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+        }
+
+        .dark {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --border: #334155;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-light: #1e3a5f;
+            --danger: #f43f5e;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: background-color 0.3s, color 0.3s;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.25s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        input, select, textarea {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+
+        .toggle-checkbox {
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 9999px;
+            border: 2px solid #cbd5e1;
+            background: white;
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            transition: all 0.25s;
+            appearance: none;
+        }
+        .toggle-checkbox:checked {
+            left: 1.25rem;
+            border-color: var(--accent);
+        }
+        .toggle-label {
+            display: block;
+            width: 2.75rem;
+            height: 1.4rem;
+            background: #cbd5e1;
+            border-radius: 9999px;
+            cursor: pointer;
+            position: relative;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background: var(--accent);
+        }
+
+        .progress-bar {
+            height: 0.5rem;
+            background: #e2e8f0;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 0.3s ease;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: white;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateY(100%);
+            opacity: 0;
+            transition: transform 0.3s, opacity 0.3s;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<!-- Top Navigation Bar -->
+<nav class="sticky top-0 z-40 border-b shadow-sm" style="background: var(--surface); border-color: var(--border);">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+                <i class="ph-fill ph-fish-simple text-2xl"></i>
+            </div>
+            <div>
+                <span class="font-extrabold text-xl tracking-tight" style="color: var(--text);">Cibitung<span class="text-blue-600">Frozen</span></span>
+                <p class="text-[10px] uppercase font-bold tracking-widest opacity-50 -mt-1" style="color: var(--text-secondary);">ERP Ultimate v4.0</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 sm:gap-3">
+            <button onclick="CFS.App.backupData()" class="text-sm font-medium opacity-70 hover:opacity-100 transition flex items-center gap-1 px-3 py-1.5 rounded-lg border" style="border-color: var(--border);"><i class="ph ph-download-simple"></i> Backup</button>
+            <button onclick="CFS.App.restorePrompt()" class="text-sm font-medium opacity-70 hover:opacity-100 transition flex items-center gap-1 px-3 py-1.5 rounded-lg border" style="border-color: var(--border);"><i class="ph ph-upload-simple"></i> Restore</button>
+            <button onclick="toggleDarkMode()" class="p-2 rounded-lg border" style="border-color: var(--border);" title="Toggle Dark Mode">
+                <i class="ph ph-moon text-lg" id="darkIcon"></i>
+            </button>
+        </div>
     </div>
-    <div class="flex items-center gap-3">
-      <button onclick="backupData()" class="text-sm font-medium text-slate-600 hover:text-blue-600 transition"><i class="ph ph-download-simple"></i> Backup</button>
-      <button onclick="restoreDataPrompt()" class="text-sm font-medium text-slate-600 hover:text-blue-600 transition"><i class="ph ph-upload-simple"></i> Restore</button>
-    </div>
-  </div>
 </nav>
 
-<!-- Main Layout -->
-<div class="max-w-7xl mx-auto px-4 py-6 w-full flex-1 flex flex-col lg:flex-row gap-6">
-
-  <!-- Sidebar -->
-  <aside class="lg:w-72 flex-shrink-0">
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden sticky top-24">
-      <div class="p-5 border-b border-slate-100 bg-slate-50/50">
-        <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider">Modul</h3>
-      </div>
-      <div class="p-3 space-y-1" id="tabs">
-        <button onclick="switchTab('tab-dashboard')" data-tab="tab-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition active bg-blue-50 text-blue-700">
-          <i class="ph ph-chart-bar text-lg"></i> Dashboard
-        </button>
-        <button onclick="switchTab('tab-stock')" data-tab="tab-stock" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition">
-          <i class="ph ph-package text-lg"></i> Stok & Batch
-        </button>
-        <button onclick="switchTab('tab-sales')" data-tab="tab-sales" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition">
-          <i class="ph ph-shopping-cart text-lg"></i> Penjualan
-        </button>
-        <button onclick="switchTab('tab-finance')" data-tab="tab-finance" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition">
-          <i class="ph ph-wallet text-lg"></i> Keuangan
-        </button>
-        <button onclick="switchTab('tab-settings')" data-tab="tab-settings" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition">
-          <i class="ph ph-gear text-lg"></i> Pengaturan
-        </button>
-      </div>
+<!-- Toast Notification -->
+<div id="toast" class="toast">
+    <div id="toastIcon" class="w-8 h-8 rounded-full flex items-center justify-center"></div>
+    <div>
+        <h4 id="toastTitle" class="text-sm font-bold"></h4>
+        <p id="toastMsg" class="text-xs opacity-70"></p>
     </div>
-  </aside>
-
-  <!-- Content -->
-  <main class="flex-1 min-w-0">
-    <!-- TAB DASHBOARD -->
-    <div id="tab-dashboard" class="tab-content active space-y-6">
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold mb-4">Ringkasan Hari Ini</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="dashboardSummary"></div>
-        <div class="mt-6">
-          <h3 class="font-semibold mb-2">Batch Hampir Kadaluarsa (≤ 7 hari)</h3>
-          <div id="expiringBatches" class="text-sm text-slate-600">Memuat...</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB STOK & BATCH -->
-    <div id="tab-stock" class="tab-content space-y-6">
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold mb-4">Stok Saat Ini</h2>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead class="bg-slate-50">
-              <tr><th class="p-3 text-left">Produk</th><th class="p-3 text-right">Total Stok (kg)</th><th class="p-3 text-right">Batch Aktif</th><th class="p-3 text-right">Aksi</th></tr>
-            </thead>
-            <tbody id="stockTableBody"></tbody>
-          </table>
-        </div>
-        <hr class="my-6">
-        <h3 class="font-semibold mb-2">Tambah Stok Baru</h3>
-        <form id="addStockForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <select id="stockProduk" class="p-2 border rounded-lg" required>
-            <option value="">Pilih Produk</option>
-            <!-- akan diisi oleh JS -->
-          </select>
-          <input type="number" id="stockBerat" placeholder="Berat (kg)" class="p-2 border rounded-lg" required>
-          <input type="number" id="stockHargaBeli" placeholder="Harga Beli /kg" class="p-2 border rounded-lg" required>
-          <input type="date" id="stockTglProduksi" class="p-2 border rounded-lg" required>
-          <input type="date" id="stockTglKadaluarsa" class="p-2 border rounded-lg" required>
-          <input type="number" id="stockOngkir" placeholder="Ongkir (total)" class="p-2 border rounded-lg" value="0">
-          <button type="submit" class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition">Simpan Batch</button>
-        </form>
-      </div>
-    </div>
-
-    <!-- TAB PENJUALAN -->
-    <div id="tab-sales" class="tab-content space-y-6">
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold mb-4">Catat Penjualan</h2>
-        <form id="salesForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input type="text" id="salesKlien" placeholder="Nama Klien" class="p-2 border rounded-lg" required>
-          <select id="salesProduk" class="p-2 border rounded-lg" required>
-            <option value="">Pilih Produk</option>
-          </select>
-          <input type="number" id="salesQty" placeholder="Jumlah (kg)" class="p-2 border rounded-lg" required>
-          <select id="salesTier" class="p-2 border rounded-lg">
-            <option value="ecer">Ecer</option>
-            <option value="grosir">Grosir</option>
-            <option value="partai">Partai Besar</option>
-          </select>
-          <input type="number" id="salesHargaManual" placeholder="Harga Jual /kg (opsional, override)" class="p-2 border rounded-lg">
-          <button type="submit" class="bg-emerald-600 text-white p-2 rounded-lg hover:bg-emerald-700 transition col-span-full">Proses Penjualan</button>
-        </form>
-        <div class="mt-4 p-4 bg-slate-50 rounded-xl hidden" id="salesResult"></div>
-      </div>
-    </div>
-
-    <!-- TAB KEUANGAN -->
-    <div id="tab-finance" class="tab-content space-y-6">
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold mb-4">Buku Besar & Laporan</h2>
-        <div id="financeSummary" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"></div>
-        <button onclick="generateExcelReport()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"><i class="ph ph-file-xls"></i> Ekspor Excel</button>
-      </div>
-    </div>
-
-    <!-- TAB PENGATURAN -->
-    <div id="tab-settings" class="tab-content space-y-6">
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold mb-4">Pengaturan Dasar</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div><label>PPN (%)</label><input type="number" id="setPPN" class="p-2 border rounded-lg w-full" value="12"></div>
-          <div><label>PPh 25 (%)</label><input type="number" id="setPPh25" class="p-2 border rounded-lg w-full" value="2"></div>
-          <div><label>PPh 21 (%)</label><input type="number" id="setPPh21" class="p-2 border rounded-lg w-full" value="5"></div>
-          <div><label>PT Share (%)</label><input type="number" id="setPTShare" class="p-2 border rounded-lg w-full" value="60"></div>
-          <div><label>Min Grosir (kg)</label><input type="number" id="setMinGrosir" class="p-2 border rounded-lg w-full" value="10"></div>
-          <div><label>Min Partai (kg)</label><input type="number" id="setMinPartai" class="p-2 border rounded-lg w-full" value="500"></div>
-          <div><label>Selisih Grosir dari Ecer (Rp)</label><input type="number" id="setSelisihGrosir" class="p-2 border rounded-lg w-full" value="5000"> <small class="text-slate-500">Ecer = Grosir + selisih ini</small></div>
-        </div>
-        <button onclick="saveSettings()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">Simpan Pengaturan</button>
-      </div>
-    </div>
-  </main>
 </div>
 
-<script>
-  // ==================== DATABASE LAYER ====================
-  localforage.config({ name: 'CibitungFrozen', storeName: 'main' });
+<!-- Main Layout -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full flex-1 flex flex-col lg:flex-row gap-6">
 
-  // ==================== PRODUK LIST ====================
-  const PRODUCT_LIST = [
-    'Ikan Banjar', 'Ikan Dori Fillet', 'Ikan Layang', 'Ikan Belo',
-    'Ikan Tongkol', 'Ikan Salem', 'Ikan Tenggiri', 'Ikan Bawal Laut', 'Cumi Cumi'
-  ];
+    <!-- Sidebar Navigation -->
+    <aside class="lg:w-72 flex-shrink-0">
+        <div class="card sticky top-24 overflow-hidden">
+            <div class="p-5 border-b" style="border-color: var(--border);">
+                <h3 class="font-bold text-sm uppercase tracking-wider opacity-70">Modul</h3>
+            </div>
+            <div class="p-2 space-y-1" id="tabs">
+                <button onclick="switchTab('tab-dashboard')" data-tab="tab-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition active bg-blue-50 text-blue-700 font-semibold"><i class="ph ph-chart-bar text-lg"></i> Dashboard</button>
+                <button onclick="switchTab('tab-stock')" data-tab="tab-stock" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-package text-lg"></i> Stok & Batch</button>
+                <button onclick="switchTab('tab-sales')" data-tab="tab-sales" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-shopping-cart text-lg"></i> Penjualan</button>
+                <button onclick="switchTab('tab-finance')" data-tab="tab-finance" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-wallet text-lg"></i> Keuangan & Akuntansi</button>
+                <button onclick="switchTab('tab-history')" data-tab="tab-history" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-clock-counter-clockwise text-lg"></i> Riwayat</button>
+                <button onclick="switchTab('tab-reports')" data-tab="tab-reports" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-file-text text-lg"></i> Laporan</button>
+                <button onclick="switchTab('tab-settings')" data-tab="tab-settings" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-gear text-lg"></i> Pengaturan</button>
+            </div>
+        </div>
+    </aside>
 
-  // ==================== STOK & BATCH ====================
-  async function getStockData() {
-    let data = await localforage.getItem('stock_batches');
-    if (!data) data = [];
-    return data;
-  }
+    <!-- Main Content Area -->
+    <main class="flex-1 min-w-0">
 
-  async function saveStockData(batches) {
-    await localforage.setItem('stock_batches', batches);
-  }
+        <!-- ==================== TAB DASHBOARD ==================== -->
+        <div id="tab-dashboard" class="tab-content active space-y-6">
+            <!-- Widget Toggle Bar -->
+            <div class="card p-4 flex flex-wrap items-center gap-4">
+                <h2 class="text-lg font-bold flex items-center gap-2"><i class="ph ph-chart-bar text-blue-600"></i> Dashboard</h2>
+                <div class="flex flex-wrap gap-2 text-sm ml-auto">
+                    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="stockSummary" checked> Stok</label>
+                    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="expiringBatches" checked> Expired</label>
+                    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="revenueChart" checked> Chart</label>
+                    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="profitLoss" checked> Laba</label>
+                    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="quickActions" checked> Aksi</label>
+                </div>
+            </div>
 
-  async function addBatch(batch) {
-    const batches = await getStockData();
-    batches.push(batch);
-    await saveStockData(batches);
-    await updateDashboard();
-    await renderStockTable();
-  }
+            <!-- Widget: Ringkasan Stok -->
+            <div id="widget-stockSummary" class="card p-6 animate-fade-in">
+                <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-fish"></i> Stok Ikan Saat Ini</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="dashboardSummaryCards">
+                    <!-- Diisi oleh JS -->
+                </div>
+            </div>
 
-  // Alokasi stok secara FEFO (mengurangi batch yang paling dekat expired)
-  async function allocateStock(productName, qtyNeeded) {
-    const batches = await getStockData();
-    // filter batch yang produknya sesuai, berat_sisa > 0, belum expired
-    const now = new Date();
-    const candidates = batches.filter(b => b.produk === productName && b.berat_sisa > 0 && new Date(b.tgl_kadaluarsa) > now);
-    candidates.sort((a,b) => new Date(a.tgl_kadaluarsa) - new Date(b.tgl_kadaluarsa)); // FEFO
-    let remaining = qtyNeeded;
-    const usedBatches = [];
-    for (let b of candidates) {
-      if (remaining <= 0) break;
-      const ambil = Math.min(b.berat_sisa, remaining);
-      b.berat_sisa -= ambil;
-      remaining -= ambil;
-      usedBatches.push({ id: b.id, nama_produk: b.produk, qty: ambil, harga_per_kg: b.hpp_per_kg });
-      if (b.berat_sisa === 0) b.status = 'habis';
-    }
-    if (remaining > 0) throw new Error(`Stok ${productName} tidak mencukupi, kurang ${remaining.toFixed(1)} kg`);
-    await saveStockData(batches);
-    return usedBatches;  // untuk perhitungan HPP aktual
-  }
+            <!-- Widget: Batch Hampir Kadaluarsa -->
+            <div id="widget-expiringBatches" class="card p-6 animate-fade-in">
+                <h3 class="font-semibold mb-3 flex items-center gap-2 text-red-600"><i class="ph ph-warning"></i> Batch Hampir Kadaluarsa (≤ 7 hari)</h3>
+                <div id="expiringBatches" class="space-y-2 text-sm">
+                    <!-- Diisi oleh JS -->
+                </div>
+            </div>
 
-  async function renderStockTable() {
-    const batches = await getStockData();
-    const summary = {};
-    PRODUCT_LIST.forEach(p => summary[p] = 0);
-    batches.forEach(b => { if (b.berat_sisa > 0) summary[b.produk] = (summary[b.produk] || 0) + b.berat_sisa; });
-    const tbody = document.getElementById('stockTableBody');
-    tbody.innerHTML = PRODUCT_LIST.map(p => {
-      const total = summary[p]?.toFixed(1) || 0;
-      const batchesAktif = batches.filter(b => b.produk === p && b.berat_sisa > 0).length;
-      return `<tr class="border-b">
-        <td class="p-3">${p}</td>
-        <td class="p-3 text-right font-semibold">${total} kg</td>
-        <td class="p-3 text-right">${batchesAktif}</td>
-        <td class="p-3 text-right"><button onclick="lihatBatch('${p}')" class="text-blue-600 text-sm">Detail</button></td>
-      </tr>`;
-    }).join('');
-  }
+            <!-- Widget: Chart Pendapatan -->
+            <div id="widget-revenueChart" class="card p-6 animate-fade-in">
+                <h3 class="font-semibold mb-4">Pendapatan 7 Hari Terakhir</h3>
+                <canvas id="chartRevenue" height="200"></canvas>
+            </div>
 
-  window.lihatBatch = async (produk) => {
-    const batches = await getStockData();
-    const filtered = batches.filter(b => b.produk === produk);
-    alert(filtered.map(b => `Batch ${b.id}: ${b.berat_sisa} kg, Exp: ${b.tgl_kadaluarsa}`).join('\n'));
-  };
+            <!-- Widget: Laba Rugi Bulan Ini -->
+            <div id="widget-profitLoss" class="card p-6 animate-fade-in">
+                <h3 class="font-semibold mb-4">Laba Rugi Bulan Ini</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="financeSummary">
+                    <!-- Diisi oleh JS -->
+                </div>
+            </div>
 
-  // ==================== PENJUALAN ====================
-  async function processSale(klien, produk, qty, tier, manualHarga) {
-    // harga dari pengaturan
-    const settings = await getSettings();
-    const usedBatches = await allocateStock(produk, qty);
-    const totalHPP = usedBatches.reduce((sum, b) => sum + b.qty * b.harga_per_kg, 0);
-    // Hitung harga dasar ecer
-    const margin = 15000; // bisa diambil dari input nanti
-    const hppAvg = totalHPP / qty;
-    let hargaEcer = hppAvg + margin; // default
-    // Terapkan selisih grosir
-    const selisih = settings.selisihGrosir || 5000;
-    let hargaJual = hargaEcer;
-    if (tier === 'grosir') hargaJual = hargaEcer - selisih; // Grosir lebih murah
-    else if (tier === 'partai') hargaJual = manualHarga || hargaEcer; // Partai sesuai input
-    if (manualHarga && tier !== 'partai') hargaJual = manualHarga; // override manual
-    const dppTotal = hargaJual * qty;
-    const ppn = dppTotal * (settings.ppn / 100);
-    const totalInvoice = dppTotal + ppn;
-    // Buat jurnal
-    await createJournal(klien, produk, qty, dppTotal, ppn, totalHPP);
-    return { usedBatches, totalInvoice, hargaJual };
-  }
+            <!-- Widget: Quick Actions -->
+            <div id="widget-quickActions" class="card p-6 animate-fade-in">
+                <h3 class="font-semibold mb-4">Aksi Cepat</h3>
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="switchTab('tab-stock')" class="btn-primary flex items-center gap-2"><i class="ph ph-plus-circle"></i> Tambah Stok</button>
+                    <button onclick="switchTab('tab-sales')" class="btn-primary flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700"><i class="ph ph-shopping-cart"></i> Catat Penjualan</button>
+                    <button onclick="switchTab('tab-finance')" class="btn-primary flex items-center gap-2 bg-slate-600 hover:bg-slate-700"><i class="ph ph-wallet"></i> Catat Beban</button>
+                    <button onclick="CFS.App.backupData()" class="btn-primary flex items-center gap-2 bg-amber-600 hover:bg-amber-700"><i class="ph ph-download-simple"></i> Backup Data</button>
+                </div>
+            </div>
+        </div>
 
-  // ==================== JURNAL AKUNTANSI ====================
-  async function getJournals() {
-    let j = await localforage.getItem('journals');
-    return j || [];
-  }
-  async function addJournal(entry) {
-    const journals = await getJournals();
-    journals.push(entry);
-    await localforage.setItem('journals', journals);
-  }
+        <!-- ==================== TAB STOK & BATCH ==================== -->
+        <div id="tab-stock" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-package text-indigo-600"></i> Stok & Batch</h2>
+                <!-- Tabel Stok -->
+                <div class="overflow-x-auto mb-6">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-50 dark:bg-slate-800">
+                            <tr>
+                                <th class="p-3 text-left">Produk</th>
+                                <th class="p-3 text-right">Total Stok (kg)</th>
+                                <th class="p-3 text-right">Batch Aktif</th>
+                                <th class="p-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stockTableBody">
+                            <!-- Diisi oleh JS -->
+                        </tbody>
+                    </table>
+                </div>
 
-  async function createJournal(klien, produk, qty, dpp, ppn, hpp) {
-    const now = new Date().toISOString();
-    const entry = {
-      id: Date.now(),
-      tanggal: now,
-      deskripsi: `Penjualan ${produk} ${qty} kg ke ${klien}`,
-      entries: [
-        { akun: 'Piutang Dagang', debet: dpp+ppn, kredit: 0 },
-        { akun: 'Penjualan', debet: 0, kredit: dpp },
-        { akun: 'PPN Keluaran', debet: 0, kredit: ppn },
-        { akun: 'HPP', debet: hpp, kredit: 0 },
-        { akun: 'Persediaan', debet: 0, kredit: hpp },
-      ]
-    };
-    await addJournal(entry);
-  }
+                <!-- Form Tambah Batch -->
+                <h3 class="font-semibold mb-3">Tambah Batch Baru</h3>
+                <form id="addStockForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <select id="stockProduk" class="w-full" required>
+                        <option value="">Pilih Produk</option>
+                        <!-- Diisi oleh JS -->
+                    </select>
+                    <input type="number" id="stockBerat" placeholder="Berat (kg)" class="w-full" required>
+                    <input type="number" id="stockHargaBeli" placeholder="Harga Beli per kg" class="w-full" required>
+                    <input type="number" id="stockOngkir" placeholder="Ongkir Total (opsional)" class="w-full" value="0">
+                    <input type="date" id="stockTglProduksi" class="w-full" required>
+                    <input type="date" id="stockTglKadaluarsa" class="w-full" required>
+                    <button type="submit" class="btn-primary col-span-full sm:col-span-2 lg:col-span-1">Simpan Batch</button>
+                </form>
 
-  // ==================== SETTINGS ====================
-  async function getSettings() {
-    let s = await localforage.getItem('settings');
-    if (!s) {
-      s = { ppn: 12, pph25: 2, pph21: 5, ptShare: 60, minGrosir: 10, minPartai: 500, selisihGrosir: 5000 };
-      await localforage.setItem('settings', s);
-    }
-    return s;
-  }
-  async function saveSettings() {
-    const s = {
-      ppn: parseFloat(document.getElementById('setPPN').value),
-      pph25: parseFloat(document.getElementById('setPPh25').value),
-      pph21: parseFloat(document.getElementById('setPPh21').value),
-      ptShare: parseFloat(document.getElementById('setPTShare').value),
-      minGrosir: parseFloat(document.getElementById('setMinGrosir').value),
-      minPartai: parseFloat(document.getElementById('setMinPartai').value),
-      selisihGrosir: parseFloat(document.getElementById('setSelisihGrosir').value),
-    };
-    await localforage.setItem('settings', s);
-    alert('Pengaturan disimpan');
-  }
+                <!-- Tombol Lihat Semua Batch -->
+                <div class="mt-4">
+                    <button onclick="document.getElementById('batchDetailModal').classList.remove('hidden')" class="text-blue-600 text-sm underline">Lihat Semua Batch (Detail)</button>
+                </div>
+            </div>
+        </div>
 
-  // ==================== UI & INIT ====================
-  function switchTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-    document.querySelectorAll('.tab-btn').forEach(b => {
-      b.classList.remove('bg-blue-50', 'text-blue-700');
-      b.classList.add('text-slate-600');
-      if (b.dataset.tab === tabId) {
-        b.classList.add('bg-blue-50', 'text-blue-700');
-        b.classList.remove('text-slate-600');
-      }
-    });
-    if (tabId === 'tab-stock') renderStockTable();
-  }
+        <!-- Modal Detail Batch -->
+        <div id="batchDetailModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden p-4">
+            <div class="card w-full max-w-4xl max-h-[85vh] overflow-auto p-6 relative">
+                <button onclick="document.getElementById('batchDetailModal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800 text-xl">&times;</button>
+                <h3 class="font-bold text-lg mb-4">Detail Batch</h3>
+                <select id="batchProdukSelect" class="w-full mb-4">
+                    <option value="">Semua Produk</option>
+                    <!-- Diisi oleh JS -->
+                </select>
+                <div id="batchDetailContent"></div>
+            </div>
+        </div>
 
-  // Inisialisasi
-  (async function init() {
-    // Isi dropdown produk
-    const productSelects = document.querySelectorAll('#stockProduk, #salesProduk');
-    productSelects.forEach(sel => {
-      sel.innerHTML = '<option value="">Pilih</option>' + PRODUCT_LIST.map(p => `<option>${p}</option>`).join('');
-    });
+        <!-- ==================== TAB PENJUALAN ==================== -->
+        <div id="tab-sales" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-shopping-cart text-emerald-600"></i> Catat Penjualan</h2>
+                <form id="salesForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="salesKlien" placeholder="Nama Klien" class="w-full" required>
+                    <select id="salesProduk" class="w-full" required>
+                        <option value="">Pilih Produk</option>
+                    </select>
+                    <input type="number" id="salesQty" placeholder="Jumlah (kg)" class="w-full" required>
+                    <select id="salesTier" class="w-full">
+                        <option value="ecer">Ecer</option>
+                        <option value="grosir">Grosir</option>
+                        <option value="partai">Partai Besar</option>
+                    </select>
+                    <input type="number" id="salesHargaManual" placeholder="Harga Jual/kg (opsional, untuk partai)" class="w-full">
+                    <div class="col-span-full flex flex-wrap gap-3">
+                        <button type="button" id="previewPriceBtn" class="btn-primary bg-slate-500 hover:bg-slate-600">Preview Harga</button>
+                        <button type="submit" class="btn-primary">Proses Penjualan</button>
+                    </div>
+                </form>
+                <!-- Hasil Preview / Penjualan -->
+                <div id="salesResult" class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl hidden">
+                    <!-- Diisi oleh JS -->
+                </div>
+            </div>
+        </div>
 
-    // Load pengaturan ke form
-    const settings = await getSettings();
-    document.getElementById('setPPN').value = settings.ppn;
-    document.getElementById('setPPh25').value = settings.pph25;
-    document.getElementById('setPPh21').value = settings.pph21;
-    document.getElementById('setPTShare').value = settings.ptShare;
-    document.getElementById('setMinGrosir').value = settings.minGrosir;
-    document.getElementById('setMinPartai').value = settings.minPartai;
-    document.getElementById('setSelisihGrosir').value = settings.selisihGrosir;
+        <!-- ==================== TAB KEUANGAN & AKUNTANSI ==================== -->
+        <div id="tab-finance" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-wallet text-blue-600"></i> Keuangan & Akuntansi</h2>
+                <!-- Ringkasan Laba Rugi -->
+                <div id="financeSummaryContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <!-- Diisi sama dengan financeSummary di dashboard, tapi dibuat duplikat agar independen -->
+                </div>
 
-    // Handler tambah stok
-    document.getElementById('addStockForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const batch = {
-        id: 'BATCH_' + Date.now(),
-        produk: document.getElementById('stockProduk').value,
-        berat_awal: parseFloat(document.getElementById('stockBerat').value),
-        berat_sisa: parseFloat(document.getElementById('stockBerat').value),
-        harga_beli: parseFloat(document.getElementById('stockHargaBeli').value),
-        ongkir: parseFloat(document.getElementById('stockOngkir').value) || 0,
-        tgl_produksi: document.getElementById('stockTglProduksi').value,
-        tgl_kadaluarsa: document.getElementById('stockTglKadaluarsa').value,
-        hpp_per_kg: (parseFloat(document.getElementById('stockHargaBeli').value) * parseFloat(document.getElementById('stockBerat').value) + parseFloat(document.getElementById('stockOngkir').value)) / parseFloat(document.getElementById('stockBerat').value),
-        status: 'aktif'
-      };
-      await addBatch(batch);
-      alert('Batch berhasil ditambahkan');
-      document.getElementById('addStockForm').reset();
-    });
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Form Beban Operasional -->
+                    <div class="card p-4">
+                        <h3 class="font-semibold mb-3">Catat Beban Operasional</h3>
+                        <form id="expenseForm" class="space-y-3">
+                            <select id="expenseAkun" class="w-full">
+                                <option value="Beban Operasional">Beban Operasional</option>
+                                <option value="Beban Listrik">Beban Listrik</option>
+                                <option value="Beban Sewa">Beban Sewa</option>
+                                <option value="Beban Gaji">Beban Gaji</option>
+                            </select>
+                            <input type="number" id="expenseJumlah" placeholder="Jumlah (Rp)" class="w-full" required>
+                            <input type="text" id="expenseDeskripsi" placeholder="Deskripsi (opsional)" class="w-full">
+                            <button type="submit" class="btn-primary w-full">Simpan Beban</button>
+                        </form>
+                    </div>
+                    <!-- Ekspor & Jurnal -->
+                    <div class="card p-4">
+                        <h3 class="font-semibold mb-3">Laporan & Ekspor</h3>
+                        <button id="exportExcelBtn" class="btn-primary bg-green-600 hover:bg-green-700 w-full mb-2"><i class="ph ph-file-xls"></i> Ekspor Jurnal Bulan Ini (Excel)</button>
+                        <button id="viewJournalBtn" class="btn-primary bg-slate-600 hover:bg-slate-700 w-full"><i class="ph ph-book-open"></i> Lihat Buku Besar</button>
+                    </div>
+                </div>
 
-    // Handler penjualan
-    document.getElementById('salesForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      try {
-        const res = await processSale(
-          document.getElementById('salesKlien').value,
-          document.getElementById('salesProduk').value,
-          parseFloat(document.getElementById('salesQty').value),
-          document.getElementById('salesTier').value,
-          parseFloat(document.getElementById('salesHargaManual').value) || null
-        );
-        document.getElementById('salesResult').classList.remove('hidden');
-        document.getElementById('salesResult').innerHTML = `
-          ✅ Penjualan berhasil!<br>
-          Invoice: ${new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR'}).format(res.totalInvoice)}<br>
-          Batch yang terpakai: ${res.usedBatches.map(b=>`${b.nama_produk} ${b.qty}kg`).join(', ')}
-        `;
-        await updateDashboard();
-        await renderStockTable();
-      } catch (err) {
-        alert(err.message);
-      }
-    });
+                <!-- Buku Besar (akan ditampilkan secara inline atau modal) -->
+                <div id="journalViewer" class="mt-6 hidden">
+                    <h3 class="font-semibold mb-2">Buku Besar (Jurnal)</h3>
+                    <div class="overflow-x-auto max-h-64">
+                        <table class="w-full text-sm">
+                            <thead class="bg-slate-50 dark:bg-slate-800">
+                                <tr><th class="p-2 text-left">Tanggal</th><th class="p-2 text-left">Deskripsi</th><th class="p-2 text-left">Akun</th><th class="p-2 text-right">Debet</th><th class="p-2 text-right">Kredit</th></tr>
+                            </thead>
+                            <tbody id="journalTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    // Dashboard awal
-    await updateDashboard();
-    await renderStockTable();
-  })();
+        <!-- ==================== TAB RIWAYAT TRANSAKSI ==================== -->
+        <div id="tab-history" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-clock-counter-clockwise text-amber-600"></i> Riwayat Transaksi</h2>
+                <form id="filterTransaksi" class="flex flex-wrap gap-3 mb-4">
+                    <select id="filterProduk" class="w-full sm:w-auto">
+                        <option value="">Semua Produk</option>
+                        <!-- Diisi JS -->
+                    </select>
+                    <input type="text" id="filterKlien" placeholder="Nama Klien" class="w-full sm:w-auto">
+                    <input type="date" id="filterStart" class="w-full sm:w-auto">
+                    <input type="date" id="filterEnd" class="w-full sm:w-auto">
+                    <button type="submit" class="btn-primary">Filter</button>
+                </form>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-50 dark:bg-slate-800">
+                            <tr>
+                                <th class="p-3 text-left">Tanggal</th>
+                                <th class="p-3 text-left">Klien</th>
+                                <th class="p-3 text-left">Produk</th>
+                                <th class="p-3 text-right">Qty (kg)</th>
+                                <th class="p-3 text-right">Invoice</th>
+                                <th class="p-3 text-center">Tier</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr><td colspan="6" class="p-4 text-center opacity-50">Belum ada transaksi.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-  async function updateDashboard() {
-    const batches = await getStockData();
-    const summary = {};
-    PRODUCT_LIST.forEach(p => summary[p] = 0);
-    batches.forEach(b => { if (b.berat_sisa > 0) summary[b.produk] += b.berat_sisa; });
-    const now = new Date();
-    const expiring = batches.filter(b => {
-      const exp = new Date(b.tgl_kadaluarsa);
-      return b.berat_sisa > 0 && (exp - now) / (1000*3600*24) <= 7;
-    });
-    document.getElementById('dashboardSummary').innerHTML = PRODUCT_LIST.map(p => `<div class="bg-white border rounded-xl p-4"><p class="text-sm text-slate-500">${p}</p><p class="text-2xl font-bold">${summary[p]?.toFixed(1)} kg</p></div>`).join('');
-    const expHtml = expiring.length ? expiring.map(b => `<div class="text-red-600">• ${b.produk} batch ${b.id} sisa ${b.berat_sisa} kg, exp ${b.tgl_kadaluarsa}</div>`).join('') : '<div class="text-green-600">Aman, tidak ada batch kritis.</div>';
-    document.getElementById('expiringBatches').innerHTML = expHtml;
-  }
+        <!-- ==================== TAB LAPORAN ==================== -->
+        <div id="tab-reports" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="ph ph-file-text text-violet-600"></i> Laporan Keuangan</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-semibold mb-2">Laba Rugi</h3>
+                        <div id="reportLabaRugi" class="text-sm space-y-1 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                            <!-- Diisi oleh JS (pendapatan, HPP, beban, dll) -->
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-2">Neraca (Mini)</h3>
+                        <div id="reportNeraca" class="text-sm space-y-1 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                            <!-- Diisi oleh JS (Aset, Kewajiban, Ekuitas) -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-  function backupData() {
-    Promise.all([
-      localforage.getItem('stock_batches'),
-      localforage.getItem('journals'),
-      localforage.getItem('settings')
-    ]).then(([batches, journals, settings]) => {
-      const blob = new Blob([JSON.stringify({ batches, journals, settings }, null, 2)], {type: 'application/json'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `cfs_backup_${new Date().toISOString().slice(0,10)}.json`;
-      a.click();
-    });
-  }
+        <!-- ==================== TAB PENGATURAN ==================== -->
+        <div id="tab-settings" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-gear text-slate-600"></i> Pengaturan Bisnis</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-3">
+                        <div><label class="text-sm font-medium">PPN (%)</label><input type="number" id="setPPN" class="w-full" value="12"></div>
+                        <div><label class="text-sm font-medium">PPh 25 (%)</label><input type="number" id="setPPh25" class="w-full" value="2"></div>
+                        <div><label class="text-sm font-medium">PPh 21 (%)</label><input type="number" id="setPPh21" class="w-full" value="5"></div>
+                        <div><label class="text-sm font-medium">PT Share (%)</label><input type="number" id="setPTShare" class="w-full" value="60"></div>
+                    </div>
+                    <div class="space-y-3">
+                        <div><label class="text-sm font-medium">Min Grosir (kg)</label><input type="number" id="setMinGrosir" class="w-full" value="10"></div>
+                        <div><label class="text-sm font-medium">Min Partai (kg)</label><input type="number" id="setMinPartai" class="w-full" value="500"></div>
+                        <div><label class="text-sm font-medium">Selisih Grosir dari Ecer (Rp)</label><input type="number" id="setSelisihGrosir" class="w-full" value="5000"></div>
+                        <div><label class="text-sm font-medium">Margin Keuntungan Default (Rp/kg)</label><input type="number" id="setMarginDefault" class="w-full" value="15000"></div>
+                    </div>
+                </div>
+                <button id="saveSettingsBtn" class="btn-primary mt-6">Simpan Pengaturan</button>
+            </div>
+        </div>
 
-  function restoreDataPrompt() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = async (e) => {
-      const file = e.target.files[0];
-      const text = await file.text();
-      const data = JSON.parse(text);
-      if (data.batches) await localforage.setItem('stock_batches', data.batches);
-      if (data.journals) await localforage.setItem('journals', data.journals);
-      if (data.settings) await localforage.setItem('settings', data.settings);
-      alert('Data berhasil dipulihkan!');
-      location.reload();
-    };
-    input.click();
-  }
+    </main>
+</div>
 
-  function generateExcelReport() {
-    // Akan diisi dengan data jurnal, untuk demo sederhana
-    alert('Fitur ekspor Excel akan datang di update berikutnya.');
-  }
-
-  // Handle bongkar muat & shrinkage (opsional) bisa ditambahkan di batch nanti.
-<script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+<!-- Script Modules (akan dibuat nanti) -->
 <script src="js/storage.js"></script>
 <script src="js/settings.js"></script>
 <script src="js/inventory.js"></script>
@@ -460,5 +514,52 @@
 <script src="js/accounting.js"></script>
 <script src="js/dashboard.js"></script>
 <script src="js/app.js"></script>
+
+<!-- Inisialisasi Tambahan untuk Dark Mode & Navigasi -->
+<script>
+    // Toggle Dark Mode
+    function toggleDarkMode() {
+        document.documentElement.classList.toggle('dark');
+        const isDark = document.documentElement.classList.contains('dark');
+        localStorage.setItem('cfs_dark', isDark ? '1' : '0');
+        const icon = document.getElementById('darkIcon');
+        if (isDark) icon.className = 'ph ph-sun text-lg text-yellow-400';
+        else icon.className = 'ph ph-moon text-lg';
+    }
+    if (localStorage.getItem('cfs_dark') === '1') {
+        document.documentElement.classList.add('dark');
+        document.getElementById('darkIcon').className = 'ph ph-sun text-lg text-yellow-400';
+    }
+
+    // Global function for tab switching (to be extended by app.js)
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.remove('bg-blue-50', 'text-blue-700', 'font-semibold');
+            b.classList.add('opacity-70');
+            if (b.dataset.tab === tabId) {
+                b.classList.add('bg-blue-50', 'text-blue-700', 'font-semibold');
+                b.classList.remove('opacity-70');
+            }
+        });
+        // Trigger dashboard refresh jika diperlukan (akan di handle app.js)
+        if (typeof CFS !== 'undefined' && CFS.App && CFS.App.onTabSwitch) CFS.App.onTabSwitch(tabId);
+    }
+
+    // Placeholder for toast
+    window.showToast = (title, msg, type = 'success') => {
+        const toast = document.getElementById('toast');
+        const icon = document.getElementById('toastIcon');
+        document.getElementById('toastTitle').innerText = title;
+        document.getElementById('toastMsg').innerText = msg;
+        if (type === 'success') icon.innerHTML = '<i class="ph ph-check text-white text-lg"></i>';
+        else icon.innerHTML = '<i class="ph ph-warning text-white text-lg"></i>';
+        icon.className = `w-8 h-8 rounded-full flex items-center justify-center ${type === 'success' ? 'bg-emerald-500' : 'bg-red-500'}`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    };
+</script>
+
 </body>
 </html>
