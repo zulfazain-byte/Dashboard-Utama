@@ -1,317 +1,336 @@
-// js/app.js
-CFS.Utils = {
-    formatRupiah: (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num),
-    formatDate: (iso) => new Date(iso).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })
-};
+window.CFS = window.CFS || {};
 
-CFS.App = {
-    init() {
-        this.setupTabs();
-        this.setupForms();
-        this.populateDropdowns();
-        this.loadSettings();
-        this.setupDashboardToggles();
-        this.setupBackupRestore();
-        this.setupBatchModal();
-        CFS.Dashboard.refreshAll();
-        CFS.Inventory.renderStockTable();
-        this.applyWidgetVisibility();
-    },
+(function() {
+    'use strict';
 
-    setupTabs() {
+    const Storage = CFS.Storage;
+
+    // Status inisialisasi modul
+    const modulesInitialized = {
+        dashboard: false,
+        stock: false,
+        sales: false,
+        purchase: false,
+        supplier: false,
+        products: false,
+        crm: false,
+        crmDetail: false,
+        pricing: false,
+        finance: false,
+        delivery: false,
+        opname: false,
+        return: false,
+        history: false,
+        audit: false,
+        reports: false,
+        notifications: false,
+        settings: false,
+        help: false
+    };
+
+    // Cache elemen global
+    const toast = document.getElementById('toast');
+    const toastIcon = document.getElementById('toastIcon');
+    const toastTitle = document.getElementById('toastTitle');
+    const toastMsg = document.getElementById('toastMsg');
+
+    // Fungsi showToast
+    function showToast(title, msg, type = 'info') {
+        if (!toast || !toastIcon || !toastTitle || !toastMsg) return;
+        toastIcon.className = 'w-9 h-9 rounded-full flex items-center justify-center text-white';
+        if (type === 'success') {
+            toastIcon.classList.add('bg-green-500');
+            toastIcon.innerHTML = '<i class="ph ph-check"></i>';
+        } else if (type === 'error') {
+            toastIcon.classList.add('bg-red-500');
+            toastIcon.innerHTML = '<i class="ph ph-x"></i>';
+        } else if (type === 'warning') {
+            toastIcon.classList.add('bg-yellow-500');
+            toastIcon.innerHTML = '<i class="ph ph-warning"></i>';
+        } else {
+            toastIcon.classList.add('bg-blue-500');
+            toastIcon.innerHTML = '<i class="ph ph-info"></i>';
+        }
+        toastTitle.textContent = title;
+        toastMsg.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+    // Expose global showToast agar modul lain bisa pakai tanpa prefix
+    window.showToast = showToast;
+
+    // Fungsi switchTab
+    function switchTab(tabId) {
+        // Sembunyikan semua tab content
+        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+        // Hapus class active dari semua tombol
         document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+            btn.classList.remove('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
+            btn.classList.add('opacity-70');
         });
-    },
-
-    onTabSwitch(tabId) {
-        if (tabId === 'tab-stock') CFS.Inventory.renderStockTable();
-        if (tabId === 'tab-dashboard') CFS.Dashboard.refreshAll();
-        if (tabId === 'tab-finance') {
-            CFS.Dashboard.renderFinanceSummary();
-            CFS.Dashboard.renderNeraca();
+        // Tampilkan tab yang dipilih
+        const target = document.getElementById(tabId);
+        if (target) target.classList.add('active');
+        // Tandai tombol
+        const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+        if (btn) {
+            btn.classList.add('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
+            btn.classList.remove('opacity-70');
         }
-        if (tabId === 'tab-reports') {
-            CFS.Dashboard.renderLabaRugiReport();
-            CFS.Dashboard.renderNeraca();
+
+        // Inisialisasi modul jika diperlukan
+        switch (tabId) {
+            case 'tab-dashboard':
+                if (!modulesInitialized.dashboard && CFS.Dashboard) {
+                    CFS.Dashboard.init();
+                    modulesInitialized.dashboard = true;
+                } else if (CFS.Dashboard) {
+                    CFS.Dashboard.refresh();
+                }
+                break;
+            case 'tab-stock':
+                if (!modulesInitialized.stock && CFS.Inventory) {
+                    CFS.Inventory.init();
+                    modulesInitialized.stock = true;
+                } else if (CFS.Inventory) {
+                    CFS.Inventory.refreshStockTable();
+                }
+                break;
+            case 'tab-sales':
+                if (!modulesInitialized.sales && CFS.Sales) {
+                    CFS.Sales.init();
+                    modulesInitialized.sales = true;
+                } else if (CFS.Sales) {
+                    CFS.Sales.refreshTodaySales();
+                    if (CFS.Inventory) CFS.Inventory.populateProductDropdowns();
+                }
+                break;
+            case 'tab-purchase':
+                // Modul pembelian belum dibuat terpisah, mungkin diintegrasikan di inventory? 
+                // Untuk sekarang, kita hanya populate dropdown supplier/produk jika ada.
+                if (CFS.Inventory) CFS.Inventory.populateProductDropdowns();
+                // Bisa tambahkan modul Purchase nanti
+                break;
+            case 'tab-supplier':
+                // Supplier bisa diintegrasikan di modul sendiri, kita asumsikan ada fungsi di Inventory atau Sales?
+                // Untuk sekarang, cukup refresh tabel supplier dari Storage
+                // Nanti bisa dibuat module supplier.js terpisah
+                break;
+            case 'tab-products':
+                if (!modulesInitialized.products && CFS.Products) {
+                    CFS.Products.init(); // jika ada
+                }
+                break;
+            case 'tab-crm':
+                if (!modulesInitialized.crm && CFS.CRM) {
+                    CFS.CRM.init();
+                    modulesInitialized.crm = true;
+                } else if (CFS.CRM) {
+                    CFS.CRM.refresh();
+                }
+                break;
+            case 'tab-crm-detail':
+                if (!modulesInitialized.crmDetail && CFS.CRMDetail) {
+                    CFS.CRMDetail.init();
+                }
+                break;
+            case 'tab-pricing':
+                if (!modulesInitialized.pricing && CFS.Pricing) {
+                    CFS.Pricing.init();
+                }
+                break;
+            case 'tab-finance':
+                if (!modulesInitialized.finance && CFS.Accounting) {
+                    CFS.Accounting.init();
+                    modulesInitialized.finance = true;
+                } else if (CFS.Accounting) {
+                    CFS.Accounting.refreshFinanceSummary();
+                }
+                break;
+            case 'tab-delivery':
+                if (!modulesInitialized.delivery && CFS.Delivery) {
+                    CFS.Delivery.init();
+                }
+                break;
+            case 'tab-opname':
+                if (!modulesInitialized.opname && CFS.Opname) {
+                    CFS.Opname.init();
+                }
+                break;
+            case 'tab-return':
+                if (!modulesInitialized.return && CFS.Return) {
+                    CFS.Return.init();
+                }
+                break;
+            case 'tab-history':
+                if (!modulesInitialized.history && CFS.History) {
+                    CFS.History.init();
+                }
+                break;
+            case 'tab-audit':
+                if (!modulesInitialized.audit && CFS.Audit) {
+                    CFS.Audit.init();
+                }
+                break;
+            case 'tab-reports':
+                if (!modulesInitialized.reports && CFS.Reports) {
+                    CFS.Reports.init();
+                }
+                break;
+            case 'tab-notifications':
+                if (!modulesInitialized.notifications && CFS.Notifications) {
+                    CFS.Notifications.init();
+                }
+                break;
+            case 'tab-settings':
+                if (!modulesInitialized.settings && CFS.Settings) {
+                    CFS.Settings.init();
+                    modulesInitialized.settings = true;
+                }
+                break;
+            case 'tab-help':
+                // Tidak perlu inisialisasi khusus
+                break;
         }
-    },
+    }
+    // Expose global
+    window.switchTab = switchTab;
 
-    setupForms() {
-        // Tambah Batch
-        document.getElementById('addStockForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const batchData = {
-                produk: document.getElementById('stockProduk').value,
-                berat: parseFloat(document.getElementById('stockBerat').value),
-                hargaBeli: parseFloat(document.getElementById('stockHargaBeli').value),
-                ongkir: parseFloat(document.getElementById('stockOngkir').value) || 0,
-                tglProduksi: document.getElementById('stockTglProduksi').value,
-                tglKadaluarsa: document.getElementById('stockTglKadaluarsa').value
-            };
-            const batch = await CFS.Inventory.addBatch(batchData);
-            await CFS.Accounting.recordPurchase(batchData.produk, (batchData.hargaBeli * batchData.berat) + batchData.ongkir, batchData.berat);
-            showToast('Berhasil', 'Batch ditambahkan.', 'success');
-            e.target.reset();
-            CFS.Dashboard.refreshAll();
-            CFS.Inventory.renderStockTable();
-        });
-
-        // Penjualan
-        document.getElementById('salesForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const klien = document.getElementById('salesKlien').value;
-            const produk = document.getElementById('salesProduk').value;
-            const qty = parseFloat(document.getElementById('salesQty').value);
-            const tier = document.getElementById('salesTier').value;
-            const manualHarga = parseFloat(document.getElementById('salesHargaManual').value) || null;
-            try {
-                const result = await CFS.Sales.processSale(klien, produk, qty, tier, manualHarga);
-                const resultDiv = document.getElementById('salesResult');
-                resultDiv.classList.remove('hidden');
-                resultDiv.innerHTML = `
-                    ✅ Penjualan berhasil!<br>
-                    <strong>Invoice:</strong> ${CFS.Utils.formatRupiah(result.totalInvoice)}<br>
-                    Batch terpakai: ${result.usedBatches.map(b => `${b.nama_produk} ${b.qty}kg`).join(', ')}
-                `;
-                showToast('Sukses', 'Penjualan tercatat.', 'success');
-                CFS.Dashboard.refreshAll();
-                CFS.Inventory.renderStockTable();
-            } catch (err) {
-                showToast('Gagal', err.message, 'error');
-            }
-        });
-
-        // Preview harga
-        document.getElementById('previewPriceBtn')?.addEventListener('click', async () => {
-            const produk = document.getElementById('salesProduk').value;
-            const qty = parseFloat(document.getElementById('salesQty').value);
-            const tier = document.getElementById('salesTier').value;
-            const manual = parseFloat(document.getElementById('salesHargaManual').value) || null;
-            const preview = await CFS.Sales.previewPricing(produk, qty, tier, manual);
-            const div = document.getElementById('salesResult');
-            div.classList.remove('hidden');
-            if (preview.error) {
-                div.innerHTML = `<span class="text-red-600">${preview.error}</span>`;
-            } else {
-                div.innerHTML = `
-                    📊 Preview:<br>
-                    HPP rata-rata: ${CFS.Utils.formatRupiah(preview.hppAvg)}<br>
-                    Harga Jual/kg: ${CFS.Utils.formatRupiah(preview.hargaJual)}<br>
-                    Estimasi Invoice: ${CFS.Utils.formatRupiah(preview.totalInvoice)}<br>
-                    Stok tersedia: ${preview.available.toFixed(1)} kg
-                `;
-            }
-        });
-
-        // Beban Operasional
-        document.getElementById('expenseForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const akun = document.getElementById('expenseAkun').value;
-            const jumlah = parseFloat(document.getElementById('expenseJumlah').value);
-            const deskripsi = document.getElementById('expenseDeskripsi').value;
-            await CFS.Accounting.recordExpense(akun, jumlah, deskripsi);
-            showToast('Tercatat', 'Beban operasional ditambahkan.', 'success');
-            e.target.reset();
-            CFS.Dashboard.refreshAll();
-        });
-
-        // Filter Riwayat
-        document.getElementById('filterTransaksi')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const filters = {
-                produk: document.getElementById('filterProduk').value,
-                klien: document.getElementById('filterKlien').value,
-                startDate: document.getElementById('filterStart').value,
-                endDate: document.getElementById('filterEnd').value
-            };
-            const trx = await CFS.Sales.getFilteredTransactions(filters);
-            CFS.App.renderTransactionTable(trx);
-        });
-
-        // Ekspor Excel
-        document.getElementById('exportExcelBtn')?.addEventListener('click', async () => {
-            const today = new Date();
-            const start = new Date(today.getFullYear(), today.getMonth(), 1);
-            const rows = await CFS.Accounting.exportToExcel(start, today);
-            if (rows.length === 0) return showToast('Info', 'Tidak ada data jurnal.', 'info');
-            const ws = XLSX.utils.json_to_sheet(rows);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Jurnal');
-            XLSX.writeFile(wb, `jurnal_${start.toISOString().slice(0,7)}.xlsx`);
-            showToast('Sukses', 'File Excel diunduh.', 'success');
-        });
-
-        // Lihat Buku Besar
-        document.getElementById('viewJournalBtn')?.addEventListener('click', async () => {
-            const journals = await CFS.Accounting.getJournals();
-            const tbody = document.getElementById('journalTableBody');
-            const viewer = document.getElementById('journalViewer');
-            if (!tbody || !viewer) return;
-            viewer.classList.toggle('hidden');
-            const rows = [];
-            journals.forEach(j => {
-                j.entries.forEach(e => {
-                    rows.push({
-                        tanggal: new Date(j.tanggal).toLocaleDateString('id-ID'),
-                        deskripsi: j.deskripsi,
-                        akun: e.akun,
-                        debet: e.debet,
-                        kredit: e.kredit
-                    });
-                });
-            });
-            tbody.innerHTML = rows.map(r => `<tr class="border-b">
-                <td class="p-2">${r.tanggal}</td>
-                <td class="p-2">${r.deskripsi}</td>
-                <td class="p-2">${r.akun}</td>
-                <td class="p-2 text-right">${r.debet > 0 ? CFS.Utils.formatRupiah(r.debet) : ''}</td>
-                <td class="p-2 text-right">${r.kredit > 0 ? CFS.Utils.formatRupiah(r.kredit) : ''}</td>
-            </tr>`).join('');
-        });
-
-        // Simpan Pengaturan
-        document.getElementById('saveSettingsBtn')?.addEventListener('click', async () => {
-            const settings = {
-                ppn: parseFloat(document.getElementById('setPPN').value),
-                pph25: parseFloat(document.getElementById('setPPh25').value),
-                pph21: parseFloat(document.getElementById('setPPh21').value),
-                ptShare: parseFloat(document.getElementById('setPTShare').value),
-                minGrosir: parseFloat(document.getElementById('setMinGrosir').value),
-                minPartai: parseFloat(document.getElementById('setMinPartai').value),
-                selisihGrosir: parseFloat(document.getElementById('setSelisihGrosir').value),
-                marginDefault: parseFloat(document.getElementById('setMarginDefault').value) || 15000
-            };
-            await CFS.Settings.save(settings);
-            showToast('Tersimpan', 'Pengaturan diperbarui.', 'success');
-        });
-    },
-
-    setupDashboardToggles() {
-        document.querySelectorAll('.widget-toggle').forEach(checkbox => {
-            checkbox.addEventListener('change', async (e) => {
-                const key = e.target.dataset.widget;
-                const s = await CFS.Settings.get();
-                s.widgetVisibility[key] = e.target.checked;
-                await CFS.Settings.save(s);
-                this.applyWidgetVisibility();
-                if (key === 'revenueChart' && e.target.checked) CFS.Dashboard.renderRevenueChart();
-            });
-        });
-    },
-
-    async applyWidgetVisibility() {
-        const s = await CFS.Settings.get();
-        const vis = s.widgetVisibility || {};
-        document.getElementById('widget-stockSummary')?.classList.toggle('hidden', !vis.stockSummary);
-        document.getElementById('widget-expiringBatches')?.classList.toggle('hidden', !vis.expiringBatches);
-        document.getElementById('widget-revenueChart')?.classList.toggle('hidden', !vis.revenueChart);
-        document.getElementById('widget-profitLoss')?.classList.toggle('hidden', !vis.profitLoss);
-        document.getElementById('widget-quickActions')?.classList.toggle('hidden', !vis.quickActions);
-    },
-
-    setupBackupRestore() {
-        window.CFS.App.backupData = async () => {
-            const [batches, journals, settings, transactions] = await Promise.all([
-                CFS.Storage.get(CFS.Storage.STOCK_KEY),
-                CFS.Storage.get(CFS.Storage.JOURNALS_KEY),
-                CFS.Storage.get(CFS.Storage.SETTINGS_KEY),
-                CFS.Storage.get(CFS.Storage.TRANSACTIONS_KEY)
-            ]);
-            const blob = new Blob([JSON.stringify({ batches, journals, settings, transactions }, null, 2)], { type: 'application/json' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `cfs_backup_${new Date().toISOString().slice(0,10)}.json`;
-            a.click();
-            showToast('Backup', 'Data diekspor.', 'success');
+    // Backup data
+    async function backupData() {
+        const data = {
+            batches: Storage.getBatches(),
+            sales: Storage.getSales(),
+            expenses: Storage.getExpenses(),
+            settings: Storage.getSettings(),
+            company: Storage.getCompany(),
+            customers: Storage.getCustomers(),
+            suppliers: Storage.getSuppliers(),
+            deliveries: Storage.getDeliveries(),
+            opnameList: Storage.getOpname(),
+            returns: Storage.getReturns(),
+            auditTrail: Storage.getAuditTrail(),
+            pricing: Storage.getPricing(),
+            products: Storage.getProducts()
         };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `cibitung_frozen_backup_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        showToast('Backup', 'Data berhasil diunduh.', 'success');
+        if (CFS.Storage && CFS.Storage.addAudit) CFS.Storage.addAudit('BACKUP', 'Data dibackup manual');
+    }
 
-        window.CFS.App.restorePrompt = () => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = async (e) => {
-                const file = e.target.files[0];
+    // Restore prompt
+    function restorePrompt() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
                 const text = await file.text();
                 const data = JSON.parse(text);
-                if (data.batches) await CFS.Storage.set(CFS.Storage.STOCK_KEY, data.batches);
-                if (data.journals) await CFS.Storage.set(CFS.Storage.JOURNALS_KEY, data.journals);
-                if (data.settings) await CFS.Storage.set(CFS.Storage.SETTINGS_KEY, data.settings);
-                if (data.transactions) await CFS.Storage.set(CFS.Storage.TRANSACTIONS_KEY, data.transactions);
-                alert('Data berhasil dipulihkan!');
+                // Validasi sederhana
+                if (!data.batches || !data.sales) throw new Error('Format tidak valid');
+                // Set data ke Storage
+                const Storage = CFS.Storage;
+                // Hapus data lama lalu set baru
+                await Storage.resetAllData(); // reset dulu
+                // Setelah reset, kita isi ulang semua state
+                // Karena resetAllData mengosongkan semuanya, kita bisa langsung set item
+                await localforage.setItem('cfs_batches', data.batches || []);
+                await localforage.setItem('cfs_sales', data.sales || []);
+                await localforage.setItem('cfs_expenses', data.expenses || []);
+                await localforage.setItem('cfs_settings', data.settings || Storage.defaultSettings);
+                await localforage.setItem('cfs_company', data.company || Storage.defaultCompany);
+                await localforage.setItem('cfs_customers', data.customers || {});
+                await localforage.setItem('cfs_suppliers', data.suppliers || []);
+                await localforage.setItem('cfs_deliveries', data.deliveries || []);
+                await localforage.setItem('cfs_opname', data.opnameList || []);
+                await localforage.setItem('cfs_returns', data.returns || []);
+                await localforage.setItem('cfs_audit_trail', data.auditTrail || []);
+                await localforage.setItem('cfs_pricing', data.pricing || {});
+                await localforage.setItem('cfs_products', data.products || []);
+                // Reload halaman agar state ter-refresh sempurna
                 location.reload();
-            };
-            input.click();
+                showToast('Restore', 'Data berhasil dipulihkan. Halaman akan dimuat ulang.', 'success');
+            } catch (err) {
+                showToast('Error', 'File backup tidak valid.', 'error');
+            }
         };
-    },
-
-    setupBatchModal() {
-        const modal = document.getElementById('batchDetailModal');
-        const select = document.getElementById('batchProdukSelect');
-        if (!select) return;
-        select.innerHTML = '<option value="">Semua Produk</option>' +
-            CFS.Inventory.PRODUCT_LIST.map(p => `<option value="${p}">${p}</option>`).join('');
-        select.addEventListener('change', async () => {
-            await CFS.Inventory.renderBatchDetail(select.value, 'batchDetailContent');
-        });
-        // Isi awal
-        CFS.Inventory.renderBatchDetail('', 'batchDetailContent');
-    },
-
-    async lihatBatch(produk) {
-        const modal = document.getElementById('batchDetailModal');
-        const select = document.getElementById('batchProdukSelect');
-        if (select) select.value = produk;
-        await CFS.Inventory.renderBatchDetail(produk, 'batchDetailContent');
-        modal?.classList.remove('hidden');
-    },
-
-    renderTransactionTable(transactions) {
-        const tbody = document.getElementById('historyTableBody');
-        if (!tbody) return;
-        if (!transactions || transactions.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center opacity-50">Tidak ada transaksi.</td></tr>';
-            return;
-        }
-        tbody.innerHTML = transactions.map(t => `
-            <tr class="border-b hover:bg-slate-50 dark:hover:bg-slate-800">
-                <td class="p-3">${new Date(t.tanggal).toLocaleDateString('id-ID')}</td>
-                <td class="p-3">${t.klien}</td>
-                <td class="p-3">${t.produk}</td>
-                <td class="p-3 text-right">${t.qty} kg</td>
-                <td class="p-3 text-right font-semibold">${CFS.Utils.formatRupiah(t.totalInvoice)}</td>
-                <td class="p-3 text-center"><span class="bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded text-xs">${t.tier}</span></td>
-            </tr>
-        `).join('');
-    },
-
-    async loadSettings() {
-        const s = await CFS.Settings.get();
-        document.getElementById('setPPN').value = s.ppn;
-        document.getElementById('setPPh25').value = s.pph25;
-        document.getElementById('setPPh21').value = s.pph21;
-        document.getElementById('setPTShare').value = s.ptShare;
-        document.getElementById('setMinGrosir').value = s.minGrosir;
-        document.getElementById('setMinPartai').value = s.minPartai;
-        document.getElementById('setSelisihGrosir').value = s.selisihGrosir;
-        const marginEl = document.getElementById('setMarginDefault');
-        if (marginEl) marginEl.value = s.marginDefault || 15000;
-        // Check widget visibility checkboxes
-        const vis = s.widgetVisibility || CFS.Settings.DEFAULTS.widgetVisibility;
-        document.querySelectorAll('.widget-toggle').forEach(cb => {
-            if (vis[cb.dataset.widget] !== undefined) cb.checked = vis[cb.dataset.widget];
-        });
-    },
-
-    populateDropdowns() {
-        const productOptions = CFS.Inventory.PRODUCT_LIST.map(p => `<option value="${p}">${p}</option>`).join('');
-        document.querySelectorAll('#stockProduk, #salesProduk, #filterProduk').forEach(sel => {
-            sel.innerHTML = '<option value="">Pilih Produk</option>' + productOptions;
-        });
+        input.click();
     }
-};
 
-// Inisialisasi setelah DOM siap
-window.addEventListener('DOMContentLoaded', () => {
-    CFS.App.init();
-});
+    // Refresh semua modul yang sedang aktif
+    function refreshAll() {
+        if (CFS.Dashboard && modulesInitialized.dashboard) CFS.Dashboard.refresh();
+        if (CFS.Inventory) CFS.Inventory.refreshStockTable();
+        if (CFS.Sales) CFS.Sales.refreshTodaySales();
+        if (CFS.Accounting && modulesInitialized.finance) CFS.Accounting.refreshFinanceSummary();
+    }
+
+    // Expose CFS.App
+    CFS.App = {
+        backupData,
+        restorePrompt,
+        showToast,
+        refreshAll,
+        switchTab
+    };
+
+    // Dark mode toggle (jika belum ada di inline, kita definisikan ulang)
+    window.toggleDarkMode = function() {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('cfs_dark', document.documentElement.classList.contains('dark') ? '1' : '0');
+        const darkIcon = document.getElementById('darkIcon');
+        if (darkIcon) {
+            darkIcon.className = document.documentElement.classList.contains('dark') ?
+                'ph ph-sun text-lg text-yellow-400' : 'ph ph-moon text-lg';
+        }
+        const sidebarMode = document.getElementById('sidebar-mode');
+        if (sidebarMode) sidebarMode.textContent = document.documentElement.classList.contains('dark') ? 'Gelap' : 'Terang';
+    };
+
+    // Inisialisasi saat DOM siap
+    window.addEventListener('DOMContentLoaded', () => {
+        // Pastikan Storage sudah dimuat (storage.js akan memuat async, tapi mungkin belum selesai)
+        // Kita akan menggunakan setTimeout untuk memastikan storage siap, atau kita bisa memanggil refreshAll setelah loadAllData selesai.
+        // Karena storage.js memiliki self-invoking async yang memuat data, kita perlu menunggu.
+        // Cara sederhana: polling atau gunakan event.
+        // Untuk kemudahan, kita asumsikan storage.js sudah selesai sebelum app.js dijalankan (karena script di-load berurutan dan async di dalam storage.js mungkin belum selesai).
+        // Lebih baik kita gunakan mekanisme: di storage.js setelah loadAllData selesai, kita panggil callback di CFS.App.
+        // Untuk sekarang, kita gunakan setTimeout 100ms untuk memberi waktu loadAllData.
+        setTimeout(() => {
+            if (CFS.Storage && CFS.Storage.loadAllData) {
+                // sudah otomatis di storage.js, hanya perlu inisialisasi tampilan
+            }
+            // Inisialisasi dashboard sebagai tab default
+            switchTab('tab-dashboard');
+            // Update system time
+            setInterval(() => {
+                const el = document.getElementById('lastUpdate');
+                if (el) el.textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                const sysEl = document.getElementById('systemDateTime');
+                if (sysEl) sysEl.textContent = new Date().toLocaleString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
+            }, 1000);
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'd') { e.preventDefault(); switchTab('tab-dashboard'); }
+                if (e.ctrlKey && e.key === 's') { e.preventDefault(); switchTab('tab-stock'); }
+                if (e.ctrlKey && e.key === 'b') { e.preventDefault(); backupData(); }
+            });
+            // Toggle dark mode sesuai localStorage
+            if (localStorage.getItem('cfs_dark') === '1') {
+                document.documentElement.classList.add('dark');
+                document.getElementById('darkIcon').className = 'ph ph-sun text-lg text-yellow-400';
+                document.getElementById('sidebar-mode').textContent = 'Gelap';
+            }
+        }, 200);
+    });
+
+
+    
+})();
