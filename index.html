@@ -17,6 +17,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
     <!-- ==================== TAILWIND CONFIG ==================== -->
     <script>
@@ -157,7 +158,6 @@
 <!-- ==================== NAVIGATION BAR ==================== -->
 <nav class="sticky top-0 z-40 border-b shadow-sm backdrop-blur-md" style="background: var(--surface); border-color: var(--border);">
     <div class="container-main flex items-center justify-between h-16">
-        <!-- Logo & Brand -->
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-600/20">
                 <i class="ph-fill ph-fish-simple text-2xl"></i>
@@ -167,12 +167,10 @@
                 <p class="text-[10px] uppercase font-bold tracking-widest opacity-50 -mt-1">ERP Ultimate v5.4</p>
             </div>
         </div>
-        <!-- Status Indicator -->
         <div class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
             <span class="w-2 h-2 rounded-full bg-green-500 pulse-dot"></span>
             <span class="text-xs font-medium text-green-700 dark:text-green-400">Sistem Online</span>
         </div>
-        <!-- Right Actions -->
         <div class="flex items-center gap-2 sm:gap-3">
             <button onclick="CFS.App.backupData()" class="btn btn-secondary text-sm py-2 px-3 hidden sm:flex tooltip">
                 <i class="ph ph-download-simple"></i> <span class="hidden md:inline">Backup</span>
@@ -192,14 +190,13 @@
 
 <!-- ==================== MAIN LAYOUT ==================== -->
 <div class="container-main py-6 flex-1 flex flex-col lg:flex-row gap-6" id="main-content">
-    <!-- ==================== SIDEBAR NAVIGATION ==================== -->
     <aside class="lg:w-72 flex-shrink-0">
         <div class="card sticky top-24 overflow-hidden">
             <div class="p-5 border-b" style="border-color: var(--border);">
                 <h3 class="font-bold text-sm uppercase tracking-wider opacity-70">📋 Modul Operasional</h3>
             </div>
             <nav class="p-2 space-y-1" id="tabs">
-                <button onclick="switchTab('tab-dashboard')" data-tab="tab-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition active bg-primary-50 text-primary-700 font-semibold" aria-current="page">
+                <button onclick="switchTab('tab-dashboard')" data-tab="tab-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition active bg-primary-50 text-primary-700 font-semibold">
                     <i class="ph ph-chart-bar text-lg"></i> Dashboard
                 </button>
                 <button onclick="switchTab('tab-stock')" data-tab="tab-stock" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
@@ -208,8 +205,23 @@
                 <button onclick="switchTab('tab-sales')" data-tab="tab-sales" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
                     <i class="ph ph-shopping-cart text-lg"></i> Penjualan
                 </button>
+                <button onclick="switchTab('tab-purchase')" data-tab="tab-purchase" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-truck text-lg"></i> Pembelian
+                </button>
+                <button onclick="switchTab('tab-supplier')" data-tab="tab-supplier" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-buildings text-lg"></i> Supplier
+                </button>
+                <button onclick="switchTab('tab-products')" data-tab="tab-products" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-list-checks text-lg"></i> Kustomisasi Produk
+                </button>
                 <button onclick="switchTab('tab-crm')" data-tab="tab-crm" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
                     <i class="ph ph-users text-lg"></i> CRM Pelanggan
+                </button>
+                <button onclick="switchTab('tab-crm-detail')" data-tab="tab-crm-detail" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-address-book text-lg"></i> Detail Pelanggan
+                </button>
+                <button onclick="switchTab('tab-pricing')" data-tab="tab-pricing" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-currency-circle-dollar text-lg"></i> Harga Jual (Online/Offline)
                 </button>
                 <button onclick="switchTab('tab-finance')" data-tab="tab-finance" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
                     <i class="ph ph-wallet text-lg"></i> Keuangan
@@ -223,27 +235,25 @@
                 <button onclick="switchTab('tab-settings')" data-tab="tab-settings" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
                     <i class="ph ph-gear text-lg"></i> Pengaturan
                 </button>
+                <button onclick="switchTab('tab-help')" data-tab="tab-help" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-question text-lg"></i> Bantuan
+                </button>
             </nav>
-            <!-- Tips Cepat -->
             <div class="p-4 border-t mt-2" style="border-color: var(--border);">
                 <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">💡 Tips Cepat</h4>
-                <p class="text-xs opacity-60 leading-relaxed">
-                    Gunakan <strong>FEFO</strong> untuk produk frozen agar batch terdekat expired terjual lebih dulu.
-                    Backup data setiap minggu untuk keamanan.
-                </p>
+                <p class="text-xs opacity-60 leading-relaxed">Gunakan <strong>FEFO</strong> untuk produk frozen agar batch terdekat expired terjual lebih dulu. Backup data setiap minggu.</p>
             </div>
-            <!-- Info Ringkas -->
             <div class="p-4 border-t mt-2" style="border-color: var(--border);">
                 <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">📌 Status Data</h4>
                 <p class="text-xs opacity-50">Batch: <span id="storedBatchesCount">-</span></p>
                 <p class="text-xs opacity-50">Transaksi: <span id="storedTransactionsCount">-</span></p>
                 <p class="text-xs opacity-50">Pelanggan: <span id="storedCustomersCount">-</span></p>
+                <p class="text-xs opacity-50">Supplier: <span id="storedSuppliersCount">-</span></p>
                 <p class="text-xs opacity-50">Mode: <span id="sidebar-mode">Terang</span></p>
             </div>
         </div>
     </aside>
 
-    <!-- ==================== MAIN CONTENT AREA ==================== -->
     <main class="flex-1 min-w-0">
 
         <!-- ==================== TAB DASHBOARD ==================== -->
@@ -251,7 +261,7 @@
             <!-- Header Selamat Datang -->
             <div class="card p-5 flex flex-wrap items-center gap-4">
                 <div>
-                    <h2 class="text-xl font-bold" style="color: var(--text);">👋 Selamat Datang, Owner</h2>
+                    <h2 class="text-xl font-bold">👋 Selamat Datang, Owner</h2>
                     <p class="text-sm opacity-70">Ringkasan operasional hari ini. Semua data real-time.</p>
                 </div>
                 <div class="flex flex-wrap gap-2 ml-auto">
@@ -261,84 +271,63 @@
                 </div>
             </div>
             <!-- Status Bar Ringkasan -->
-            <div class="card p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm" id="statusBar">
+            <div class="card p-4 grid grid-cols-2 md:grid-cols-5 gap-4 text-sm" id="statusBar">
                 <div class="text-center"><span class="opacity-60">Total Produk</span><p class="font-bold text-xl">9</p></div>
                 <div class="text-center"><span class="opacity-60">Stok Total</span><p class="font-bold text-xl" id="statusTotalStock">0 kg</p></div>
                 <div class="text-center"><span class="opacity-60">Batch Aktif</span><p class="font-bold text-xl" id="statusActiveBatches">0</p></div>
                 <div class="text-center"><span class="opacity-60">Batch Kritis</span><p class="font-bold text-xl text-red-600" id="statusCriticalBatches">0</p></div>
+                <div class="text-center"><span class="opacity-60">Pendapatan Hari Ini</span><p class="font-bold text-xl" id="statusTodayRevenue">Rp 0</p></div>
             </div>
             <!-- Widget Toggles -->
             <div class="card p-4 flex flex-wrap items-center gap-3 text-sm fade-in">
                 <span class="font-medium opacity-60">Widget aktif:</span>
-                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift">
-                    <input type="checkbox" class="widget-toggle" data-widget="stockSummary" checked> 🐟 Stok
-                </label>
-                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift">
-                    <input type="checkbox" class="widget-toggle" data-widget="expiringBatches" checked> ⚠️ Expired
-                </label>
-                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift">
-                    <input type="checkbox" class="widget-toggle" data-widget="revenueChart" checked> 📊 Chart
-                </label>
-                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift">
-                    <input type="checkbox" class="widget-toggle" data-widget="profitLoss" checked> 💰 Laba
-                </label>
-                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift">
-                    <input type="checkbox" class="widget-toggle" data-widget="quickActions" checked> ⚡ Cepat
-                </label>
-                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift">
-                    <input type="checkbox" class="widget-toggle" data-widget="recentActivity" checked> 📜 Aktivitas
-                </label>
-                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift">
-                    <input type="checkbox" class="widget-toggle" data-widget="topProducts" checked> 🏆 Top Produk
-                </label>
+                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="stockSummary" checked> 🐟 Stok</label>
+                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="expiringBatches" checked> ⚠️ Expired</label>
+                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="revenueChart" checked> 📊 Chart</label>
+                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="profitLoss" checked> 💰 Laba</label>
+                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="quickActions" checked> ⚡ Cepat</label>
+                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="recentActivity" checked> 📜 Aktivitas</label>
+                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="topProducts" checked> 🏆 Top Produk</label>
+                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="stockChart" checked> 📈 Stok Chart</label>
+                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="calendarWidget" checked> 📅 Kalender</label>
             </div>
-            <!-- Widget 1: Stok Summary -->
+            <!-- Widget: Stok Summary -->
             <div id="widget-stockSummary" class="card p-6 fade-in">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="font-semibold flex items-center gap-2"><i class="ph ph-fish text-primary-600"></i> Stok Ikan Saat Ini</h3>
                     <button onclick="switchTab('tab-stock')" class="text-xs text-primary-600 hover:underline">Lihat detail →</button>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="dashboardSummaryCards">
-                    <!-- Akan diisi oleh JS -->
-                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="dashboardSummaryCards"></div>
             </div>
-            <!-- Widget 2: Batch Expired -->
+            <!-- Widget: Batch Expired -->
             <div id="widget-expiringBatches" class="card p-6 fade-in">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="font-semibold flex items-center gap-2 text-red-600"><i class="ph ph-warning"></i> ⚠ Batch Hampir Kadaluarsa (≤7 hari)</h3>
                     <span class="text-xs text-red-400 font-medium">Periksa setiap hari</span>
                 </div>
-                <div id="expiringBatches" class="space-y-2 text-sm">
-                    <!-- Akan diisi oleh JS -->
-                </div>
+                <div id="expiringBatches" class="space-y-2 text-sm"></div>
             </div>
-            <!-- Widget 3: Revenue Chart -->
+            <!-- Widget: Revenue Chart -->
             <div id="widget-revenueChart" class="card p-6 fade-in">
                 <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-chart-line-up text-green-600"></i> Pendapatan 7 Hari Terakhir</h3>
                 <canvas id="chartRevenue" height="220"></canvas>
             </div>
-            <!-- Widget 4: Laba Rugi Bulanan -->
+            <!-- Widget: Laba Rugi Bulanan -->
             <div id="widget-profitLoss" class="card p-6 fade-in">
                 <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-chart-pie text-violet-600"></i> Laba Rugi Bulan Ini</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="financeSummary">
-                    <!-- Akan diisi oleh JS -->
-                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="financeSummary"></div>
             </div>
-            <!-- Widget 5: Aktivitas Terbaru -->
+            <!-- Widget: Aktivitas Terbaru -->
             <div id="widget-recentActivity" class="card p-6 fade-in">
                 <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-activity text-slate-600"></i> Aktivitas Terbaru</h3>
-                <div id="recentActivityList" class="text-sm space-y-2 max-h-48 overflow-auto">
-                    <p class="opacity-50">Belum ada aktivitas.</p>
-                </div>
+                <div id="recentActivityList" class="text-sm space-y-2 max-h-48 overflow-auto"><p class="opacity-50">Belum ada aktivitas.</p></div>
             </div>
-            <!-- Widget 6: Top Produk -->
+            <!-- Widget: Top Produk -->
             <div id="widget-topProducts" class="card p-6 fade-in">
                 <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-medal text-amber-600"></i> Top 5 Produk Terlaris</h3>
-                <div id="topProductsList" class="text-sm space-y-2">
-                    <p class="opacity-50">Data akan muncul setelah ada transaksi.</p>
-                </div>
+                <div id="topProductsList" class="text-sm space-y-2"><p class="opacity-50">Data akan muncul setelah ada transaksi.</p></div>
             </div>
-            <!-- Widget 7: Quick Actions -->
+            <!-- Widget: Quick Actions -->
             <div id="widget-quickActions" class="card p-6 fade-in">
                 <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-lightning text-amber-600"></i> Aksi Cepat</h3>
                 <div class="flex flex-wrap gap-3">
@@ -349,7 +338,17 @@
                     <button onclick="switchTab('tab-reports')" class="btn btn-secondary"><i class="ph ph-file-text"></i> Lihat Laporan</button>
                 </div>
             </div>
-            <!-- Widget 8: Tips & Trik -->
+            <!-- Widget: Stok Chart -->
+            <div id="widget-stockChart" class="card p-6 fade-in">
+                <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-chart-bar text-blue-600"></i> Grafik Stok per Produk</h3>
+                <canvas id="chartStockProduct" height="220"></canvas>
+            </div>
+            <!-- Widget: Kalender -->
+            <div id="widget-calendarWidget" class="card p-6 fade-in">
+                <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-calendar text-purple-600"></i> Kalender Aktivitas</h3>
+                <div id="dashboardCalendar"></div>
+            </div>
+            <!-- Tips & Trik -->
             <div class="card p-6 fade-in">
                 <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-lightbulb text-yellow-600"></i> Tips & Trik</h3>
                 <ul class="list-disc list-inside text-sm space-y-2 opacity-80">
@@ -365,79 +364,50 @@
         <!-- ==================== TAB STOK & BATCH ==================== -->
         <div id="tab-stock" class="tab-content space-y-6">
             <div class="card p-6">
-                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-package text-primary-600"></i> Manajemen Batch & Stok</h2>
+                <h2 class="text-xl font-bold mb-4"><i class="ph ph-package text-primary-600"></i> Manajemen Batch & Stok</h2>
                 <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-4 text-sm flex items-start gap-2">
                     <i class="ph ph-info text-blue-600 mt-0.5"></i>
                     <p>📌 <strong>Catatan:</strong> Pastikan mengisi <em>tanggal kadaluarsa</em> dengan benar agar sistem memprioritaskan batch dengan metode FEFO.</p>
                 </div>
-                <!-- Tabel Ringkasan Stok -->
                 <div class="overflow-x-auto mb-6">
                     <table class="w-full text-sm">
-                        <caption class="text-xs opacity-50 mb-2 text-left">Tabel ringkasan stok per produk</caption>
-                        <thead class="bg-slate-50 dark:bg-slate-800">
-                            <tr>
-                                <th class="p-3 text-left">Produk</th>
-                                <th class="p-3 text-right">Total Stok (kg)</th>
-                                <th class="p-3 text-right">Batch Aktif</th>
-                                <th class="p-3 text-center">Status Stok</th>
-                                <th class="p-3 text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="stockTableBody">
-                            <!-- Akan diisi oleh JS -->
-                        </tbody>
+                        <thead class="bg-slate-50 dark:bg-slate-800"><tr><th class="p-3 text-left">Produk</th><th class="p-3 text-right">Total Stok (kg)</th><th class="p-3 text-right">Batch Aktif</th><th class="p-3 text-center">Status Stok</th><th class="p-3 text-center">Aksi</th></tr></thead>
+                        <tbody id="stockTableBody"></tbody>
                     </table>
                 </div>
-                <!-- Batch Terpakai Hari Ini -->
                 <div class="card p-4 mb-6 bg-slate-50 dark:bg-slate-800">
-                    <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-clock text-slate-500"></i> Batch Terpakai Hari Ini</h3>
+                    <h3 class="font-semibold mb-2"><i class="ph ph-clock text-slate-500"></i> Batch Terpakai Hari Ini</h3>
                     <div id="usedBatchesToday" class="text-sm opacity-70">Belum ada batch terpakai hari ini.</div>
                 </div>
-                <!-- Divider -->
                 <div style="border-top:1px solid var(--border); margin: 1.5rem 0;"></div>
-                <!-- Form Tambah Batch -->
-                <h3 class="font-semibold mb-3 flex items-center gap-2">
-                    <i class="ph ph-plus-circle text-green-600"></i> Tambah Batch Baru (Landed Cost Lengkap)
-                </h3>
+                <h3 class="font-semibold mb-3"><i class="ph ph-plus-circle text-green-600"></i> Tambah Batch Baru</h3>
                 <form id="addStockForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <select id="stockProduk" required><option value="">Pilih Produk</option></select>
-                    <input type="number" id="stockBerat" placeholder="Berat (kg) - berat kotor batch" required>
-                    <input type="number" id="stockHargaBeli" placeholder="Harga Beli per kg - dari supplier" required>
-                    <input type="number" id="stockOngkir" placeholder="Ongkir Total (Rp) - biaya ekspedisi" value="0">
-                    <input type="number" id="stockBensin" placeholder="Biaya Bensin Self-pickup (Rp)" value="0">
+                    <input type="number" id="stockBerat" placeholder="Berat (kg)" required>
+                    <input type="number" id="stockHargaBeli" placeholder="Harga Beli per kg" required>
+                    <input type="number" id="stockOngkir" placeholder="Ongkir Total (Rp)" value="0">
+                    <input type="number" id="stockBensin" placeholder="Biaya Bensin (Rp)" value="0">
                     <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium">Bongkar Muat <span class="text-xs text-slate-400">(jika ada)</span></label>
-                        <div class="toggle-wrapper">
-                            <input type="checkbox" id="stockToggleBongkar" class="toggle-checkbox">
-                            <div class="toggle-label"></div>
-                        </div>
+                        <label class="text-sm font-medium">Bongkar Muat</label>
+                        <div class="toggle-wrapper"><input type="checkbox" id="stockToggleBongkar" class="toggle-checkbox"><div class="toggle-label"></div></div>
                     </div>
                     <input type="number" id="stockBongkarNominal" placeholder="Biaya Bongkar (Rp)" class="hidden" value="0">
                     <div>
-                        <label class="text-xs font-semibold">Pajak Pembelian <span class="text-slate-400">(jika ada)</span></label>
+                        <label class="text-xs font-semibold">Pajak Pembelian</label>
                         <div class="flex gap-2">
-                            <select id="stockPajakType" class="w-1/2">
-                                <option value="none">Tidak Ada</option>
-                                <option value="persen">Persentase (%)</option>
-                                <option value="nominal">Nominal (Rp)</option>
-                            </select>
+                            <select id="stockPajakType" class="w-1/2"><option value="none">Tidak Ada</option><option value="persen">Persentase (%)</option><option value="nominal">Nominal (Rp)</option></select>
                             <input type="number" id="stockPajakValue" placeholder="Nilai Pajak" class="hidden w-1/2" value="0">
                         </div>
                     </div>
                     <input type="date" id="stockTglProduksi" required>
                     <input type="date" id="stockTglKadaluarsa" required>
+                    <input type="text" id="stockSupplier" placeholder="Supplier (opsional)">
                     <button type="submit" class="btn btn-primary col-span-full sm:col-span-1">💾 Simpan Batch</button>
                 </form>
                 <button onclick="document.getElementById('batchDetailModal').classList.remove('hidden')" class="text-blue-600 text-sm underline mt-3">📦 Lihat Semua Batch (Detail)</button>
-                <!-- Panduan FEFO (Dekoratif) -->
                 <div class="mt-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm">
                     <h4 class="font-semibold mb-2">📖 Panduan Alokasi Stok (FEFO)</h4>
                     <p class="opacity-70">Sistem otomatis memilih batch dengan tanggal kadaluarsa terdekat. Ubah metode di <strong>Pengaturan</strong>.</p>
-                </div>
-                <!-- Placeholder dekoratif: Suhu Gudang -->
-                <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm flex items-center gap-2">
-                    <i class="ph ph-thermometer-cold text-slate-400"></i>
-                    <span class="opacity-60">Suhu Gudang Ideal: <strong>-18°C</strong> (pastikan cold storage berfungsi)</span>
                 </div>
             </div>
         </div>
@@ -448,29 +418,19 @@
                 <button onclick="document.getElementById('batchDetailModal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800 text-2xl transition">&times;</button>
                 <h3 class="font-bold text-lg mb-4">📦 Detail Batch</h3>
                 <select id="batchProdukSelect" class="w-full mb-4"><option value="">Semua Produk</option></select>
-                <div id="batchDetailContent">
-                    <!-- Akan diisi oleh JS -->
-                </div>
+                <div id="batchDetailContent"></div>
             </div>
         </div>
 
         <!-- ==================== TAB PENJUALAN ==================== -->
         <div id="tab-sales" class="tab-content space-y-6">
             <div class="card p-6">
-                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-shopping-cart text-emerald-600"></i> Catat Penjualan</h2>
-                <div class="bg-emerald-50 dark:bg-emerald-900/10 p-4 rounded-lg mb-4 text-sm flex items-start gap-2">
-                    <i class="ph ph-info text-emerald-600 mt-0.5"></i>
-                    <p>Harga otomatis dihitung berdasarkan <strong>HPP + margin</strong>. Untuk partai besar, Anda bisa override harga manual.</p>
-                </div>
+                <h2 class="text-xl font-bold mb-4"><i class="ph ph-shopping-cart text-emerald-600"></i> Catat Penjualan</h2>
                 <form id="salesForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="text" id="salesKlien" placeholder="Nama Klien" required>
                     <select id="salesProduk" required><option value="">Pilih Produk</option></select>
                     <input type="number" id="salesQty" placeholder="Jumlah (kg)" required>
-                    <select id="salesTier">
-                        <option value="ecer">Ecer</option>
-                        <option value="grosir">Grosir</option>
-                        <option value="partai">Partai Besar</option>
-                    </select>
+                    <select id="salesTier"><option value="ecer">Ecer</option><option value="grosir">Grosir</option><option value="partai">Partai Besar</option></select>
                     <input type="number" id="salesHargaManual" placeholder="Harga Jual/kg (opsional)">
                     <input type="text" id="salesCatatan" placeholder="Catatan (opsional)" class="col-span-full">
                     <div class="flex flex-wrap gap-2 col-span-full">
@@ -479,107 +439,129 @@
                         <button type="button" id="printInvoiceBtn" class="btn btn-secondary" disabled>🖨️ Cetak Invoice</button>
                     </div>
                 </form>
-                <div id="salesResult" class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl hidden">
-                    <!-- Akan diisi oleh JS -->
-                </div>
-                <!-- Penjualan Hari Ini -->
+                <div id="salesResult" class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl hidden"></div>
                 <div class="mt-6">
-                    <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-list-checks text-slate-500"></i> Penjualan Hari Ini</h3>
-                    <div id="todaySalesList" class="text-sm space-y-2 max-h-48 overflow-auto">
-                        <p class="opacity-50">Belum ada penjualan hari ini.</p>
-                    </div>
-                </div>
-                <!-- Tips Margin -->
-                <div class="mt-4 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg text-sm">
-                    <h4 class="font-semibold mb-2">💡 Tips Margin</h4>
-                    <p class="opacity-80">Margin default dapat diubah di <strong>Pengaturan</strong>. Untuk partai besar, Anda bisa memasukkan harga manual sesuai negosiasi.</p>
-                </div>
-                <!-- Placeholder dekoratif: Metode Pembayaran -->
-                <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm flex items-center gap-2">
-                    <i class="ph ph-credit-card text-slate-400"></i>
-                    <span class="opacity-60">Metode Pembayaran yang didukung: <strong>Tunai, Transfer, QRIS</strong> (invoice akan mencatat DPP + PPN)</span>
+                    <h3 class="font-semibold mb-2"><i class="ph ph-list-checks text-slate-500"></i> Penjualan Hari Ini</h3>
+                    <div id="todaySalesList" class="text-sm space-y-2 max-h-48 overflow-auto"><p class="opacity-50">Belum ada penjualan hari ini.</p></div>
                 </div>
             </div>
         </div>
 
-        <!-- ==================== TAB CRM ==================== -->
+        <!-- ==================== TAB PEMBELIAN ==================== -->
+        <div id="tab-purchase" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4"><i class="ph ph-truck text-blue-600"></i> Pembelian (Purchase Order)</h2>
+                <form id="purchaseForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <select id="purchaseSupplier" required><option value="">Pilih Supplier</option></select>
+                    <select id="purchaseProduk" required><option value="">Pilih Produk</option></select>
+                    <input type="number" id="purchaseQty" placeholder="Jumlah (kg)" required>
+                    <input type="number" id="purchaseHarga" placeholder="Harga Beli per kg" required>
+                    <input type="date" id="purchaseTgl" required>
+                    <input type="text" id="purchaseCatatan" placeholder="Catatan" class="col-span-full">
+                    <button type="submit" class="btn btn-primary col-span-full">📦 Buat PO</button>
+                </form>
+                <div class="mt-6">
+                    <h3 class="font-semibold mb-2">Daftar Purchase Order</h3>
+                    <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th class="p-2">Tanggal</th><th>Supplier</th><th>Produk</th><th>Qty</th><th>Total</th><th>Status</th></tr></thead><tbody id="purchaseTableBody"><tr><td colspan="6" class="text-center p-4 opacity-50">Belum ada PO</td></tr></tbody></table></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB SUPPLIER ==================== -->
+        <div id="tab-supplier" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4"><i class="ph ph-buildings text-indigo-600"></i> Manajemen Supplier</h2>
+                <form id="supplierForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <input type="text" id="supplierName" placeholder="Nama Supplier" required>
+                    <input type="text" id="supplierContact" placeholder="Kontak">
+                    <input type="text" id="supplierAddress" placeholder="Alamat" class="col-span-full">
+                    <button type="submit" class="btn btn-primary">➕ Tambah Supplier</button>
+                </form>
+                <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th class="p-2">Nama</th><th>Kontak</th><th>Alamat</th><th>Total PO</th><th>Aksi</th></tr></thead><tbody id="supplierTableBody"><tr><td colspan="5" class="text-center p-4 opacity-50">Belum ada supplier</td></tr></tbody></table></div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB KUSTOMISASI PRODUK ==================== -->
+        <div id="tab-products" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4"><i class="ph ph-list-checks text-orange-600"></i> Kustomisasi Produk</h2>
+                <form id="productCustomForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <input type="text" id="newProductName" placeholder="Nama Produk Baru" required>
+                    <input type="text" id="newProductCategory" placeholder="Kategori (misal: Ikan Laut)">
+                    <input type="number" id="newProductMinStock" placeholder="Stok Minimum (kg)" value="10">
+                    <input type="text" id="newProductUnit" placeholder="Satuan (kg)" value="kg">
+                    <button type="submit" class="btn btn-primary">➕ Tambah Produk</button>
+                </form>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead><tr><th class="p-2 text-left">Produk</th><th class="p-2">Kategori</th><th class="p-2">Stok Min</th><th class="p-2">Satuan</th><th class="p-2 text-center">Aksi</th></tr></thead>
+                        <tbody id="productTableBody">
+                            <!-- Diisi oleh JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB CRM PELANGGAN (Umum) ==================== -->
         <div id="tab-crm" class="tab-content space-y-6">
             <div class="card p-6">
-                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-users text-indigo-600"></i> CRM Pelanggan</h2>
-                <!-- Statistik Utama -->
+                <h2 class="text-xl font-bold mb-4"><i class="ph ph-users text-indigo-600"></i> CRM Pelanggan</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6" id="crmStats">
-                    <div class="card p-4 text-center hover-lift">
-                        <p class="text-xs opacity-60">Total Pelanggan</p>
-                        <p class="text-2xl font-bold" id="crmTotalCustomers">0</p>
-                    </div>
-                    <div class="card p-4 text-center hover-lift">
-                        <p class="text-xs opacity-60">Total Pendapatan</p>
-                        <p class="text-2xl font-bold" id="crmTotalRevenue">Rp 0</p>
-                    </div>
-                    <div class="card p-4 text-center hover-lift">
-                        <p class="text-xs opacity-60">Pelanggan Aktif (30 hari)</p>
-                        <p class="text-2xl font-bold" id="crmActiveCustomers">0</p>
-                    </div>
+                    <div class="card p-4 text-center hover-lift"><p class="text-xs opacity-60">Total Pelanggan</p><p class="text-2xl font-bold" id="crmTotalCustomers">0</p></div>
+                    <div class="card p-4 text-center hover-lift"><p class="text-xs opacity-60">Total Pendapatan</p><p class="text-2xl font-bold" id="crmTotalRevenue">Rp 0</p></div>
+                    <div class="card p-4 text-center hover-lift"><p class="text-xs opacity-60">Pelanggan Aktif (30 hari)</p><p class="text-2xl font-bold" id="crmActiveCustomers">0</p></div>
                 </div>
-                <!-- Segmentasi Pelanggan -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 text-sm">
-                    <div class="card p-3 text-center hover-lift">
-                        <span class="opacity-60">🏆 Top</span>
-                        <p class="font-bold text-lg" id="segTop">0</p>
-                    </div>
-                    <div class="card p-3 text-center hover-lift">
-                        <span class="opacity-60">⭐ Regular</span>
-                        <p class="font-bold text-lg" id="segRegular">0</p>
-                    </div>
-                    <div class="card p-3 text-center hover-lift">
-                        <span class="opacity-60">🆕 New</span>
-                        <p class="font-bold text-lg" id="segNew">0</p>
-                    </div>
-                    <div class="card p-3 text-center hover-lift">
-                        <span class="opacity-60">⚠️ Churn Risk</span>
-                        <p class="font-bold text-lg text-red-600" id="segChurn">0</p>
-                    </div>
+                    <div class="card p-3 text-center hover-lift"><span class="opacity-60">🏆 Top</span><p class="font-bold text-lg" id="segTop">0</p></div>
+                    <div class="card p-3 text-center hover-lift"><span class="opacity-60">⭐ Regular</span><p class="font-bold text-lg" id="segRegular">0</p></div>
+                    <div class="card p-3 text-center hover-lift"><span class="opacity-60">🆕 New</span><p class="font-bold text-lg" id="segNew">0</p></div>
+                    <div class="card p-3 text-center hover-lift"><span class="opacity-60">⚠️ Churn Risk</span><p class="font-bold text-lg text-red-600" id="segChurn">0</p></div>
                 </div>
-                <!-- Header Tabel & Tombol Ekspor -->
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="font-semibold">Daftar Pelanggan</h3>
                     <button id="exportCustomersCSV" class="btn btn-sm btn-secondary"><i class="ph ph-file-csv"></i> Ekspor CSV</button>
                 </div>
-                <!-- Tabel Pelanggan -->
+                <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th class="p-2 text-left">Nama</th><th class="p-2 text-right">Total Pembelian</th><th class="p-2 text-right">Transaksi</th><th class="p-2 text-right">Terakhir Beli</th><th class="p-2 text-center">Status</th><th class="p-2 text-center">Aksi</th></tr></thead><tbody id="crmTableBody"><tr><td colspan="6" class="text-center p-4 opacity-50">Belum ada data pelanggan</td></tr></tbody></table></div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB DETAIL PELANGGAN ==================== -->
+        <div id="tab-crm-detail" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4"><i class="ph ph-address-book text-indigo-600"></i> Detail Pelanggan</h2>
+                <form id="customerDetailForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <input type="text" id="customerFullName" placeholder="Nama Lengkap" required>
+                    <input type="text" id="customerPhone" placeholder="Nomor Telepon">
+                    <input type="email" id="customerEmail" placeholder="Email">
+                    <input type="text" id="customerAddress" placeholder="Alamat">
+                    <select id="customerType"><option value="ecer">Ecer</option><option value="grosir">Grosir</option><option value="partai">Partai</option></select>
+                    <input type="text" id="customerNotes" placeholder="Catatan (opsional)" class="col-span-full">
+                    <button type="submit" class="btn btn-primary">Simpan Pelanggan</button>
+                </form>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
-                        <thead>
-                            <tr>
-                                <th class="p-2 text-left">Nama</th>
-                                <th class="p-2 text-right">Total Pembelian</th>
-                                <th class="p-2 text-right">Transaksi</th>
-                                <th class="p-2 text-right">Terakhir Beli</th>
-                                <th class="p-2 text-center">Status</th>
-                                <th class="p-2 text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="crmTableBody">
-                            <tr><td colspan="6" class="text-center p-4 opacity-50">Belum ada data pelanggan</td></tr>
-                        </tbody>
+                        <thead><tr><th class="p-2">Nama</th><th>Telepon</th><th>Email</th><th>Alamat</th><th>Tipe</th><th>Aksi</th></tr></thead>
+                        <tbody id="customerDetailTableBody"></tbody>
                     </table>
-                </div>
-                <!-- Placeholder dekoratif: Catatan CRM -->
-                <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm flex items-center gap-2">
-                    <i class="ph ph-info text-slate-400"></i>
-                    <span class="opacity-60">Segmentasi otomatis: <strong>Top</strong> (pembelian > 10 jt), <strong>Regular</strong> (2-10 jt), <strong>New</strong> (pertama kali), <strong>Churn</strong> (tidak beli 30 hari).</span>
                 </div>
             </div>
         </div>
 
-        <!-- Modal Konfirmasi Hapus Pelanggan -->
-        <div id="deleteCustomerModal" class="modal-backdrop hidden">
-            <div class="card w-full max-w-md p-6 text-center">
-                <i class="ph ph-warning-circle text-5xl text-red-500 mx-auto mb-3"></i>
-                <h3 class="text-lg font-bold mb-2">Hapus Pelanggan?</h3>
-                <p class="text-sm opacity-70 mb-4">Data pelanggan <strong id="deleteCustomerName"></strong> akan dihapus permanen. Riwayat transaksi tetap aman.</p>
-                <div class="flex gap-3 justify-center">
-                    <button onclick="document.getElementById('deleteCustomerModal').classList.add('hidden')" class="btn btn-secondary">Batal</button>
-                    <button id="confirmDeleteCustomer" class="btn btn-danger">Ya, Hapus</button>
+        <!-- ==================== TAB HARGA JUAL (ONLINE/OFFLINE) ==================== -->
+        <div id="tab-pricing" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4"><i class="ph ph-currency-circle-dollar text-purple-600"></i> Penentuan Harga Jual (Online vs Offline)</h2>
+                <p class="text-sm opacity-70 mb-4">Atur harga jual berbeda untuk penjualan di toko (offline) dan marketplace (online).</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead><tr><th class="p-2 text-left">Produk</th><th class="p-2 text-right">Harga Beli Rata²</th><th class="p-2 text-right">Harga Offline/kg</th><th class="p-2 text-right">Harga Online/kg</th><th class="p-2 text-center">Aksi</th></tr></thead>
+                        <tbody id="pricingTableBody"></tbody>
+                    </table>
+                </div>
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button id="applyDefaultPricing" class="btn btn-secondary">🔄 Terapkan Harga Default</button>
+                    <button id="savePricingBtn" class="btn btn-primary">💾 Simpan Harga</button>
                 </div>
             </div>
         </div>
@@ -587,63 +569,31 @@
         <!-- ==================== TAB KEUANGAN ==================== -->
         <div id="tab-finance" class="tab-content space-y-6">
             <div class="card p-6">
-                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-wallet text-primary-600"></i> Keuangan & Akuntansi</h2>
-                <div id="financeSummaryContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <!-- Akan diisi oleh JS -->
-                </div>
+                <h2 class="text-xl font-bold mb-4"><i class="ph ph-wallet text-primary-600"></i> Keuangan & Akuntansi</h2>
+                <div id="financeSummaryContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"></div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Form Beban -->
                     <div class="card p-4">
-                        <h3 class="font-semibold mb-3 flex items-center gap-2"><i class="ph ph-receipt text-slate-500"></i> Catat Beban Operasional</h3>
+                        <h3 class="font-semibold mb-3"><i class="ph ph-receipt text-slate-500"></i> Catat Beban Operasional</h3>
                         <form id="expenseForm" class="space-y-3">
-                            <select id="expenseAkun">
-                                <option value="Beban Operasional">Beban Operasional</option>
-                                <option value="Beban Listrik">Beban Listrik</option>
-                                <option value="Beban Sewa">Beban Sewa</option>
-                                <option value="Beban Gaji">Beban Gaji</option>
-                                <option value="Beban Transport">Beban Transport</option>
-                            </select>
+                            <select id="expenseAkun"><option value="Beban Operasional">Beban Operasional</option><option value="Beban Listrik">Beban Listrik</option><option value="Beban Sewa">Beban Sewa</option><option value="Beban Gaji">Beban Gaji</option><option value="Beban Transport">Beban Transport</option></select>
                             <input type="number" id="expenseJumlah" placeholder="Jumlah (Rp)" required>
                             <input type="text" id="expenseDeskripsi" placeholder="Deskripsi (opsional)">
                             <button type="submit" class="btn btn-primary w-full">💾 Simpan Beban</button>
                         </form>
                     </div>
-                    <!-- Laporan & Ekspor -->
                     <div class="card p-4">
-                        <h3 class="font-semibold mb-3 flex items-center gap-2"><i class="ph ph-file-text text-slate-500"></i> Laporan & Ekspor</h3>
+                        <h3 class="font-semibold mb-3"><i class="ph ph-file-text text-slate-500"></i> Laporan & Ekspor</h3>
                         <button id="exportExcelBtn" class="btn btn-success w-full mb-2"><i class="ph ph-file-xls"></i> Ekspor Jurnal Bulan Ini (Excel)</button>
                         <button id="viewJournalBtn" class="btn btn-secondary w-full"><i class="ph ph-book-open"></i> Lihat Buku Besar</button>
                     </div>
                 </div>
-                <!-- Buku Besar -->
                 <div id="journalViewer" class="mt-6 hidden">
                     <h3 class="font-semibold mb-2">📖 Buku Besar (Jurnal)</h3>
-                    <div class="overflow-x-auto max-h-64">
-                        <table class="w-full text-sm">
-                            <thead><tr><th class="p-2">Tanggal</th><th>Deskripsi</th><th>Akun</th><th>Debet</th><th>Kredit</th></tr></thead>
-                            <tbody id="journalTableBody"></tbody>
-                        </table>
-                    </div>
+                    <div class="overflow-x-auto max-h-64"><table class="w-full text-sm"><thead><tr><th class="p-2">Tanggal</th><th>Deskripsi</th><th>Akun</th><th>Debet</th><th>Kredit</th></tr></thead><tbody id="journalTableBody"></tbody></table></div>
                 </div>
-                <!-- Grafik Laba Rugi Tahunan -->
                 <div class="mt-6 card p-4">
-                    <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-chart-bar text-blue-500"></i> Grafik Laba Rugi Tahunan</h3>
+                    <h3 class="font-semibold mb-2"><i class="ph ph-chart-bar text-blue-500"></i> Grafik Laba Rugi Tahunan</h3>
                     <canvas id="chartYearlyPL" height="150"></canvas>
-                </div>
-                <!-- Arus Kas -->
-                <div class="mt-4 card p-4">
-                    <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-bank text-slate-500"></i> Arus Kas (Sederhana)</h3>
-                    <div id="cashflowSummary" class="text-sm opacity-70">Data akan terisi setelah beberapa transaksi dan beban tercatat.</div>
-                </div>
-                <!-- Catatan Pajak -->
-                <div class="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-sm">
-                    <h4 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-scales text-amber-600"></i> Catatan Pajak</h4>
-                    <p class="opacity-80">PPN dihitung otomatis dari DPP. PPh 25 dan PPh 21 dihitung dari laba bersih. Pastikan pengaturan pajak sudah benar di tab <strong>Pengaturan</strong>.</p>
-                </div>
-                <!-- Placeholder dekoratif: Status Keuangan -->
-                <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm flex items-center gap-2">
-                    <i class="ph ph-chart-pie-slice text-slate-400"></i>
-                    <span class="opacity-60">Analisis: <strong>Rasio Laba Kotor</strong> menunjukkan efisiensi operasional. Pantau secara berkala.</span>
                 </div>
             </div>
         </div>
@@ -651,123 +601,47 @@
         <!-- ==================== TAB RIWAYAT ==================== -->
         <div id="tab-history" class="tab-content space-y-6">
             <div class="card p-6">
-                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-clock-counter-clockwise text-amber-600"></i> Riwayat Transaksi</h2>
-                <!-- Filter -->
+                <h2 class="text-xl font-bold mb-4"><i class="ph ph-clock-counter-clockwise text-amber-600"></i> Riwayat Transaksi</h2>
                 <form id="filterTransaksi" class="flex flex-wrap gap-3 mb-4">
                     <select id="filterProduk"><option value="">Semua Produk</option></select>
                     <input type="text" id="filterKlien" placeholder="Nama Klien">
                     <input type="date" id="filterStart"> <input type="date" id="filterEnd">
                     <button type="submit" class="btn btn-primary">Filter</button>
                 </form>
-                <!-- Tabel Riwayat -->
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr>
-                                <th class="p-2">Tanggal</th>
-                                <th class="p-2">Klien</th>
-                                <th class="p-2">Produk</th>
-                                <th class="p-2 text-right">Qty</th>
-                                <th class="p-2 text-right">Invoice</th>
-                                <th class="p-2 text-center">Tier</th>
-                                <th class="p-2 text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyTableBody">
-                            <tr><td colspan="7" class="text-center p-4 opacity-50">Belum ada transaksi</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <!-- Statistik Riwayat -->
+                <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th class="p-2">Tanggal</th><th>Klien</th><th>Produk</th><th class="text-right">Qty</th><th class="text-right">Invoice</th><th class="text-center">Tier</th><th class="text-center">Aksi</th></tr></thead><tbody id="historyTableBody"><tr><td colspan="7" class="text-center p-4 opacity-50">Belum ada transaksi</td></tr></tbody></table></div>
                 <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm" id="historyStats">
-                    <div class="card p-3 text-center hover-lift">
-                        <span class="opacity-60">Total Transaksi</span>
-                        <p class="font-bold" id="historyTotalTrx">0</p>
-                    </div>
-                    <div class="card p-3 text-center hover-lift">
-                        <span class="opacity-60">Total Pendapatan</span>
-                        <p class="font-bold" id="historyTotalRevenue">Rp 0</p>
-                    </div>
-                    <div class="card p-3 text-center hover-lift">
-                        <span class="opacity-60">Rata-rata/hari</span>
-                        <p class="font-bold" id="historyAvgDaily">Rp 0</p>
-                    </div>
-                    <div class="card p-3 text-center hover-lift">
-                        <span class="opacity-60">Transaksi Hari Ini</span>
-                        <p class="font-bold" id="historyTodayTrx">0</p>
-                    </div>
+                    <div class="card p-3 text-center hover-lift"><span class="opacity-60">Total Transaksi</span><p class="font-bold" id="historyTotalTrx">0</p></div>
+                    <div class="card p-3 text-center hover-lift"><span class="opacity-60">Total Pendapatan</span><p class="font-bold" id="historyTotalRevenue">Rp 0</p></div>
+                    <div class="card p-3 text-center hover-lift"><span class="opacity-60">Rata-rata/hari</span><p class="font-bold" id="historyAvgDaily">Rp 0</p></div>
+                    <div class="card p-3 text-center hover-lift"><span class="opacity-60">Transaksi Hari Ini</span><p class="font-bold" id="historyTodayTrx">0</p></div>
                 </div>
-                <!-- Grafik Riwayat -->
                 <div class="mt-4 card p-4">
-                    <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-chart-line text-blue-500"></i> Grafik Riwayat Pendapatan (30 Hari)</h3>
+                    <h3 class="font-semibold mb-2"><i class="ph ph-chart-line text-blue-500"></i> Grafik Riwayat Pendapatan (30 Hari)</h3>
                     <canvas id="chartHistoryRevenue" height="150"></canvas>
                 </div>
-                <!-- Tombol Hapus Semua Riwayat (Dekoratif) -->
-                <div class="mt-4 flex justify-end">
-                    <button id="clearAllHistoryBtn" class="btn btn-danger btn-sm"><i class="ph ph-trash"></i> Hapus Semua Riwayat</button>
-                </div>
-                <!-- Placeholder dekoratif: Rekomendasi -->
-                <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm flex items-center gap-2">
-                    <i class="ph ph-target text-slate-400"></i>
-                    <span class="opacity-60">Tips: Gunakan filter untuk melihat performa produk tertentu dalam rentang waktu yang spesifik.</span>
-                </div>
+                <div class="mt-4 flex justify-end"><button id="clearAllHistoryBtn" class="btn btn-danger btn-sm"><i class="ph ph-trash"></i> Hapus Semua Riwayat</button></div>
             </div>
         </div>
 
         <!-- ==================== TAB LAPORAN ==================== -->
         <div id="tab-reports" class="tab-content space-y-6">
             <div class="card p-6">
-                <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="ph ph-file-text text-violet-600"></i> Laporan Keuangan</h2>
-                <!-- Laba Rugi & Neraca -->
+                <h2 class="text-xl font-bold mb-6"><i class="ph ph-file-text text-violet-600"></i> Laporan Keuangan</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-trend-up text-green-600"></i> Laba Rugi</h3>
-                        <div id="reportLabaRugi" class="text-sm p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
-                            <!-- Akan diisi oleh JS -->
-                        </div>
+                        <h3 class="font-semibold mb-2"><i class="ph ph-trend-up text-green-600"></i> Laba Rugi</h3>
+                        <div id="reportLabaRugi" class="text-sm p-4 bg-slate-50 dark:bg-slate-800 rounded-xl"></div>
                     </div>
                     <div>
-                        <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-buildings text-blue-600"></i> Neraca</h3>
-                        <div id="reportNeraca" class="text-sm p-4 bg-slate-50 dark:bg-slate-800 rounded-xl space-y-3">
-                            <div><strong>Aset</strong><div id="neracaAset"></div></div>
-                            <div><strong>Kewajiban</strong><div id="neracaKewajiban"></div></div>
-                            <div><strong>Ekuitas</strong><div id="neracaEkuitas"></div></div>
-                            <div class="font-bold mt-2" id="neracaBalance"></div>
-                        </div>
+                        <h3 class="font-semibold mb-2"><i class="ph ph-buildings text-blue-600"></i> Neraca</h3>
+                        <div id="reportNeraca" class="text-sm p-4 bg-slate-50 dark:bg-slate-800 rounded-xl"></div>
                     </div>
                 </div>
-                <!-- Divider -->
                 <div style="border-top:1px solid var(--border); margin: 1.5rem 0;"></div>
-                <!-- Laporan Tambahan -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                    <div class="card p-4 hover-lift">
-                        <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-package text-slate-500"></i> Laporan Stok</h3>
-                        <div id="reportStok" class="text-sm space-y-1"></div>
-                    </div>
-                    <div class="card p-4 hover-lift">
-                        <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-money text-emerald-500"></i> Margin per Produk</h3>
-                        <div id="reportMargin" class="text-sm space-y-1"></div>
-                    </div>
-                    <div class="card p-4 hover-lift">
-                        <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-chart-line-up text-violet-500"></i> Proyeksi Keuangan</h3>
-                        <div id="reportProyeksi" class="text-sm space-y-1"></div>
-                    </div>
-                </div>
-                <!-- Keterangan Laporan -->
-                <div class="mt-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm">
-                    <h4 class="font-semibold mb-2">📋 Keterangan Laporan</h4>
-                    <ul class="list-disc list-inside space-y-1 opacity-70">
-                        <li><strong>Laba Rugi:</strong> Pendapatan dikurangi HPP, beban, dan pajak.</li>
-                        <li><strong>Neraca:</strong> Aset = Kewajiban + Ekuitas. Menampilkan saldo akun utama.</li>
-                        <li><strong>Stok:</strong> Total stok per produk dari seluruh batch aktif.</li>
-                        <li><strong>Margin:</strong> Selisih total invoice dengan HPP per produk.</li>
-                        <li><strong>Proyeksi:</strong> Estimasi pendapatan 3 bulan ke depan berdasarkan rata-rata historis.</li>
-                    </ul>
-                </div>
-                <!-- Placeholder dekoratif: Perbandingan Industri -->
-                <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm flex items-center gap-2">
-                    <i class="ph ph-globe text-slate-400"></i>
-                    <span class="opacity-60">Benchmark: Margin kotor ideal untuk industri frozen food adalah 25–40%.</span>
+                    <div class="card p-4 hover-lift"><h3 class="font-semibold mb-2"><i class="ph ph-package"></i> Laporan Stok</h3><div id="reportStok" class="text-sm space-y-1"></div></div>
+                    <div class="card p-4 hover-lift"><h3 class="font-semibold mb-2"><i class="ph ph-money"></i> Margin per Produk</h3><div id="reportMargin" class="text-sm space-y-1"></div></div>
+                    <div class="card p-4 hover-lift"><h3 class="font-semibold mb-2"><i class="ph ph-chart-line-up"></i> Proyeksi Keuangan</h3><div id="reportProyeksi" class="text-sm space-y-1"></div></div>
                 </div>
             </div>
         </div>
@@ -775,50 +649,25 @@
         <!-- ==================== TAB PENGATURAN ==================== -->
         <div id="tab-settings" class="tab-content space-y-6">
             <div class="card p-6">
-                <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="ph ph-gear text-slate-600"></i> Pengaturan Bisnis</h2>
-                <!-- Grid Pengaturan -->
+                <h2 class="text-xl font-bold mb-6"><i class="ph ph-gear text-slate-600"></i> Pengaturan Bisnis</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-3">
-                        <div><label class="text-sm font-medium">PPN (%)</label><input type="number" id="setPPN" value="12" class="w-full"></div>
-                        <div><label class="text-sm font-medium">PPh 25 (%)</label><input type="number" id="setPPh25" value="2" class="w-full"></div>
-                        <div><label class="text-sm font-medium">PPh 21 (%)</label><input type="number" id="setPPh21" value="5" class="w-full"></div>
-                        <div><label class="text-sm font-medium">PT Share (%)</label><input type="number" id="setPTShare" value="60" class="w-full"></div>
-                        <div><label class="text-sm font-medium">Min Grosir (kg)</label><input type="number" id="setMinGrosir" value="10" class="w-full"></div>
+                        <div><label class="text-sm font-medium">PPN (%)</label><input type="number" id="setPPN" value="12"></div>
+                        <div><label class="text-sm font-medium">PPh 25 (%)</label><input type="number" id="setPPh25" value="2"></div>
+                        <div><label class="text-sm font-medium">PPh 21 (%)</label><input type="number" id="setPPh21" value="5"></div>
+                        <div><label class="text-sm font-medium">PT Share (%)</label><input type="number" id="setPTShare" value="60"></div>
+                        <div><label class="text-sm font-medium">Min Grosir (kg)</label><input type="number" id="setMinGrosir" value="10"></div>
                     </div>
                     <div class="space-y-3">
-                        <div><label class="text-sm font-medium">Min Partai (kg)</label><input type="number" id="setMinPartai" value="500" class="w-full"></div>
-                        <div><label class="text-sm font-medium">Selisih Grosir dari Ecer (Rp)</label><input type="number" id="setSelisihGrosir" value="5000" class="w-full"></div>
-                        <div><label class="text-sm font-medium">Margin Default (Rp/kg)</label><input type="number" id="setMarginDefault" value="15000" class="w-full"></div>
-                        <div>
-                            <label class="text-sm font-medium">Metode Penyimpanan</label>
-                            <select id="setStorageMethod" class="w-full">
-                                <option value="none">Tidak Ada</option>
-                                <option value="flat_monthly">Flat Bulanan</option>
-                                <option value="per_kg_day">Harian per Kg</option>
-                            </select>
-                        </div>
-                        <div id="storageFlatInput">
-                            <label class="text-sm font-medium">Biaya Sewa Bulanan (Rp)</label>
-                            <input type="number" id="setStorageFlat" value="0" class="w-full">
-                        </div>
-                        <div id="storagePerKgInput" class="hidden">
-                            <label class="text-sm font-medium">Biaya per Kg per Hari (Rp)</label>
-                            <input type="number" id="setStoragePerKg" value="0" class="w-full">
-                        </div>
-                        <div>
-                            <label class="text-sm font-medium">Alokasi Stok</label>
-                            <select id="setFifoMethod" class="w-full">
-                                <option value="fefo">FEFO (Kadaluarsa Terdekat)</option>
-                                <option value="fifo">FIFO (Masuk Pertama)</option>
-                            </select>
-                        </div>
+                        <div><label class="text-sm font-medium">Min Partai (kg)</label><input type="number" id="setMinPartai" value="500"></div>
+                        <div><label class="text-sm font-medium">Selisih Grosir dari Ecer (Rp)</label><input type="number" id="setSelisihGrosir" value="5000"></div>
+                        <div><label class="text-sm font-medium">Margin Default (Rp/kg)</label><input type="number" id="setMarginDefault" value="15000"></div>
+                        <div><label class="text-sm font-medium">Alokasi Stok</label><select id="setFifoMethod"><option value="fefo">FEFO</option><option value="fifo">FIFO</option></select></div>
                     </div>
                 </div>
                 <button id="saveSettingsBtn" class="btn btn-primary mt-6">💾 Simpan Pengaturan</button>
-
-                <!-- Profil Usaha untuk Invoice -->
                 <div class="mt-8 card p-4">
-                    <h3 class="font-semibold mb-3 flex items-center gap-2"><i class="ph ph-storefront text-slate-500"></i> Profil Usaha (untuk Invoice)</h3>
+                    <h3 class="font-semibold mb-3"><i class="ph ph-storefront"></i> Profil Usaha (Invoice)</h3>
                     <form id="companyProfileForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input type="text" id="companyName" placeholder="Nama Usaha" value="Cibitung Frozen">
                         <input type="text" id="companyAddress" placeholder="Alamat" value="Jl. Industri No.1">
@@ -827,31 +676,35 @@
                         <button type="button" id="saveCompanyBtn" class="btn btn-primary col-span-full sm:col-span-1">Simpan Profil</button>
                     </form>
                 </div>
-
-                <!-- Reset Ulang Data -->
-                <div class="mt-8 card p-4 border-red-200 dark:border-red-800 bg-red-50/30 dark:bg-red-900/10">
-                    <h3 class="font-semibold mb-3 text-red-700 dark:text-red-400 flex items-center gap-2">
-                        <i class="ph ph-warning-circle text-xl"></i> Reset Ulang Semua Data
-                    </h3>
-                    <p class="text-sm text-red-700/80 dark:text-red-400/80 mb-4">
-                        Tindakan ini akan menghapus seluruh data termasuk batch, transaksi, jurnal, pelanggan, dan pengaturan. Data yang sudah dihapus <strong>tidak dapat dikembalikan</strong>. Pastikan Anda sudah melakukan backup terlebih dahulu.
-                    </p>
-                    <button id="resetAllDataBtn" class="btn btn-danger w-full sm:w-auto">
-                        <i class="ph ph-trash"></i> Reset Semua Data
-                    </button>
+                <div class="mt-8 card p-4 border-red-200 dark:border-red-800 bg-red-50/30">
+                    <h3 class="font-semibold mb-3 text-red-700"><i class="ph ph-warning-circle"></i> Reset Semua Data</h3>
+                    <p class="text-sm text-red-700/80 mb-4">Menghapus seluruh data. Harap backup terlebih dahulu.</p>
+                    <button id="resetAllDataBtn" class="btn btn-danger"><i class="ph ph-trash"></i> Reset Semua Data</button>
                 </div>
+            </div>
+        </div>
 
-                <!-- Backup & Keamanan -->
-                <div class="mt-6 card p-4">
-                    <h3 class="font-semibold mb-3 flex items-center gap-2"><i class="ph ph-cloud-arrow-up text-slate-500"></i> Backup & Keamanan</h3>
-                    <p class="text-sm opacity-70">Data Anda disimpan di browser. Lakukan backup manual secara berkala menggunakan tombol di pojok kanan atas, atau gunakan <kbd>Ctrl+B</kbd>.</p>
-                    <button onclick="CFS.App.backupData()" class="btn btn-primary mt-2"><i class="ph ph-download-simple"></i> Backup Sekarang</button>
-                </div>
-
-                <!-- Placeholder dekoratif: Tanggal & Jam Sistem -->
-                <div class="mt-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm flex items-center gap-2">
-                    <i class="ph ph-clock-countdown text-slate-400"></i>
-                    <span class="opacity-60">Waktu sistem: <span id="systemDateTime">-</span></span>
+        <!-- ==================== TAB BANTUAN ==================== -->
+        <div id="tab-help" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4"><i class="ph ph-question text-blue-600"></i> Pusat Bantuan</h2>
+                <div class="space-y-4">
+                    <details class="border rounded-lg p-4">
+                        <summary class="font-semibold cursor-pointer">📘 Bagaimana cara menambah stok baru?</summary>
+                        <p class="mt-2 text-sm opacity-80">Buka tab <strong>Stok & Batch</strong>, isi form Tambah Batch Baru dengan data produk, berat, harga beli, dan tanggal kadaluarsa. Klik Simpan Batch.</p>
+                    </details>
+                    <details class="border rounded-lg p-4">
+                        <summary class="font-semibold cursor-pointer">📗 Apa perbedaan FEFO dan FIFO?</summary>
+                        <p class="mt-2 text-sm opacity-80">FEFO (First Expired First Out) mengeluarkan stok yang paling dekat kadaluarsa lebih dulu. FIFO (First In First Out) berdasarkan urutan masuk. Ubah di Pengaturan.</p>
+                    </details>
+                    <details class="border rounded-lg p-4">
+                        <summary class="font-semibold cursor-pointer">📙 Bagaimana cara backup data?</summary>
+                        <p class="mt-2 text-sm opacity-80">Klik tombol <strong>Backup</strong> di pojok kanan atas. File JSON akan diunduh. Untuk memulihkan, klik <strong>Restore</strong> dan pilih file backup.</p>
+                    </details>
+                    <details class="border rounded-lg p-4">
+                        <summary class="font-semibold cursor-pointer">📕 Apa itu HPP dan margin?</summary>
+                        <p class="mt-2 text-sm opacity-80">HPP (Harga Pokok Penjualan) adalah biaya dasar produk. Margin adalah keuntungan per kg yang ditambahkan di atas HPP. Atur margin default di Pengaturan.</p>
+                    </details>
                 </div>
             </div>
         </div>
@@ -867,6 +720,36 @@
 </footer>
 
 <!-- ==================== JAVASCRIPT EXTERNAL ==================== -->
+<script src="js/storage.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/inventory.js"></script>
+<script src="js/sales.js"></script>
+<script src="js/accounting.js"></script>
+<script src="js/dashboard.js"></script>
 <script src="js/app.js"></script>
+
+<!-- ==================== INLINE SCRIPTS UNTUK DARK MODE & WAKTU ==================== -->
+<script>
+    function toggleDarkMode() {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('cfs_dark', document.documentElement.classList.contains('dark') ? '1' : '0');
+        document.getElementById('darkIcon').className = document.documentElement.classList.contains('dark')
+            ? 'ph ph-sun text-lg text-yellow-400' : 'ph ph-moon text-lg';
+        document.getElementById('sidebar-mode').textContent = document.documentElement.classList.contains('dark') ? 'Gelap' : 'Terang';
+    }
+    (function() {
+        if (localStorage.getItem('cfs_dark') === '1') {
+            document.documentElement.classList.add('dark');
+            document.getElementById('darkIcon').className = 'ph ph-sun text-lg text-yellow-400';
+            document.getElementById('sidebar-mode').textContent = 'Gelap';
+        }
+        setInterval(() => {
+            const el = document.getElementById('lastUpdate');
+            if (el) el.textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            const sysEl = document.getElementById('systemDateTime');
+            if (sysEl) sysEl.textContent = new Date().toLocaleString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
+        }, 1000);
+    })();
+</script>
 </body>
 </html>
