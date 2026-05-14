@@ -813,26 +813,114 @@
             </div>
         </div>
 
-        <!-- ==================== TAB LAPORAN ==================== -->
-        <div id="tab-reports" class="tab-content space-y-6">
-            <div class="card p-6">
-                <h2 class="text-xl font-bold mb-6"><i class="ph ph-file-text text-violet-600"></i> Laporan Keuangan</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div><h3 class="font-semibold mb-2"><i class="ph ph-trend-up text-green-600"></i> Laba Rugi</h3><div id="reportLabaRugi" class="text-sm p-4 bg-slate-50 dark:bg-slate-800 rounded-xl"></div></div>
-                    <div><h3 class="font-semibold mb-2"><i class="ph ph-buildings text-blue-600"></i> Neraca</h3><div id="reportNeraca" class="text-sm p-4 bg-slate-50 dark:bg-slate-800 rounded-xl"></div></div>
+       <!-- ==================== TAB LAPORAN (DIPERKAYA) ==================== -->
+<div id="tab-reports" class="tab-content space-y-6">
+    <div class="card p-6">
+        <h2 class="text-xl font-bold mb-6"><i class="ph ph-file-text text-violet-600"></i> Laporan Keuangan & Operasional</h2>
+        
+        <!-- Filter Periode -->
+        <div class="flex flex-wrap items-center gap-4 mb-6 bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-medium">Dari</label>
+                <input type="date" id="reportStartDate" class="w-40">
+            </div>
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-medium">Sampai</label>
+                <input type="date" id="reportEndDate" class="w-40">
+            </div>
+            <button id="applyReportFilter" class="btn btn-primary btn-sm">Tampilkan</button>
+            <div class="flex gap-2 ml-auto">
+                <button id="exportReportPDF" class="btn btn-secondary btn-sm"><i class="ph ph-file-pdf"></i> PDF</button>
+                <button id="exportReportExcel" class="btn btn-secondary btn-sm"><i class="ph ph-file-xls"></i> Excel</button>
+            </div>
+        </div>
+
+        <!-- Ringkasan Utama -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6" id="reportSummaryCards">
+            <div class="card p-3 text-center"><span class="text-xs opacity-60">Pendapatan</span><p class="font-bold text-lg" id="rptPendapatan">Rp 0</p></div>
+            <div class="card p-3 text-center"><span class="text-xs opacity-60">HPP</span><p class="font-bold text-lg" id="rptHPP">Rp 0</p></div>
+            <div class="card p-3 text-center"><span class="text-xs opacity-60">Laba Kotor</span><p class="font-bold text-lg" id="rptLabaKotor">Rp 0</p></div>
+            <div class="card p-3 text-center"><span class="text-xs opacity-60">Beban</span><p class="font-bold text-lg" id="rptBeban">Rp 0</p></div>
+            <div class="card p-3 text-center"><span class="text-xs opacity-60">Laba Bersih</span><p class="font-bold text-lg" id="rptLabaBersih">Rp 0</p></div>
+        </div>
+
+        <!-- Tabel Laba Rugi Detail -->
+        <div class="mb-6">
+            <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-trend-up text-green-600"></i> Laba Rugi Detail</h3>
+            <div class="overflow-x-auto max-h-64 border rounded-lg">
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-100 dark:bg-slate-700 sticky top-0">
+                        <tr><th class="p-2 text-left">Keterangan</th><th class="p-2 text-right">Jumlah</th></tr>
+                    </thead>
+                    <tbody id="reportDetailLabaRugi">
+                        <!-- diisi JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Dua Kolom: Laporan Stok per Gudang & Laporan Penjualan per Channel -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+                <h3 class="font-semibold mb-2"><i class="ph ph-package text-blue-600"></i> Stok per Gudang</h3>
+                <div class="overflow-x-auto max-h-48 border rounded-lg">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-100 dark:bg-slate-700"><tr><th class="p-2 text-left">Produk</th><th class="p-2 text-right">Gudang Utama</th><th class="p-2 text-right">Cold Storage</th><th class="p-2 text-right">Total</th></tr></thead>
+                        <tbody id="reportStokGudang"></tbody>
+                    </table>
                 </div>
-                <div style="border-top:1px solid var(--border); margin: 1.5rem 0;"></div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                    <div class="card p-4"><h3 class="font-semibold mb-2"><i class="ph ph-package"></i> Laporan Stok</h3><div id="reportStok" class="text-sm space-y-1"></div></div>
-                    <div class="card p-4"><h3 class="font-semibold mb-2"><i class="ph ph-money"></i> Margin per Produk</h3><div id="reportMargin" class="text-sm space-y-1"></div></div>
-                    <div class="card p-4"><h3 class="font-semibold mb-2"><i class="ph ph-chart-line-up"></i> Proyeksi Keuangan</h3><div id="reportProyeksi" class="text-sm space-y-1"></div></div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <div class="card p-4"><h3 class="font-semibold mb-2"><i class="ph ph-storefront"></i> Laporan Penjualan per Channel</h3><div id="reportChannelSales" class="text-sm space-y-1"></div></div>
-                    <div class="card p-4"><h3 class="font-semibold mb-2"><i class="ph ph-truck"></i> Laporan Pengiriman</h3><div id="reportDelivery" class="text-sm space-y-1"></div></div>
+            </div>
+            <div>
+                <h3 class="font-semibold mb-2"><i class="ph ph-storefront text-purple-600"></i> Penjualan per Channel</h3>
+                <div class="overflow-x-auto max-h-48 border rounded-lg">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-100 dark:bg-slate-700"><tr><th class="p-2 text-left">Channel</th><th class="p-2 text-right">Transaksi</th><th class="p-2 text-right">Total</th></tr></thead>
+                        <tbody id="reportChannelTable"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
+
+        <!-- Tabel Penjualan per Pelanggan -->
+        <div class="mb-6">
+            <h3 class="font-semibold mb-2"><i class="ph ph-users text-indigo-600"></i> Top Pelanggan</h3>
+            <div class="overflow-x-auto max-h-48 border rounded-lg">
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-100 dark:bg-slate-700"><tr><th class="p-2 text-left">Pelanggan</th><th class="p-2 text-right">Transaksi</th><th class="p-2 text-right">Total Pembelian</th></tr></thead>
+                    <tbody id="reportTopCustomers"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Laporan Retur dan Opname -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+                <h3 class="font-semibold mb-2"><i class="ph ph-arrow-u-up-left text-red-600"></i> Retur Penjualan</h3>
+                <div class="overflow-x-auto max-h-48 border rounded-lg">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-100 dark:bg-slate-700"><tr><th class="p-2 text-left">Tanggal</th><th class="p-2">Produk</th><th class="p-2 text-right">Qty</th><th class="p-2">Alasan</th></tr></thead>
+                        <tbody id="reportRetur"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div>
+                <h3 class="font-semibold mb-2"><i class="ph ph-clipboard-text text-amber-600"></i> Stock Opname Terakhir</h3>
+                <div class="overflow-x-auto max-h-48 border rounded-lg">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-100 dark:bg-slate-700"><tr><th class="p-2 text-left">Tanggal</th><th class="p-2">Produk</th><th class="p-2 text-right">Selisih</th></tr></thead>
+                        <tbody id="reportOpname"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grafik Penjualan Bulanan -->
+        <div>
+            <h3 class="font-semibold mb-2"><i class="ph ph-chart-line text-blue-500"></i> Tren Penjualan Bulanan</h3>
+            <canvas id="chartReportMonthlySales" height="200"></canvas>
+        </div>
+    </div>
+</div>
 
         <!-- ==================== TAB NOTIFIKASI ==================== -->
         <div id="tab-notifications" class="tab-content space-y-6">
