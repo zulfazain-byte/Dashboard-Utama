@@ -11,18 +11,12 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐟</text></svg>">
 
     <!-- ==================== LIBRARY CDN ==================== -->
-    <script src="https://cdn.tailwindcss.com">
-    </script>
-    <script src="https://unpkg.com/@phosphor-icons/web">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js">
-    </script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js">
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <!-- ==================== TAILWIND CONFIG ==================== -->
     <script>
@@ -32,28 +26,14 @@
                 extend: {
                     colors: {
                         primary: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            200: '#bfdbfe',
-                            300: '#93c5fd',
-                            400: '#60a5fa',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            800: '#1e40af',
-                            900: '#1e3a8a',
+                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd',
+                            400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8',
+                            800: '#1e40af', 900: '#1e3a8a',
                         },
                         accent: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            200: '#bbf7d0',
-                            300: '#86efac',
-                            400: '#4ade80',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            700: '#15803d',
-                            800: '#166534',
-                            900: '#14532d',
+                            50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac',
+                            400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#15803d',
+                            800: '#166534', 900: '#14532d',
                         },
                     },
                     fontFamily: {
@@ -80,7 +60,7 @@
             --success: #16a34a;
             --warning: #d97706;
             --info: #0891b2;
-            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.06);
             --transition-base: all 0.2s ease;
             --radius-lg: 1rem;
             --radius-md: 0.75rem;
@@ -99,14 +79,10 @@
             --success: #22c55e;
             --warning: #f59e0b;
             --info: #06b6d4;
-            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.4);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -120,1584 +96,777 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        .container-main {
-            width: 100%;
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-
-        .tab-content {
-            display: none;
-            opacity: 0;
-            transform: translateY(8px);
-            transition: opacity 0.3s, transform 0.3s;
-        }
-
-        .tab-content.active {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--card-shadow);
-            transition: var(--transition-base);
-        }
-
-        .card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        input,
-        select,
-        textarea {
-            background: var(--surface);
-            color: var(--text);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 0.625rem 0.75rem;
-            transition: var(--transition-base);
-            outline: none;
-            font-family: inherit;
-            font-size: 0.875rem;
-            width: 100%;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.625rem 1.25rem;
-            font-weight: 600;
-            border-radius: var(--radius-md);
-            transition: var(--transition-base);
-            cursor: pointer;
-            border: none;
-            font-size: 0.875rem;
-            white-space: nowrap;
-            user-select: none;
-        }
-
-        .btn:active {
-            transform: scale(0.97);
-        }
-
-        .btn-primary {
-            background-color: var(--accent);
-            color: white;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-        }
-
-        .btn-primary:hover {
-            background-color: #1d4ed8;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
-
-        .btn-secondary {
-            background-color: transparent;
-            border: 1px solid var(--border);
-            color: var(--text);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--bg);
-            border-color: var(--accent);
-        }
-
-        .btn-success {
-            background-color: var(--success);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background-color: #15803d;
-        }
-
-        .btn-danger {
-            background-color: var(--danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background-color: #b91c1c;
-        }
-
-        .btn-sm {
-            padding: 0.375rem 0.75rem;
-            font-size: 0.75rem;
-        }
-
-        .toggle-checkbox {
-            width: 1.25rem;
-            height: 1.25rem;
-            border-radius: 9999px;
-            border: 2px solid #cbd5e1;
-            background: white;
-            cursor: pointer;
-            position: absolute;
-            top: 0.175rem;
-            left: 0.175rem;
-            z-index: 10;
-            transition: all 0.3s;
-            appearance: none;
-        }
-
-        .toggle-checkbox:checked {
-            left: 1.35rem;
-            border-color: var(--accent);
-            background: white;
-        }
-
-        .toggle-label {
-            display: block;
-            width: 2.75rem;
-            height: 1.6rem;
-            background: #cbd5e1;
-            border-radius: 9999px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .toggle-checkbox:checked+.toggle-label {
-            background: var(--accent);
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            border-radius: var(--radius-md);
-            padding: 1rem 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            transform: translateY(120%);
-            opacity: 0;
-            transition: transform 0.3s, opacity 0.3s;
-            z-index: 9999;
-            pointer-events: none;
-            max-width: 380px;
-        }
-
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-backdrop {
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(4px);
-            position: fixed;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
-            padding: 1rem;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.125rem 0.625rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            background: var(--accent-light);
-            color: var(--accent);
-        }
-
-        .tooltip {
-            position: relative;
-            display: inline-flex;
-        }
-
-        .tooltip .tooltip-text {
-            visibility: hidden;
-            background-color: #1e293b;
-            color: #fff;
-            text-align: center;
-            border-radius: var(--radius-sm);
-            padding: 0.5rem 0.75rem;
-            position: absolute;
-            z-index: 100;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            white-space: nowrap;
-            font-size: 0.75rem;
-            font-weight: 500;
-            opacity: 0;
-            transition: opacity 0.2s;
-            pointer-events: none;
-        }
-
-        .tooltip:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .widget-toggle-label {
-            transition: all 0.3s ease;
-        }
-
-        .widget-toggle-label:hover {
-            transform: scale(1.05);
-            color: var(--accent);
-        }
-
-        .shimmer {
-            background: linear-gradient(90deg, var(--border) 25%, transparent 50%, var(--border) 75%);
-            background-size: 200% 100%;
-            animation: shimmerAnim 1.5s infinite;
-        }
-
-        @keyframes shimmerAnim {
-            0% {
-                background-position: -200% 0;
-            }
-            100% {
-                background-position: 200% 0;
-            }
-        }
-
-        .fade-in {
-            animation: fadeInUp 0.4s ease forwards;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(16px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .pulse-dot {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.4;
-            }
-        }
-
-        .hover-lift {
-            transition: transform 0.2s ease;
-        }
-
-        .hover-lift:hover {
-            transform: translateY(-2px);
-        }
+        .container-main { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 1rem; }
+        .tab-content { display: none; opacity: 0; transform: translateY(8px); transition: opacity 0.3s, transform 0.3s; }
+        .tab-content.active { display: block; opacity: 1; transform: translateY(0); }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--card-shadow); transition: var(--transition-base); }
+        .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        input, select, textarea { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.625rem 0.75rem; transition: var(--transition-base); outline: none; font-family: inherit; font-size: 0.875rem; width: 100%; }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.625rem 1.25rem; font-weight: 600; border-radius: var(--radius-md); transition: var(--transition-base); cursor: pointer; border: none; font-size: 0.875rem; white-space: nowrap; user-select: none; }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background-color: var(--accent); color: white; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .btn-primary:hover { background-color: #1d4ed8; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+        .btn-secondary { background-color: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-secondary:hover { background-color: var(--bg); border-color: var(--accent); }
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-success:hover { background-color: #15803d; }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-danger:hover { background-color: #b91c1c; }
+        .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.75rem; }
+        .toggle-checkbox { width: 1.25rem; height: 1.25rem; border-radius: 9999px; border: 2px solid #cbd5e1; background: white; cursor: pointer; position: absolute; top: 0.175rem; left: 0.175rem; z-index: 10; transition: all 0.3s; appearance: none; }
+        .toggle-checkbox:checked { left: 1.35rem; border-color: var(--accent); background: white; }
+        .toggle-label { display: block; width: 2.75rem; height: 1.6rem; background: #cbd5e1; border-radius: 9999px; cursor: pointer; transition: background 0.3s; }
+        .toggle-checkbox:checked+.toggle-label { background: var(--accent); }
+        .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--surface); border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-radius: var(--radius-md); padding: 1rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; transform: translateY(120%); opacity: 0; transition: transform 0.3s, opacity 0.3s; z-index: 9999; pointer-events: none; max-width: 380px; }
+        .toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+        .modal-backdrop { background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 50; padding: 1rem; }
+        .badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.125rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background: var(--accent-light); color: var(--accent); }
+        .tooltip { position: relative; display: inline-flex; }
+        .tooltip .tooltip-text { visibility: hidden; background-color: #1e293b; color: #fff; text-align: center; border-radius: var(--radius-sm); padding: 0.5rem 0.75rem; position: absolute; z-index: 100; bottom: 125%; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 0.75rem; font-weight: 500; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+        .tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
+        .widget-toggle-label { transition: all 0.3s ease; }
+        .widget-toggle-label:hover { transform: scale(1.05); color: var(--accent); }
+        .shimmer { background: linear-gradient(90deg, var(--border) 25%, transparent 50%, var(--border) 75%); background-size: 200% 100%; animation: shimmerAnim 1.5s infinite; }
+        @keyframes shimmerAnim { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        .fade-in { animation: fadeInUp 0.4s ease forwards; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .pulse-dot { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .hover-lift { transition: transform 0.2s ease; }
+        .hover-lift:hover { transform: translateY(-2px); }
 
         @media (max-width: 640px) {
-            .hide-mobile {
-                display: none !important;
-            }
-            .container-main {
-                padding: 0 0.75rem;
-            }
-            .card {
-                border-radius: 0.75rem;
-            }
+            .hide-mobile { display: none !important; }
+            .container-main { padding: 0 0.75rem; }
+            .card { border-radius: 0.75rem; }
         }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- ==================== TOAST NOTIFICATION ==================== -->
-    <div id="toast" class="toast">
-        <div id="toastIcon" class="w-9 h-9 rounded-full flex items-center justify-center text-white"></div>
-        <div>
-            <h4 id="toastTitle" class="text-sm font-bold"></h4>
-            <p id="toastMsg" class="text-xs opacity-70 mt-0.5"></p>
+<!-- ==================== TOAST NOTIFICATION ==================== -->
+<div id="toast" class="toast">
+    <div id="toastIcon" class="w-9 h-9 rounded-full flex items-center justify-center text-white"></div>
+    <div>
+        <h4 id="toastTitle" class="text-sm font-bold"></h4>
+        <p id="toastMsg" class="text-xs opacity-70 mt-0.5"></p>
+    </div>
+</div>
+
+<!-- ==================== NAVIGATION BAR ==================== -->
+<nav class="sticky top-0 z-40 border-b shadow-sm backdrop-blur-md" style="background: var(--surface); border-color: var(--border);">
+    <div class="container-main flex items-center justify-between h-16">
+        <!-- Logo & Brand -->
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-600/20">
+                <i class="ph-fill ph-fish-simple text-2xl"></i>
+            </div>
+            <div>
+                <span class="font-extrabold text-xl tracking-tight" style="color: var(--text);">Cibitung<span class="text-primary-600">Frozen</span></span>
+                <p class="text-[10px] uppercase font-bold tracking-widest opacity-50 -mt-1">ERP Ultimate v5.4</p>
+            </div>
+        </div>
+        <!-- Status Indicator -->
+        <div class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+            <span class="w-2 h-2 rounded-full bg-green-500 pulse-dot"></span>
+            <span class="text-xs font-medium text-green-700 dark:text-green-400">Sistem Online</span>
+        </div>
+        <!-- Right Actions -->
+        <div class="flex items-center gap-2 sm:gap-3">
+            <button onclick="CFS.App.backupData()" class="btn btn-secondary text-sm py-2 px-3 hidden sm:flex tooltip">
+                <i class="ph ph-download-simple"></i> <span class="hidden md:inline">Backup</span>
+                <span class="tooltip-text">Unduh semua data sebagai JSON</span>
+            </button>
+            <button onclick="CFS.App.restorePrompt()" class="btn btn-secondary text-sm py-2 px-3 hidden sm:flex tooltip">
+                <i class="ph ph-upload-simple"></i> <span class="hidden md:inline">Restore</span>
+                <span class="tooltip-text">Pulihkan data dari file backup</span>
+            </button>
+            <button onclick="toggleDarkMode()" class="p-2 rounded-xl border tooltip" style="border-color: var(--border);">
+                <i class="ph ph-moon text-lg" id="darkIcon"></i>
+                <span class="tooltip-text">Ganti tema gelap/terang</span>
+            </button>
         </div>
     </div>
+</nav>
 
-    <!-- ==================== NAVIGATION BAR ==================== -->
-    <nav class="sticky top-0 z-40 border-b shadow-sm backdrop-blur-md" style="background: var(--surface); border-color: var(--border);">
-        <div class="container-main flex items-center justify-between h-16">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-600/20">
-                    <i class="ph-fill ph-fish-simple text-2xl"></i>
-                </div>
+<!-- ==================== MAIN LAYOUT ==================== -->
+<div class="container-main py-6 flex-1 flex flex-col lg:flex-row gap-6" id="main-content">
+    <!-- ==================== SIDEBAR NAVIGATION ==================== -->
+    <aside class="lg:w-72 flex-shrink-0">
+        <div class="card sticky top-24 overflow-hidden">
+            <div class="p-5 border-b" style="border-color: var(--border);">
+                <h3 class="font-bold text-sm uppercase tracking-wider opacity-70">📋 Modul Operasional</h3>
+            </div>
+            <nav class="p-2 space-y-1" id="tabs">
+                <button onclick="switchTab('tab-dashboard')" data-tab="tab-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition active bg-primary-50 text-primary-700 font-semibold" aria-current="page">
+                    <i class="ph ph-chart-bar text-lg"></i> Dashboard
+                </button>
+                <button onclick="switchTab('tab-stock')" data-tab="tab-stock" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-package text-lg"></i> Stok & Batch
+                </button>
+                <button onclick="switchTab('tab-sales')" data-tab="tab-sales" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-shopping-cart text-lg"></i> Penjualan
+                </button>
+                <button onclick="switchTab('tab-crm')" data-tab="tab-crm" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-users text-lg"></i> CRM Pelanggan
+                </button>
+                <button onclick="switchTab('tab-finance')" data-tab="tab-finance" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-wallet text-lg"></i> Keuangan
+                </button>
+                <button onclick="switchTab('tab-history')" data-tab="tab-history" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-clock-counter-clockwise text-lg"></i> Riwayat
+                </button>
+                <button onclick="switchTab('tab-reports')" data-tab="tab-reports" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-file-text text-lg"></i> Laporan
+                </button>
+                <button onclick="switchTab('tab-settings')" data-tab="tab-settings" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-gear text-lg"></i> Pengaturan
+                </button>
+            </nav>
+            <!-- Tips Cepat -->
+            <div class="p-4 border-t mt-2" style="border-color: var(--border);">
+                <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">💡 Tips Cepat</h4>
+                <p class="text-xs opacity-60 leading-relaxed">
+                    Gunakan <strong>FEFO</strong> untuk produk frozen agar batch terdekat expired terjual lebih dulu.
+                    Backup data setiap minggu untuk keamanan.
+                </p>
+            </div>
+            <!-- Info Ringkas -->
+            <div class="p-4 border-t mt-2" style="border-color: var(--border);">
+                <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">📌 Status Data</h4>
+                <p class="text-xs opacity-50">Batch: <span id="storedBatchesCount">-</span></p>
+                <p class="text-xs opacity-50">Transaksi: <span id="storedTransactionsCount">-</span></p>
+                <p class="text-xs opacity-50">Pelanggan: <span id="storedCustomersCount">-</span></p>
+                <p class="text-xs opacity-50">Mode: <span id="sidebar-mode">Terang</span></p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ==================== MAIN CONTENT AREA ==================== -->
+    <main class="flex-1 min-w-0">
+
+        <!-- ==================== TAB DASHBOARD ==================== -->
+        <div id="tab-dashboard" class="tab-content active space-y-6">
+            <!-- Header Selamat Datang -->
+            <div class="card p-5 flex flex-wrap items-center gap-4">
                 <div>
-                    <span class="font-extrabold text-xl tracking-tight" style="color: var(--text);">Cibitung<span class="text-primary-600">Frozen</span></span>
-                    <p class="text-[10px] uppercase font-bold tracking-widest opacity-50 -mt-1">ERP Ultimate v5.4</p>
+                    <h2 class="text-xl font-bold" style="color: var(--text);">👋 Selamat Datang, Owner</h2>
+                    <p class="text-sm opacity-70">Ringkasan operasional hari ini. Semua data real-time.</p>
+                </div>
+                <div class="flex flex-wrap gap-2 ml-auto">
+                    <span class="badge bg-primary-100 text-primary-700"><i class="ph ph-calendar mr-1"></i> <span id="dashDate"></span></span>
+                    <span class="badge bg-green-100 text-green-700"><i class="ph ph-check-circle mr-1"></i> Sistem Aktif</span>
+                    <span class="badge bg-amber-100 text-amber-700 hide-mobile"><i class="ph ph-clock mr-1"></i> Update: <span id="lastUpdate">sekarang</span></span>
                 </div>
             </div>
-            <div class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                <span class="w-2 h-2 rounded-full bg-green-500 pulse-dot"></span>
-                <span class="text-xs font-medium text-green-700 dark:text-green-400">Sistem Online</span>
+            <!-- Status Bar Ringkasan -->
+            <div class="card p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm" id="statusBar">
+                <div class="text-center"><span class="opacity-60">Total Produk</span><p class="font-bold text-xl">9</p></div>
+                <div class="text-center"><span class="opacity-60">Stok Total</span><p class="font-bold text-xl" id="statusTotalStock">0 kg</p></div>
+                <div class="text-center"><span class="opacity-60">Batch Aktif</span><p class="font-bold text-xl" id="statusActiveBatches">0</p></div>
+                <div class="text-center"><span class="opacity-60">Batch Kritis</span><p class="font-bold text-xl text-red-600" id="statusCriticalBatches">0</p></div>
             </div>
-            <div class="flex items-center gap-2 sm:gap-3">
-                <button onclick="CFS.App.backupData()" class="btn btn-secondary text-sm py-2 px-3 hidden sm:flex tooltip">
-                    <i class="ph ph-download-simple"></i> <span class="hidden md:inline">Backup</span>
-                    <span class="tooltip-text">Unduh semua data sebagai JSON</span>
-                </button>
-                <button onclick="CFS.App.restorePrompt()" class="btn btn-secondary text-sm py-2 px-3 hidden sm:flex tooltip">
-                    <i class="ph ph-upload-simple"></i> <span class="hidden md:inline">Restore</span>
-                    <span class="tooltip-text">Pulihkan data dari file backup</span>
-                </button>
-                <button onclick="toggleDarkMode()" class="p-2 rounded-xl border tooltip" style="border-color: var(--border);">
-                    <i class="ph ph-moon text-lg" id="darkIcon"></i>
-                    <span class="tooltip-text">Ganti tema gelap/terang</span>
-                </button>
+            <!-- Widget Toggles -->
+            <div class="card p-4 flex flex-wrap items-center gap-3 text-sm fade-in">
+                <span class="font-medium opacity-60">Widget aktif:</span>
+                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift">
+                    <input type="checkbox" class="widget-toggle" data-widget="stockSummary" checked> 🐟 Stok
+                </label>
+                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift">
+                    <input type="checkbox" class="widget-toggle" data-widget="expiringBatches" checked> ⚠️ Expired
+                </label>
+                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift">
+                    <input type="checkbox" class="widget-toggle" data-widget="revenueChart" checked> 📊 Chart
+                </label>
+                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift">
+                    <input type="checkbox" class="widget-toggle" data-widget="profitLoss" checked> 💰 Laba
+                </label>
+                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift">
+                    <input type="checkbox" class="widget-toggle" data-widget="quickActions" checked> ⚡ Cepat
+                </label>
+                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift">
+                    <input type="checkbox" class="widget-toggle" data-widget="recentActivity" checked> 📜 Aktivitas
+                </label>
+                <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift">
+                    <input type="checkbox" class="widget-toggle" data-widget="topProducts" checked> 🏆 Top Produk
+                </label>
+            </div>
+            <!-- Widget 1: Stok Summary -->
+            <div id="widget-stockSummary" class="card p-6 fade-in">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold flex items-center gap-2"><i class="ph ph-fish text-primary-600"></i> Stok Ikan Saat Ini</h3>
+                    <button onclick="switchTab('tab-stock')" class="text-xs text-primary-600 hover:underline">Lihat detail →</button>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="dashboardSummaryCards">
+                    <!-- Akan diisi oleh JS -->
+                </div>
+            </div>
+            <!-- Widget 2: Batch Expired -->
+            <div id="widget-expiringBatches" class="card p-6 fade-in">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-semibold flex items-center gap-2 text-red-600"><i class="ph ph-warning"></i> ⚠ Batch Hampir Kadaluarsa (≤7 hari)</h3>
+                    <span class="text-xs text-red-400 font-medium">Periksa setiap hari</span>
+                </div>
+                <div id="expiringBatches" class="space-y-2 text-sm">
+                    <!-- Akan diisi oleh JS -->
+                </div>
+            </div>
+            <!-- Widget 3: Revenue Chart -->
+            <div id="widget-revenueChart" class="card p-6 fade-in">
+                <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-chart-line-up text-green-600"></i> Pendapatan 7 Hari Terakhir</h3>
+                <canvas id="chartRevenue" height="220"></canvas>
+            </div>
+            <!-- Widget 4: Laba Rugi Bulanan -->
+            <div id="widget-profitLoss" class="card p-6 fade-in">
+                <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-chart-pie text-violet-600"></i> Laba Rugi Bulan Ini</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="financeSummary">
+                    <!-- Akan diisi oleh JS -->
+                </div>
+            </div>
+            <!-- Widget 5: Aktivitas Terbaru -->
+            <div id="widget-recentActivity" class="card p-6 fade-in">
+                <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-activity text-slate-600"></i> Aktivitas Terbaru</h3>
+                <div id="recentActivityList" class="text-sm space-y-2 max-h-48 overflow-auto">
+                    <p class="opacity-50">Belum ada aktivitas.</p>
+                </div>
+            </div>
+            <!-- Widget 6: Top Produk -->
+            <div id="widget-topProducts" class="card p-6 fade-in">
+                <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-medal text-amber-600"></i> Top 5 Produk Terlaris</h3>
+                <div id="topProductsList" class="text-sm space-y-2">
+                    <p class="opacity-50">Data akan muncul setelah ada transaksi.</p>
+                </div>
+            </div>
+            <!-- Widget 7: Quick Actions -->
+            <div id="widget-quickActions" class="card p-6 fade-in">
+                <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-lightning text-amber-600"></i> Aksi Cepat</h3>
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="switchTab('tab-stock')" class="btn btn-primary"><i class="ph ph-plus-circle"></i> Tambah Stok</button>
+                    <button onclick="switchTab('tab-sales')" class="btn btn-success"><i class="ph ph-shopping-cart"></i> Catat Penjualan</button>
+                    <button onclick="switchTab('tab-finance')" class="btn btn-secondary"><i class="ph ph-wallet"></i> Catat Beban</button>
+                    <button onclick="CFS.App.backupData()" class="btn btn-secondary"><i class="ph ph-download-simple"></i> Backup</button>
+                    <button onclick="switchTab('tab-reports')" class="btn btn-secondary"><i class="ph ph-file-text"></i> Lihat Laporan</button>
+                </div>
+            </div>
+            <!-- Widget 8: Tips & Trik -->
+            <div class="card p-6 fade-in">
+                <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-lightbulb text-yellow-600"></i> Tips & Trik</h3>
+                <ul class="list-disc list-inside text-sm space-y-2 opacity-80">
+                    <li>Manfaatkan <strong>Preview Harga</strong> sebelum memproses penjualan.</li>
+                    <li>Backup data setiap minggu untuk keamanan.</li>
+                    <li>Gunakan filter di Riwayat untuk mencari transaksi lama.</li>
+                    <li>Laporan Proyeksi membantu perencanaan stok.</li>
+                    <li>Stok menipis? Cek tab <strong>Laporan</strong> untuk rekomendasi restock.</li>
+                </ul>
             </div>
         </div>
-    </nav>
 
-    <!-- ==================== MAIN LAYOUT ==================== -->
-    <div class="container-main py-6 flex-1 flex flex-col lg:flex-row gap-6" id="main-content">
-        <aside class="lg:w-72 flex-shrink-0">
-            <div class="card sticky top-24 overflow-hidden">
-                <div class="p-5 border-b" style="border-color: var(--border);">
-                    <h3 class="font-bold text-sm uppercase tracking-wider opacity-70">📋 Modul Operasional</h3>
+        <!-- ==================== TAB STOK & BATCH ==================== -->
+        <div id="tab-stock" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-package text-primary-600"></i> Manajemen Batch & Stok</h2>
+                <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-4 text-sm flex items-start gap-2">
+                    <i class="ph ph-info text-blue-600 mt-0.5"></i>
+                    <p>📌 <strong>Catatan:</strong> Pastikan mengisi <em>tanggal kadaluarsa</em> dengan benar agar sistem memprioritaskan batch dengan metode FEFO.</p>
                 </div>
-                <nav class="p-2 space-y-1" id="tabs">
-                    <button onclick="switchTab('tab-dashboard')" data-tab="tab-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition active bg-primary-50 text-primary-700 font-semibold">
-                        <i class="ph ph-chart-bar text-lg"></i> Dashboard
-                    </button>
-                    <button onclick="switchTab('tab-stock')" data-tab="tab-stock" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-package text-lg"></i> Stok & Batch
-                    </button>
-                    <button onclick="switchTab('tab-sales')" data-tab="tab-sales" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-shopping-cart text-lg"></i> Penjualan
-                    </button>
-                    <button onclick="switchTab('tab-crm')" data-tab="tab-crm" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-users text-lg"></i> CRM Pelanggan
-                    </button>
-                    <button onclick="switchTab('tab-finance')" data-tab="tab-finance" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-wallet text-lg"></i> Keuangan
-                    </button>
-                    <button onclick="switchTab('tab-history')" data-tab="tab-history" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-clock-counter-clockwise text-lg"></i> Riwayat
-                    </button>
-                    <button onclick="switchTab('tab-reports')" data-tab="tab-reports" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-file-text text-lg"></i> Laporan
-                    </button>
-                    <button onclick="switchTab('tab-settings')" data-tab="tab-settings" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-gear text-lg"></i> Pengaturan
-                    </button>
-                </nav>
-                <div class="p-4 border-t mt-2" style="border-color: var(--border);">
-                    <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">💡 Tips Cepat</h4>
-                    <p class="text-xs opacity-60 leading-relaxed">Gunakan <strong>FEFO</strong> untuk produk frozen agar batch terdekat expired terjual lebih dulu. Backup data setiap minggu untuk keamanan.</p>
+                <!-- Tabel Ringkasan Stok -->
+                <div class="overflow-x-auto mb-6">
+                    <table class="w-full text-sm">
+                        <caption class="text-xs opacity-50 mb-2 text-left">Tabel ringkasan stok per produk</caption>
+                        <thead class="bg-slate-50 dark:bg-slate-800">
+                            <tr>
+                                <th class="p-3 text-left">Produk</th>
+                                <th class="p-3 text-right">Total Stok (kg)</th>
+                                <th class="p-3 text-right">Batch Aktif</th>
+                                <th class="p-3 text-center">Status Stok</th>
+                                <th class="p-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stockTableBody">
+                            <!-- Akan diisi oleh JS -->
+                        </tbody>
+                    </table>
                 </div>
-                <div class="p-4 border-t mt-2" style="border-color: var(--border);">
-                    <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">📌 Status Data</h4>
-                    <p class="text-xs opacity-50">Batch: <span id="storedBatchesCount">-</span></p>
-                    <p class="text-xs opacity-50">Transaksi: <span id="storedTransactionsCount">-</span></p>
-                    <p class="text-xs opacity-50">Pelanggan: <span id="storedCustomersCount">-</span></p>
-                    <p class="text-xs opacity-50">Mode: <span id="sidebar-mode">Terang</span></p>
+                <!-- Batch Terpakai Hari Ini -->
+                <div class="card p-4 mb-6 bg-slate-50 dark:bg-slate-800">
+                    <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-clock text-slate-500"></i> Batch Terpakai Hari Ini</h3>
+                    <div id="usedBatchesToday" class="text-sm opacity-70">Belum ada batch terpakai hari ini.</div>
                 </div>
-            </div>
-        </aside>
-
-        <main class="flex-1 min-w-0">
-            <!-- ==================== TAB DASHBOARD ==================== -->
-            <div id="tab-dashboard" class="tab-content active space-y-6">
-                <div class="card p-5 flex flex-wrap items-center gap-4">
+                <!-- Divider -->
+                <div style="border-top:1px solid var(--border); margin: 1.5rem 0;"></div>
+                <!-- Form Tambah Batch -->
+                <h3 class="font-semibold mb-3 flex items-center gap-2">
+                    <i class="ph ph-plus-circle text-green-600"></i> Tambah Batch Baru (Landed Cost Lengkap)
+                </h3>
+                <form id="addStockForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <select id="stockProduk" required><option value="">Pilih Produk</option></select>
+                    <input type="number" id="stockBerat" placeholder="Berat (kg) - berat kotor batch" required>
+                    <input type="number" id="stockHargaBeli" placeholder="Harga Beli per kg - dari supplier" required>
+                    <input type="number" id="stockOngkir" placeholder="Ongkir Total (Rp) - biaya ekspedisi" value="0">
+                    <input type="number" id="stockBensin" placeholder="Biaya Bensin Self-pickup (Rp)" value="0">
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-medium">Bongkar Muat <span class="text-xs text-slate-400">(jika ada)</span></label>
+                        <div class="toggle-wrapper">
+                            <input type="checkbox" id="stockToggleBongkar" class="toggle-checkbox">
+                            <div class="toggle-label"></div>
+                        </div>
+                    </div>
+                    <input type="number" id="stockBongkarNominal" placeholder="Biaya Bongkar (Rp)" class="hidden" value="0">
                     <div>
-                        <h2 class="text-xl font-bold" style="color: var(--text);">👋 Selamat Datang, Owner</h2>
-                        <p class="text-sm opacity-70">Ringkasan operasional hari ini. Semua data real-time.</p>
-                    </div>
-                    <div class="flex flex-wrap gap-2 ml-auto">
-                        <span class="badge bg-primary-100 text-primary-700"><i class="ph ph-calendar mr-1"></i> <span id="dashDate"></span></span>
-                        <span class="badge bg-green-100 text-green-700"><i class="ph ph-check-circle mr-1"></i> Sistem Aktif</span>
-                        <span class="badge bg-amber-100 text-amber-700 hide-mobile"><i class="ph ph-clock mr-1"></i> Update: <span id="lastUpdate">sekarang</span></span>
-                    </div>
-                </div>
-                <div class="card p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm" id="statusBar">
-                    <div class="text-center"><span class="opacity-60">Total Produk</span><p class="font-bold text-xl">9</p></div>
-                    <div class="text-center"><span class="opacity-60">Stok Total</span><p class="font-bold text-xl" id="statusTotalStock">0 kg</p></div>
-                    <div class="text-center"><span class="opacity-60">Batch Aktif</span><p class="font-bold text-xl" id="statusActiveBatches">0</p></div>
-                    <div class="text-center"><span class="opacity-60">Batch Kritis</span><p class="font-bold text-xl text-red-600" id="statusCriticalBatches">0</p></div>
-                </div>
-                <div class="card p-4 flex flex-wrap items-center gap-3 text-sm fade-in">
-                    <span class="font-medium opacity-60">Widget aktif:</span>
-                    <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift"><input type="checkbox" class="widget-toggle" data-widget="stockSummary" checked> 🐟 Stok</label>
-                    <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift"><input type="checkbox" class="widget-toggle" data-widget="expiringBatches" checked> ⚠️ Expired</label>
-                    <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift"><input type="checkbox" class="widget-toggle" data-widget="revenueChart" checked> 📊 Chart</label>
-                    <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift"><input type="checkbox" class="widget-toggle" data-widget="profitLoss" checked> 💰 Laba</label>
-                    <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift"><input type="checkbox" class="widget-toggle" data-widget="quickActions" checked> ⚡ Cepat</label>
-                    <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift"><input type="checkbox" class="widget-toggle" data-widget="recentActivity" checked> 📜 Aktivitas</label>
-                    <label class="widget-toggle-label flex items-center gap-1 cursor-pointer hover-lift"><input type="checkbox" class="widget-toggle" data-widget="topProducts" checked> 🏆 Top Produk</label>
-                </div>
-                <div id="widget-stockSummary" class="card p-6 fade-in">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-semibold flex items-center gap-2"><i class="ph ph-fish text-primary-600"></i> Stok Ikan Saat Ini</h3>
-                        <button onclick="switchTab('tab-stock')" class="text-xs text-primary-600 hover:underline">Lihat detail →</button>
-                    </div>
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="dashboardSummaryCards"></div>
-                </div>
-                <div id="widget-expiringBatches" class="card p-6 fade-in">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="font-semibold flex items-center gap-2 text-red-600"><i class="ph ph-warning"></i> ⚠ Batch Hampir Kadaluarsa (≤7 hari)</h3>
-                        <span class="text-xs text-red-400 font-medium">Periksa setiap hari</span>
-                    </div>
-                    <div id="expiringBatches" class="space-y-2 text-sm"></div>
-                </div>
-                <div id="widget-revenueChart" class="card p-6 fade-in">
-                    <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-chart-line-up text-green-600"></i> Pendapatan 7 Hari Terakhir</h3>
-                    <canvas id="chartRevenue" height="220"></canvas>
-                </div>
-                <div id="widget-profitLoss" class="card p-6 fade-in">
-                    <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-chart-pie text-violet-600"></i> Laba Rugi Bulan Ini</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="financeSummary"></div>
-                </div>
-                <div id="widget-recentActivity" class="card p-6 fade-in">
-                    <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-activity text-slate-600"></i> Aktivitas Terbaru</h3>
-                    <div id="recentActivityList" class="text-sm space-y-2 max-h-48 overflow-auto"><p class="opacity-50">Belum ada aktivitas.</p></div>
-                </div>
-                <div id="widget-topProducts" class="card p-6 fade-in">
-                    <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-medal text-amber-600"></i> Top 5 Produk Terlaris</h3>
-                    <div id="topProductsList" class="text-sm space-y-2"><p class="opacity-50">Data akan muncul setelah ada transaksi.</p></div>
-                </div>
-                <div id="widget-quickActions" class="card p-6 fade-in">
-                    <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="ph ph-lightning text-amber-600"></i> Aksi Cepat</h3>
-                    <div class="flex flex-wrap gap-3">
-                        <button onclick="switchTab('tab-stock')" class="btn btn-primary"><i class="ph ph-plus-circle"></i> Tambah Stok</button>
-                        <button onclick="switchTab('tab-sales')" class="btn btn-success"><i class="ph ph-shopping-cart"></i> Catat Penjualan</button>
-                        <button onclick="switchTab('tab-finance')" class="btn btn-secondary"><i class="ph ph-wallet"></i> Catat Beban</button>
-                        <button onclick="CFS.App.backupData()" class="btn btn-secondary"><i class="ph ph-download-simple"></i> Backup</button>
-                        <button onclick="switchTab('tab-reports')" class="btn btn-secondary"><i class="ph ph-file-text"></i> Lihat Laporan</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ==================== TAB STOK & BATCH ==================== -->
-            <div id="tab-stock" class="tab-content space-y-6">
-                <div class="card p-6">
-                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-package text-primary-600"></i> Manajemen Batch & Stok</h2>
-                    <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-4 text-sm flex items-start gap-2">
-                        <i class="ph ph-info text-blue-600 mt-0.5"></i>
-                        <p>📌 <strong>Catatan:</strong> Pastikan mengisi <em>tanggal kadaluarsa</em> dengan benar agar sistem memprioritaskan batch dengan metode FEFO.</p>
-                    </div>
-                    <div class="overflow-x-auto mb-6">
-                        <table class="w-full text-sm">
-                            <thead class="bg-slate-50 dark:bg-slate-800"><tr><th class="p-3 text-left">Produk</th><th class="p-3 text-right">Total Stok (kg)</th><th class="p-3 text-right">Batch Aktif</th><th class="p-3 text-center">Status Stok</th><th class="p-3 text-center">Aksi</th></tr></thead>
-                            <tbody id="stockTableBody"></tbody>
-                        </table>
-                    </div>
-                    <div class="card p-4 mb-6 bg-slate-50 dark:bg-slate-800">
-                        <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-clock text-slate-500"></i> Batch Terpakai Hari Ini</h3>
-                        <div id="usedBatchesToday" class="text-sm opacity-70">Belum ada batch terpakai hari ini.</div>
-                    </div>
-                    <div style="border-top:1px solid var(--border); margin: 1.5rem 0;"></div>
-                    <h3 class="font-semibold mb-3 flex items-center gap-2"><i class="ph ph-plus-circle text-green-600"></i> Tambah Batch Baru (Landed Cost Lengkap)</h3>
-                    <form id="addStockForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <select id="stockProduk" required><option value="">Pilih Produk</option></select>
-                        <input type="number" id="stockBerat" placeholder="Berat (kg)" required>
-                        <input type="number" id="stockHargaBeli" placeholder="Harga Beli per kg" required>
-                        <input type="number" id="stockOngkir" placeholder="Ongkir Total (Rp)" value="0">
-                        <input type="number" id="stockBensin" placeholder="Biaya Bensin (Rp)" value="0">
-                        <div class="flex items-center gap-2">
-                            <label class="text-sm font-medium">Bongkar Muat</label>
-                            <div class="toggle-wrapper"><input type="checkbox" id="stockToggleBongkar" class="toggle-checkbox"><div class="toggle-label"></div></div>
-                        </div>
-                        <input type="number" id="stockBongkarNominal" placeholder="Biaya Bongkar (Rp)" class="hidden" value="0">
-                        <div>
-                            <label class="text-xs font-semibold">Pajak Pembelian</label>
-                            <div class="flex gap-2">
-                                <select id="stockPajakType" class="w-1/2"><option value="none">Tidak Ada</option><option value="persen">Persentase (%)</option><option value="nominal">Nominal (Rp)</option></select>
-                                <input type="number" id="stockPajakValue" placeholder="Nilai Pajak" class="hidden w-1/2" value="0">
-                            </div>
-                        </div>
-                        <input type="date" id="stockTglProduksi" required>
-                        <input type="date" id="stockTglKadaluarsa" required>
-                        <button type="submit" class="btn btn-primary col-span-full sm:col-span-1">💾 Simpan Batch</button>
-                    </form>
-                    <button onclick="document.getElementById('batchDetailModal').classList.remove('hidden')" class="text-blue-600 text-sm underline mt-3">📦 Lihat Semua Batch (Detail)</button>
-                </div>
-            </div>
-
-            <!-- Modal Detail Batch -->
-            <div id="batchDetailModal" class="modal-backdrop hidden">
-                <div class="card w-full max-w-5xl max-h-[85vh] overflow-auto p-6 relative">
-                    <button onclick="document.getElementById('batchDetailModal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800 text-2xl transition">&times;</button>
-                    <h3 class="font-bold text-lg mb-4">📦 Detail Batch</h3>
-                    <select id="batchProdukSelect" class="w-full mb-4"><option value="">Semua Produk</option></select>
-                    <div id="batchDetailContent"></div>
-                </div>
-            </div>
-
-            <!-- ==================== TAB PENJUALAN ==================== -->
-            <div id="tab-sales" class="tab-content space-y-6">
-                <div class="card p-6">
-                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-shopping-cart text-emerald-600"></i> Catat Penjualan</h2>
-                    <form id="salesForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" id="salesKlien" placeholder="Nama Klien" required>
-                        <select id="salesProduk" required><option value="">Pilih Produk</option></select>
-                        <input type="number" id="salesQty" placeholder="Jumlah (kg)" required>
-                        <select id="salesTier"><option value="ecer">Ecer</option><option value="grosir">Grosir</option><option value="partai">Partai Besar</option></select>
-                        <input type="number" id="salesHargaManual" placeholder="Harga Jual/kg (opsional)">
-                        <input type="text" id="salesCatatan" placeholder="Catatan (opsional)" class="col-span-full">
-                        <div class="flex flex-wrap gap-2 col-span-full">
-                            <button type="button" id="previewPriceBtn" class="btn btn-secondary">🔍 Preview Harga</button>
-                            <button type="submit" class="btn btn-primary">💰 Proses Penjualan</button>
-                            <button type="button" id="printInvoiceBtn" class="btn btn-secondary" disabled>🖨️ Cetak Invoice</button>
-                        </div>
-                    </form>
-                    <div id="salesResult" class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl hidden"></div>
-                    <div class="mt-6">
-                        <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-list-checks text-slate-500"></i> Penjualan Hari Ini</h3>
-                        <div id="todaySalesList" class="text-sm space-y-2 max-h-48 overflow-auto"><p class="opacity-50">Belum ada penjualan hari ini.</p></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ==================== TAB CRM ==================== -->
-            <div id="tab-crm" class="tab-content space-y-6">
-                <div class="card p-6">
-                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-users text-indigo-600"></i> CRM Pelanggan</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6" id="crmStats">
-                        <div class="card p-4 text-center hover-lift"><p class="text-xs opacity-60">Total Pelanggan</p><p class="text-2xl font-bold" id="crmTotalCustomers">0</p></div>
-                        <div class="card p-4 text-center hover-lift"><p class="text-xs opacity-60">Total Pendapatan</p><p class="text-2xl font-bold" id="crmTotalRevenue">Rp 0</p></div>
-                        <div class="card p-4 text-center hover-lift"><p class="text-xs opacity-60">Pelanggan Aktif (30 hari)</p><p class="text-2xl font-bold" id="crmActiveCustomers">0</p></div>
-                    </div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 text-sm">
-                        <div class="card p-3 text-center hover-lift"><span class="opacity-60">🏆 Top</span><p class="font-bold text-lg" id="segTop">0</p></div>
-                        <div class="card p-3 text-center hover-lift"><span class="opacity-60">⭐ Regular</span><p class="font-bold text-lg" id="segRegular">0</p></div>
-                        <div class="card p-3 text-center hover-lift"><span class="opacity-60">🆕 New</span><p class="font-bold text-lg" id="segNew">0</p></div>
-                        <div class="card p-3 text-center hover-lift"><span class="opacity-60">⚠️ Churn Risk</span><p class="font-bold text-lg text-red-600" id="segChurn">0</p></div>
-                    </div>
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="font-semibold">Daftar Pelanggan</h3>
-                        <button id="exportCustomersCSV" class="btn btn-sm btn-secondary"><i class="ph ph-file-csv"></i> Ekspor CSV</button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm"><thead><tr><th class="p-2 text-left">Nama</th><th class="p-2 text-right">Total Pembelian</th><th class="p-2 text-right">Transaksi</th><th class="p-2 text-right">Terakhir Beli</th><th class="p-2 text-center">Status</th><th class="p-2 text-center">Aksi</th></tr></thead>
-                            <tbody id="crmTableBody"><tr><td colspan="6" class="text-center p-4 opacity-50">Belum ada data pelanggan</td></tr></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal Konfirmasi Hapus Pelanggan -->
-            <div id="deleteCustomerModal" class="modal-backdrop hidden">
-                <div class="card w-full max-w-md p-6 text-center">
-                    <i class="ph ph-warning-circle text-5xl text-red-500 mx-auto mb-3"></i>
-                    <h3 class="text-lg font-bold mb-2">Hapus Pelanggan?</h3>
-                    <p class="text-sm opacity-70 mb-4">Data pelanggan <strong id="deleteCustomerName"></strong> akan dihapus permanen.</p>
-                    <div class="flex gap-3 justify-center"><button onclick="document.getElementById('deleteCustomerModal').classList.add('hidden')" class="btn btn-secondary">Batal</button><button id="confirmDeleteCustomer" class="btn btn-danger">Ya, Hapus</button></div>
-                </div>
-            </div>
-
-            <!-- ==================== TAB KEUANGAN ==================== -->
-            <div id="tab-finance" class="tab-content space-y-6">
-                <div class="card p-6">
-                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-wallet text-primary-600"></i> Keuangan & Akuntansi</h2>
-                    <div id="financeSummaryContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"></div>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="card p-4">
-                            <h3 class="font-semibold mb-3 flex items-center gap-2"><i class="ph ph-receipt text-slate-500"></i> Catat Beban Operasional</h3>
-                            <form id="expenseForm" class="space-y-3">
-                                <select id="expenseAkun"><option value="Beban Operasional">Beban Operasional</option><option value="Beban Listrik">Beban Listrik</option><option value="Beban Sewa">Beban Sewa</option><option value="Beban Gaji">Beban Gaji</option><option value="Beban Transport">Beban Transport</option></select>
-                                <input type="number" id="expenseJumlah" placeholder="Jumlah (Rp)" required>
-                                <input type="text" id="expenseDeskripsi" placeholder="Deskripsi (opsional)">
-                                <button type="submit" class="btn btn-primary w-full">💾 Simpan Beban</button>
-                            </form>
-                        </div>
-                        <div class="card p-4">
-                            <h3 class="font-semibold mb-3 flex items-center gap-2"><i class="ph ph-file-text text-slate-500"></i> Laporan & Ekspor</h3>
-                            <button id="exportExcelBtn" class="btn btn-success w-full mb-2"><i class="ph ph-file-xls"></i> Ekspor Jurnal Bulan Ini (Excel)</button>
-                            <button id="viewJournalBtn" class="btn btn-secondary w-full"><i class="ph ph-book-open"></i> Lihat Buku Besar</button>
+                        <label class="text-xs font-semibold">Pajak Pembelian <span class="text-slate-400">(jika ada)</span></label>
+                        <div class="flex gap-2">
+                            <select id="stockPajakType" class="w-1/2">
+                                <option value="none">Tidak Ada</option>
+                                <option value="persen">Persentase (%)</option>
+                                <option value="nominal">Nominal (Rp)</option>
+                            </select>
+                            <input type="number" id="stockPajakValue" placeholder="Nilai Pajak" class="hidden w-1/2" value="0">
                         </div>
                     </div>
-                    <div id="journalViewer" class="mt-6 hidden">
-                        <h3 class="font-semibold mb-2">📖 Buku Besar (Jurnal)</h3>
-                        <div class="overflow-x-auto max-h-64"><table class="w-full text-sm"><thead><tr><th class="p-2">Tanggal</th><th>Deskripsi</th><th>Akun</th><th>Debet</th><th>Kredit</th></tr></thead><tbody id="journalTableBody"></tbody></table></div>
-                    </div>
-                    <div class="mt-6 card p-4">
-                        <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-chart-bar text-blue-500"></i> Grafik Laba Rugi Tahunan</h3>
-                        <canvas id="chartYearlyPL" height="150"></canvas>
-                    </div>
+                    <input type="date" id="stockTglProduksi" required>
+                    <input type="date" id="stockTglKadaluarsa" required>
+                    <button type="submit" class="btn btn-primary col-span-full sm:col-span-1">💾 Simpan Batch</button>
+                </form>
+                <button onclick="document.getElementById('batchDetailModal').classList.remove('hidden')" class="text-blue-600 text-sm underline mt-3">📦 Lihat Semua Batch (Detail)</button>
+                <!-- Panduan FEFO (Dekoratif) -->
+                <div class="mt-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm">
+                    <h4 class="font-semibold mb-2">📖 Panduan Alokasi Stok (FEFO)</h4>
+                    <p class="opacity-70">Sistem otomatis memilih batch dengan tanggal kadaluarsa terdekat. Ubah metode di <strong>Pengaturan</strong>.</p>
+                </div>
+                <!-- Placeholder dekoratif: Suhu Gudang -->
+                <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm flex items-center gap-2">
+                    <i class="ph ph-thermometer-cold text-slate-400"></i>
+                    <span class="opacity-60">Suhu Gudang Ideal: <strong>-18°C</strong> (pastikan cold storage berfungsi)</span>
                 </div>
             </div>
-
-            <!-- ==================== TAB RIWAYAT ==================== -->
-            <div id="tab-history" class="tab-content space-y-6">
-                <div class="card p-6">
-                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-clock-counter-clockwise text-amber-600"></i> Riwayat Transaksi</h2>
-                    <form id="filterTransaksi" class="flex flex-wrap gap-3 mb-4">
-                        <select id="filterProduk"><option value="">Semua Produk</option></select>
-                        <input type="text" id="filterKlien" placeholder="Nama Klien">
-                        <input type="date" id="filterStart"> <input type="date" id="filterEnd">
-                        <button type="submit" class="btn btn-primary">Filter</button>
-                    </form>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm"><thead><tr><th class="p-2">Tanggal</th><th class="p-2">Klien</th><th class="p-2">Produk</th><th class="p-2 text-right">Qty</th><th class="p-2 text-right">Invoice</th><th class="p-2 text-center">Tier</th><th class="p-2 text-center">Aksi</th></tr></thead>
-                            <tbody id="historyTableBody"><tr><td colspan="7" class="text-center p-4 opacity-50">Belum ada transaksi</td></tr></tbody>
-                        </table>
-                    </div>
-                    <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm" id="historyStats">
-                        <div class="card p-3 text-center hover-lift"><span class="opacity-60">Total Transaksi</span><p class="font-bold" id="historyTotalTrx">0</p></div>
-                        <div class="card p-3 text-center hover-lift"><span class="opacity-60">Total Pendapatan</span><p class="font-bold" id="historyTotalRevenue">Rp 0</p></div>
-                        <div class="card p-3 text-center hover-lift"><span class="opacity-60">Rata-rata/hari</span><p class="font-bold" id="historyAvgDaily">Rp 0</p></div>
-                        <div class="card p-3 text-center hover-lift"><span class="opacity-60">Transaksi Hari Ini</span><p class="font-bold" id="historyTodayTrx">0</p></div>
-                    </div>
-                    <div class="mt-4 card p-4">
-                        <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-chart-line text-blue-500"></i> Grafik Riwayat Pendapatan (30 Hari)</h3>
-                        <canvas id="chartHistoryRevenue" height="150"></canvas>
-                    </div>
-                    <div class="mt-4 flex justify-end"><button id="clearAllHistoryBtn" class="btn btn-danger btn-sm"><i class="ph ph-trash"></i> Hapus Semua Riwayat</button></div>
-                </div>
-            </div>
-
-            <!-- ==================== TAB LAPORAN ==================== -->
-            <div id="tab-reports" class="tab-content space-y-6">
-                <div class="card p-6">
-                    <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="ph ph-file-text text-violet-600"></i> Laporan Keuangan</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-trend-up text-green-600"></i> Laba Rugi</h3>
-                            <div id="reportLabaRugi" class="text-sm p-4 bg-slate-50 dark:bg-slate-800 rounded-xl"></div>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-buildings text-blue-600"></i> Neraca</h3>
-                            <div id="reportNeraca" class="text-sm p-4 bg-slate-50 dark:bg-slate-800 rounded-xl space-y-3"></div>
-                        </div>
-                    </div>
-                    <div style="border-top:1px solid var(--border); margin: 1.5rem 0;"></div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                        <div class="card p-4 hover-lift"><h3 class="font-semibold mb-2"><i class="ph ph-package"></i> Laporan Stok</h3><div id="reportStok" class="text-sm space-y-1"></div></div>
-                        <div class="card p-4 hover-lift"><h3 class="font-semibold mb-2"><i class="ph ph-money"></i> Margin per Produk</h3><div id="reportMargin" class="text-sm space-y-1"></div></div>
-                        <div class="card p-4 hover-lift"><h3 class="font-semibold mb-2"><i class="ph ph-chart-line-up"></i> Proyeksi Keuangan</h3><div id="reportProyeksi" class="text-sm space-y-1"></div></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ==================== TAB PENGATURAN ==================== -->
-            <div id="tab-settings" class="tab-content space-y-6">
-                <div class="card p-6">
-                    <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="ph ph-gear text-slate-600"></i> Pengaturan Bisnis</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-3">
-                            <div><label class="text-sm font-medium">PPN (%)</label><input type="number" id="setPPN" value="12"></div>
-                            <div><label class="text-sm font-medium">PPh 25 (%)</label><input type="number" id="setPPh25" value="2"></div>
-                            <div><label class="text-sm font-medium">PPh 21 (%)</label><input type="number" id="setPPh21" value="5"></div>
-                            <div><label class="text-sm font-medium">PT Share (%)</label><input type="number" id="setPTShare" value="60"></div>
-                            <div><label class="text-sm font-medium">Min Grosir (kg)</label><input type="number" id="setMinGrosir" value="10"></div>
-                        </div>
-                        <div class="space-y-3">
-                            <div><label class="text-sm font-medium">Min Partai (kg)</label><input type="number" id="setMinPartai" value="500"></div>
-                            <div><label class="text-sm font-medium">Selisih Grosir dari Ecer (Rp)</label><input type="number" id="setSelisihGrosir" value="5000"></div>
-                            <div><label class="text-sm font-medium">Margin Default (Rp/kg)</label><input type="number" id="setMarginDefault" value="15000"></div>
-                            <div><label class="text-sm font-medium">Alokasi Stok</label><select id="setFifoMethod"><option value="fefo">FEFO</option><option value="fifo">FIFO</option></select></div>
-                        </div>
-                    </div>
-                    <button id="saveSettingsBtn" class="btn btn-primary mt-6">💾 Simpan Pengaturan</button>
-                    <div class="mt-8 card p-4 border-red-200 dark:border-red-800 bg-red-50/30 dark:bg-red-900/10">
-                        <h3 class="font-semibold mb-3 text-red-700 dark:text-red-400"><i class="ph ph-warning-circle text-xl"></i> Reset Ulang Semua Data</h3>
-                        <p class="text-sm text-red-700/80 dark:text-red-400/80 mb-4">Tindakan ini akan menghapus seluruh data. Pastikan Anda sudah backup terlebih dahulu.</p>
-                        <button id="resetAllDataBtn" class="btn btn-danger w-full sm:w-auto"><i class="ph ph-trash"></i> Reset Semua Data</button>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- ==================== FOOTER ==================== -->
-    <footer class="border-t mt-auto py-4" style="background: var(--surface); border-color: var(--border);">
-        <div class="container-main text-center text-xs opacity-50">
-            <p>&copy; 2025 <strong>Cibitung Frozen</strong> — ERP Ultimate v5.4</p>
         </div>
-    </footer>
 
-    <!-- ==================== JAVASCRIPT CORE (UPGRADE: Self‑contained) ==================== -->
-    <script>
-        (function() {
-            /* ========== GLOBAL HELPERS ========== */
-            const $ = (sel, ctx = document) => ctx.querySelector(sel);
-            const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+        <!-- Modal Detail Batch -->
+        <div id="batchDetailModal" class="modal-backdrop hidden">
+            <div class="card w-full max-w-5xl max-h-[85vh] overflow-auto p-6 relative">
+                <button onclick="document.getElementById('batchDetailModal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800 text-2xl transition">&times;</button>
+                <h3 class="font-bold text-lg mb-4">📦 Detail Batch</h3>
+                <select id="batchProdukSelect" class="w-full mb-4"><option value="">Semua Produk</option></select>
+                <div id="batchDetailContent">
+                    <!-- Akan diisi oleh JS -->
+                </div>
+            </div>
+        </div>
 
-            /* toast */
-            function showToast(title, msg, type = 'info') {
-                const t = $('#toast');
-                const icon = $('#toastIcon');
-                icon.className = 'w-9 h-9 rounded-full flex items-center justify-center text-white';
-                if (type === 'success') icon.classList.add('bg-green-500');
-                else if (type === 'error') icon.classList.add('bg-red-500');
-                else icon.classList.add('bg-blue-500');
-                icon.innerHTML = type === 'success' ? '<i class="ph ph-check"></i>' : type === 'error' ?
-                    '<i class="ph ph-x"></i>' : '<i class="ph ph-info"></i>';
-                $('#toastTitle').textContent = title;
-                $('#toastMsg').textContent = msg;
-                t.classList.add('show');
-                setTimeout(() => t.classList.remove('show'), 3000);
-            }
+        <!-- ==================== TAB PENJUALAN ==================== -->
+        <div id="tab-sales" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-shopping-cart text-emerald-600"></i> Catat Penjualan</h2>
+                <div class="bg-emerald-50 dark:bg-emerald-900/10 p-4 rounded-lg mb-4 text-sm flex items-start gap-2">
+                    <i class="ph ph-info text-emerald-600 mt-0.5"></i>
+                    <p>Harga otomatis dihitung berdasarkan <strong>HPP + margin</strong>. Untuk partai besar, Anda bisa override harga manual.</p>
+                </div>
+                <form id="salesForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="salesKlien" placeholder="Nama Klien" required>
+                    <select id="salesProduk" required><option value="">Pilih Produk</option></select>
+                    <input type="number" id="salesQty" placeholder="Jumlah (kg)" required>
+                    <select id="salesTier">
+                        <option value="ecer">Ecer</option>
+                        <option value="grosir">Grosir</option>
+                        <option value="partai">Partai Besar</option>
+                    </select>
+                    <input type="number" id="salesHargaManual" placeholder="Harga Jual/kg (opsional)">
+                    <input type="text" id="salesCatatan" placeholder="Catatan (opsional)" class="col-span-full">
+                    <div class="flex flex-wrap gap-2 col-span-full">
+                        <button type="button" id="previewPriceBtn" class="btn btn-secondary">🔍 Preview Harga</button>
+                        <button type="submit" class="btn btn-primary">💰 Proses Penjualan</button>
+                        <button type="button" id="printInvoiceBtn" class="btn btn-secondary" disabled>🖨️ Cetak Invoice</button>
+                    </div>
+                </form>
+                <div id="salesResult" class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl hidden">
+                    <!-- Akan diisi oleh JS -->
+                </div>
+                <!-- Penjualan Hari Ini -->
+                <div class="mt-6">
+                    <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-list-checks text-slate-500"></i> Penjualan Hari Ini</h3>
+                    <div id="todaySalesList" class="text-sm space-y-2 max-h-48 overflow-auto">
+                        <p class="opacity-50">Belum ada penjualan hari ini.</p>
+                    </div>
+                </div>
+                <!-- Tips Margin -->
+                <div class="mt-4 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg text-sm">
+                    <h4 class="font-semibold mb-2">💡 Tips Margin</h4>
+                    <p class="opacity-80">Margin default dapat diubah di <strong>Pengaturan</strong>. Untuk partai besar, Anda bisa memasukkan harga manual sesuai negosiasi.</p>
+                </div>
+                <!-- Placeholder dekoratif: Metode Pembayaran -->
+                <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm flex items-center gap-2">
+                    <i class="ph ph-credit-card text-slate-400"></i>
+                    <span class="opacity-60">Metode Pembayaran yang didukung: <strong>Tunai, Transfer, QRIS</strong> (invoice akan mencatat DPP + PPN)</span>
+                </div>
+            </div>
+        </div>
 
-            /* ========== STORAGE & STATE ========== */
-            const STORAGE_KEYS = {
-                batches: 'cfs_batches',
-                sales: 'cfs_sales',
-                expenses: 'cfs_expenses',
-                settings: 'cfs_settings',
-                company: 'cfs_company',
-                customers: 'cfs_customers'
-            };
+        <!-- ==================== TAB CRM ==================== -->
+        <div id="tab-crm" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-users text-indigo-600"></i> CRM Pelanggan</h2>
+                <!-- Statistik Utama -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6" id="crmStats">
+                    <div class="card p-4 text-center hover-lift">
+                        <p class="text-xs opacity-60">Total Pelanggan</p>
+                        <p class="text-2xl font-bold" id="crmTotalCustomers">0</p>
+                    </div>
+                    <div class="card p-4 text-center hover-lift">
+                        <p class="text-xs opacity-60">Total Pendapatan</p>
+                        <p class="text-2xl font-bold" id="crmTotalRevenue">Rp 0</p>
+                    </div>
+                    <div class="card p-4 text-center hover-lift">
+                        <p class="text-xs opacity-60">Pelanggan Aktif (30 hari)</p>
+                        <p class="text-2xl font-bold" id="crmActiveCustomers">0</p>
+                    </div>
+                </div>
+                <!-- Segmentasi Pelanggan -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 text-sm">
+                    <div class="card p-3 text-center hover-lift">
+                        <span class="opacity-60">🏆 Top</span>
+                        <p class="font-bold text-lg" id="segTop">0</p>
+                    </div>
+                    <div class="card p-3 text-center hover-lift">
+                        <span class="opacity-60">⭐ Regular</span>
+                        <p class="font-bold text-lg" id="segRegular">0</p>
+                    </div>
+                    <div class="card p-3 text-center hover-lift">
+                        <span class="opacity-60">🆕 New</span>
+                        <p class="font-bold text-lg" id="segNew">0</p>
+                    </div>
+                    <div class="card p-3 text-center hover-lift">
+                        <span class="opacity-60">⚠️ Churn Risk</span>
+                        <p class="font-bold text-lg text-red-600" id="segChurn">0</p>
+                    </div>
+                </div>
+                <!-- Header Tabel & Tombol Ekspor -->
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-semibold">Daftar Pelanggan</h3>
+                    <button id="exportCustomersCSV" class="btn btn-sm btn-secondary"><i class="ph ph-file-csv"></i> Ekspor CSV</button>
+                </div>
+                <!-- Tabel Pelanggan -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr>
+                                <th class="p-2 text-left">Nama</th>
+                                <th class="p-2 text-right">Total Pembelian</th>
+                                <th class="p-2 text-right">Transaksi</th>
+                                <th class="p-2 text-right">Terakhir Beli</th>
+                                <th class="p-2 text-center">Status</th>
+                                <th class="p-2 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="crmTableBody">
+                            <tr><td colspan="6" class="text-center p-4 opacity-50">Belum ada data pelanggan</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Placeholder dekoratif: Catatan CRM -->
+                <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm flex items-center gap-2">
+                    <i class="ph ph-info text-slate-400"></i>
+                    <span class="opacity-60">Segmentasi otomatis: <strong>Top</strong> (pembelian > 10 jt), <strong>Regular</strong> (2-10 jt), <strong>New</strong> (pertama kali), <strong>Churn</strong> (tidak beli 30 hari).</span>
+                </div>
+            </div>
+        </div>
 
-            const defaultProducts = [
-                'Ikan Salmon', 'Ikan Tuna', 'Ikan Kakap', 'Ikan Bandeng', 'Ikan Lele',
-                'Udang Vaname', 'Cumi-Cumi', 'Kepiting', 'Ikan Dori'
-            ];
+        <!-- Modal Konfirmasi Hapus Pelanggan -->
+        <div id="deleteCustomerModal" class="modal-backdrop hidden">
+            <div class="card w-full max-w-md p-6 text-center">
+                <i class="ph ph-warning-circle text-5xl text-red-500 mx-auto mb-3"></i>
+                <h3 class="text-lg font-bold mb-2">Hapus Pelanggan?</h3>
+                <p class="text-sm opacity-70 mb-4">Data pelanggan <strong id="deleteCustomerName"></strong> akan dihapus permanen. Riwayat transaksi tetap aman.</p>
+                <div class="flex gap-3 justify-center">
+                    <button onclick="document.getElementById('deleteCustomerModal').classList.add('hidden')" class="btn btn-secondary">Batal</button>
+                    <button id="confirmDeleteCustomer" class="btn btn-danger">Ya, Hapus</button>
+                </div>
+            </div>
+        </div>
 
-            const defaultSettings = {
-                ppn: 12,
-                pph25: 2,
-                pph21: 5,
-                ptShare: 60,
-                minGrosir: 10,
-                minPartai: 500,
-                selisihGrosir: 5000,
-                marginDefault: 15000,
-                fifoMethod: 'fefo',
-                storageMethod: 'none',
-                storageFlat: 0,
-                storagePerKg: 0
-            };
+        <!-- ==================== TAB KEUANGAN ==================== -->
+        <div id="tab-finance" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-wallet text-primary-600"></i> Keuangan & Akuntansi</h2>
+                <div id="financeSummaryContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <!-- Akan diisi oleh JS -->
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Form Beban -->
+                    <div class="card p-4">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2"><i class="ph ph-receipt text-slate-500"></i> Catat Beban Operasional</h3>
+                        <form id="expenseForm" class="space-y-3">
+                            <select id="expenseAkun">
+                                <option value="Beban Operasional">Beban Operasional</option>
+                                <option value="Beban Listrik">Beban Listrik</option>
+                                <option value="Beban Sewa">Beban Sewa</option>
+                                <option value="Beban Gaji">Beban Gaji</option>
+                                <option value="Beban Transport">Beban Transport</option>
+                            </select>
+                            <input type="number" id="expenseJumlah" placeholder="Jumlah (Rp)" required>
+                            <input type="text" id="expenseDeskripsi" placeholder="Deskripsi (opsional)">
+                            <button type="submit" class="btn btn-primary w-full">💾 Simpan Beban</button>
+                        </form>
+                    </div>
+                    <!-- Laporan & Ekspor -->
+                    <div class="card p-4">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2"><i class="ph ph-file-text text-slate-500"></i> Laporan & Ekspor</h3>
+                        <button id="exportExcelBtn" class="btn btn-success w-full mb-2"><i class="ph ph-file-xls"></i> Ekspor Jurnal Bulan Ini (Excel)</button>
+                        <button id="viewJournalBtn" class="btn btn-secondary w-full"><i class="ph ph-book-open"></i> Lihat Buku Besar</button>
+                    </div>
+                </div>
+                <!-- Buku Besar -->
+                <div id="journalViewer" class="mt-6 hidden">
+                    <h3 class="font-semibold mb-2">📖 Buku Besar (Jurnal)</h3>
+                    <div class="overflow-x-auto max-h-64">
+                        <table class="w-full text-sm">
+                            <thead><tr><th class="p-2">Tanggal</th><th>Deskripsi</th><th>Akun</th><th>Debet</th><th>Kredit</th></tr></thead>
+                            <tbody id="journalTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Grafik Laba Rugi Tahunan -->
+                <div class="mt-6 card p-4">
+                    <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-chart-bar text-blue-500"></i> Grafik Laba Rugi Tahunan</h3>
+                    <canvas id="chartYearlyPL" height="150"></canvas>
+                </div>
+                <!-- Arus Kas -->
+                <div class="mt-4 card p-4">
+                    <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-bank text-slate-500"></i> Arus Kas (Sederhana)</h3>
+                    <div id="cashflowSummary" class="text-sm opacity-70">Data akan terisi setelah beberapa transaksi dan beban tercatat.</div>
+                </div>
+                <!-- Catatan Pajak -->
+                <div class="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-sm">
+                    <h4 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-scales text-amber-600"></i> Catatan Pajak</h4>
+                    <p class="opacity-80">PPN dihitung otomatis dari DPP. PPh 25 dan PPh 21 dihitung dari laba bersih. Pastikan pengaturan pajak sudah benar di tab <strong>Pengaturan</strong>.</p>
+                </div>
+                <!-- Placeholder dekoratif: Status Keuangan -->
+                <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm flex items-center gap-2">
+                    <i class="ph ph-chart-pie-slice text-slate-400"></i>
+                    <span class="opacity-60">Analisis: <strong>Rasio Laba Kotor</strong> menunjukkan efisiensi operasional. Pantau secara berkala.</span>
+                </div>
+            </div>
+        </div>
 
-            const defaultCompany = {
-                name: 'Cibitung Frozen',
-                address: 'Jl. Industri No.1',
-                phone: '0812-3456-7890',
-                email: 'info@cibitungfrozen.com'
-            };
+        <!-- ==================== TAB RIWAYAT ==================== -->
+        <div id="tab-history" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-clock-counter-clockwise text-amber-600"></i> Riwayat Transaksi</h2>
+                <!-- Filter -->
+                <form id="filterTransaksi" class="flex flex-wrap gap-3 mb-4">
+                    <select id="filterProduk"><option value="">Semua Produk</option></select>
+                    <input type="text" id="filterKlien" placeholder="Nama Klien">
+                    <input type="date" id="filterStart"> <input type="date" id="filterEnd">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </form>
+                <!-- Tabel Riwayat -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr>
+                                <th class="p-2">Tanggal</th>
+                                <th class="p-2">Klien</th>
+                                <th class="p-2">Produk</th>
+                                <th class="p-2 text-right">Qty</th>
+                                <th class="p-2 text-right">Invoice</th>
+                                <th class="p-2 text-center">Tier</th>
+                                <th class="p-2 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr><td colspan="7" class="text-center p-4 opacity-50">Belum ada transaksi</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Statistik Riwayat -->
+                <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm" id="historyStats">
+                    <div class="card p-3 text-center hover-lift">
+                        <span class="opacity-60">Total Transaksi</span>
+                        <p class="font-bold" id="historyTotalTrx">0</p>
+                    </div>
+                    <div class="card p-3 text-center hover-lift">
+                        <span class="opacity-60">Total Pendapatan</span>
+                        <p class="font-bold" id="historyTotalRevenue">Rp 0</p>
+                    </div>
+                    <div class="card p-3 text-center hover-lift">
+                        <span class="opacity-60">Rata-rata/hari</span>
+                        <p class="font-bold" id="historyAvgDaily">Rp 0</p>
+                    </div>
+                    <div class="card p-3 text-center hover-lift">
+                        <span class="opacity-60">Transaksi Hari Ini</span>
+                        <p class="font-bold" id="historyTodayTrx">0</p>
+                    </div>
+                </div>
+                <!-- Grafik Riwayat -->
+                <div class="mt-4 card p-4">
+                    <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-chart-line text-blue-500"></i> Grafik Riwayat Pendapatan (30 Hari)</h3>
+                    <canvas id="chartHistoryRevenue" height="150"></canvas>
+                </div>
+                <!-- Tombol Hapus Semua Riwayat (Dekoratif) -->
+                <div class="mt-4 flex justify-end">
+                    <button id="clearAllHistoryBtn" class="btn btn-danger btn-sm"><i class="ph ph-trash"></i> Hapus Semua Riwayat</button>
+                </div>
+                <!-- Placeholder dekoratif: Rekomendasi -->
+                <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm flex items-center gap-2">
+                    <i class="ph ph-target text-slate-400"></i>
+                    <span class="opacity-60">Tips: Gunakan filter untuk melihat performa produk tertentu dalam rentang waktu yang spesifik.</span>
+                </div>
+            </div>
+        </div>
 
-            // State containers
-            let batches = [];
-            let sales = [];
-            let expenses = [];
-            let settings = { ...defaultSettings };
-            let company = { ...defaultCompany };
-            let customers = {}; // key: name, value: { totalSpent, transactionCount, lastPurchase }
+        <!-- ==================== TAB LAPORAN ==================== -->
+        <div id="tab-reports" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="ph ph-file-text text-violet-600"></i> Laporan Keuangan</h2>
+                <!-- Laba Rugi & Neraca -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-trend-up text-green-600"></i> Laba Rugi</h3>
+                        <div id="reportLabaRugi" class="text-sm p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                            <!-- Akan diisi oleh JS -->
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-buildings text-blue-600"></i> Neraca</h3>
+                        <div id="reportNeraca" class="text-sm p-4 bg-slate-50 dark:bg-slate-800 rounded-xl space-y-3">
+                            <div><strong>Aset</strong><div id="neracaAset"></div></div>
+                            <div><strong>Kewajiban</strong><div id="neracaKewajiban"></div></div>
+                            <div><strong>Ekuitas</strong><div id="neracaEkuitas"></div></div>
+                            <div class="font-bold mt-2" id="neracaBalance"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Divider -->
+                <div style="border-top:1px solid var(--border); margin: 1.5rem 0;"></div>
+                <!-- Laporan Tambahan -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <div class="card p-4 hover-lift">
+                        <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-package text-slate-500"></i> Laporan Stok</h3>
+                        <div id="reportStok" class="text-sm space-y-1"></div>
+                    </div>
+                    <div class="card p-4 hover-lift">
+                        <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-money text-emerald-500"></i> Margin per Produk</h3>
+                        <div id="reportMargin" class="text-sm space-y-1"></div>
+                    </div>
+                    <div class="card p-4 hover-lift">
+                        <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-chart-line-up text-violet-500"></i> Proyeksi Keuangan</h3>
+                        <div id="reportProyeksi" class="text-sm space-y-1"></div>
+                    </div>
+                </div>
+                <!-- Keterangan Laporan -->
+                <div class="mt-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm">
+                    <h4 class="font-semibold mb-2">📋 Keterangan Laporan</h4>
+                    <ul class="list-disc list-inside space-y-1 opacity-70">
+                        <li><strong>Laba Rugi:</strong> Pendapatan dikurangi HPP, beban, dan pajak.</li>
+                        <li><strong>Neraca:</strong> Aset = Kewajiban + Ekuitas. Menampilkan saldo akun utama.</li>
+                        <li><strong>Stok:</strong> Total stok per produk dari seluruh batch aktif.</li>
+                        <li><strong>Margin:</strong> Selisih total invoice dengan HPP per produk.</li>
+                        <li><strong>Proyeksi:</strong> Estimasi pendapatan 3 bulan ke depan berdasarkan rata-rata historis.</li>
+                    </ul>
+                </div>
+                <!-- Placeholder dekoratif: Perbandingan Industri -->
+                <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm flex items-center gap-2">
+                    <i class="ph ph-globe text-slate-400"></i>
+                    <span class="opacity-60">Benchmark: Margin kotor ideal untuk industri frozen food adalah 25–40%.</span>
+                </div>
+            </div>
+        </div>
 
-            async function loadData() {
-                try {
-                    const b = await localforage.getItem(STORAGE_KEYS.batches);
-                    if (b) batches = b;
-                    const s = await localforage.getItem(STORAGE_KEYS.sales);
-                    if (s) sales = s;
-                    const e = await localforage.getItem(STORAGE_KEYS.expenses);
-                    if (e) expenses = e;
-                    const st = await localforage.getItem(STORAGE_KEYS.settings);
-                    if (st) settings = { ...defaultSettings, ...st };
-                    const comp = await localforage.getItem(STORAGE_KEYS.company);
-                    if (comp) company = { ...defaultCompany, ...comp };
-                    const cust = await localforage.getItem(STORAGE_KEYS.customers);
-                    if (cust) customers = cust;
-                } catch (err) {
-                    console.error('Gagal memuat data', err);
-                }
-                if (!batches.length && !sales.length) seedSampleData();
-                rebuildCustomersFromSales();
-            }
+        <!-- ==================== TAB PENGATURAN ==================== -->
+        <div id="tab-settings" class="tab-content space-y-6">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="ph ph-gear text-slate-600"></i> Pengaturan Bisnis</h2>
+                <!-- Grid Pengaturan -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-3">
+                        <div><label class="text-sm font-medium">PPN (%)</label><input type="number" id="setPPN" value="12" class="w-full"></div>
+                        <div><label class="text-sm font-medium">PPh 25 (%)</label><input type="number" id="setPPh25" value="2" class="w-full"></div>
+                        <div><label class="text-sm font-medium">PPh 21 (%)</label><input type="number" id="setPPh21" value="5" class="w-full"></div>
+                        <div><label class="text-sm font-medium">PT Share (%)</label><input type="number" id="setPTShare" value="60" class="w-full"></div>
+                        <div><label class="text-sm font-medium">Min Grosir (kg)</label><input type="number" id="setMinGrosir" value="10" class="w-full"></div>
+                    </div>
+                    <div class="space-y-3">
+                        <div><label class="text-sm font-medium">Min Partai (kg)</label><input type="number" id="setMinPartai" value="500" class="w-full"></div>
+                        <div><label class="text-sm font-medium">Selisih Grosir dari Ecer (Rp)</label><input type="number" id="setSelisihGrosir" value="5000" class="w-full"></div>
+                        <div><label class="text-sm font-medium">Margin Default (Rp/kg)</label><input type="number" id="setMarginDefault" value="15000" class="w-full"></div>
+                        <div>
+                            <label class="text-sm font-medium">Metode Penyimpanan</label>
+                            <select id="setStorageMethod" class="w-full">
+                                <option value="none">Tidak Ada</option>
+                                <option value="flat_monthly">Flat Bulanan</option>
+                                <option value="per_kg_day">Harian per Kg</option>
+                            </select>
+                        </div>
+                        <div id="storageFlatInput">
+                            <label class="text-sm font-medium">Biaya Sewa Bulanan (Rp)</label>
+                            <input type="number" id="setStorageFlat" value="0" class="w-full">
+                        </div>
+                        <div id="storagePerKgInput" class="hidden">
+                            <label class="text-sm font-medium">Biaya per Kg per Hari (Rp)</label>
+                            <input type="number" id="setStoragePerKg" value="0" class="w-full">
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium">Alokasi Stok</label>
+                            <select id="setFifoMethod" class="w-full">
+                                <option value="fefo">FEFO (Kadaluarsa Terdekat)</option>
+                                <option value="fifo">FIFO (Masuk Pertama)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button id="saveSettingsBtn" class="btn btn-primary mt-6">💾 Simpan Pengaturan</button>
 
-            async function saveAll() {
-                await localforage.setItem(STORAGE_KEYS.batches, batches);
-                await localforage.setItem(STORAGE_KEYS.sales, sales);
-                await localforage.setItem(STORAGE_KEYS.expenses, expenses);
-                await localforage.setItem(STORAGE_KEYS.settings, settings);
-                await localforage.setItem(STORAGE_KEYS.company, company);
-                await localforage.setItem(STORAGE_KEYS.customers, customers);
-            }
+                <!-- Profil Usaha untuk Invoice -->
+                <div class="mt-8 card p-4">
+                    <h3 class="font-semibold mb-3 flex items-center gap-2"><i class="ph ph-storefront text-slate-500"></i> Profil Usaha (untuk Invoice)</h3>
+                    <form id="companyProfileForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" id="companyName" placeholder="Nama Usaha" value="Cibitung Frozen">
+                        <input type="text" id="companyAddress" placeholder="Alamat" value="Jl. Industri No.1">
+                        <input type="text" id="companyPhone" placeholder="Telepon" value="0812-3456-7890">
+                        <input type="text" id="companyEmail" placeholder="Email" value="info@cibitungfrozen.com">
+                        <button type="button" id="saveCompanyBtn" class="btn btn-primary col-span-full sm:col-span-1">Simpan Profil</button>
+                    </form>
+                </div>
 
-            function seedSampleData() {
-                const today = new Date();
-                const addDays = (d, n) => { const r = new Date(d);
-                    r.setDate(r.getDate() + n); return r; };
-                const fmt = d => d.toISOString().split('T')[0];
-                // sample batches
-                const prodSamples = ['Ikan Salmon', 'Ikan Tuna', 'Udang Vaname', 'Ikan Kakap', 'Ikan Lele'];
-                prodSamples.forEach((p, i) => {
-                    batches.push({
-                        id: 'b' + Date.now() + i,
-                        produk: p,
-                        berat: 100 + i * 20,
-                        hargaBeli: 45000 + i * 5000,
-                        ongkir: 50000,
-                        bensin: 20000,
-                        bongkar: i % 2 === 0 ? 30000 : 0,
-                        pajakType: 'none',
-                        pajakValue: 0,
-                        tglProduksi: fmt(addDays(today, -30)),
-                        tglKadaluarsa: fmt(addDays(today, 60 + i * 10)),
-                        used: 0
-                    });
-                });
-                // sample sales
-                sales.push({
-                    id: 's' + Date.now(),
-                    tanggal: fmt(today),
-                    klien: 'Budi Santoso',
-                    produk: 'Ikan Salmon',
-                    qty: 5,
-                    tier: 'ecer',
-                    hargaJual: 65000,
-                    hpp: 50000,
-                    catatan: '',
-                    batchUsed: batches[0].id
-                });
-                batches[0].used += 5;
-                // expense
-                expenses.push({
-                    id: 'e1',
-                    tanggal: fmt(today),
-                    akun: 'Beban Listrik',
-                    jumlah: 150000,
-                    deskripsi: 'Listrik bulan ini'
-                });
-                rebuildCustomersFromSales();
-                saveAll();
-            }
+                <!-- Reset Ulang Data -->
+                <div class="mt-8 card p-4 border-red-200 dark:border-red-800 bg-red-50/30 dark:bg-red-900/10">
+                    <h3 class="font-semibold mb-3 text-red-700 dark:text-red-400 flex items-center gap-2">
+                        <i class="ph ph-warning-circle text-xl"></i> Reset Ulang Semua Data
+                    </h3>
+                    <p class="text-sm text-red-700/80 dark:text-red-400/80 mb-4">
+                        Tindakan ini akan menghapus seluruh data termasuk batch, transaksi, jurnal, pelanggan, dan pengaturan. Data yang sudah dihapus <strong>tidak dapat dikembalikan</strong>. Pastikan Anda sudah melakukan backup terlebih dahulu.
+                    </p>
+                    <button id="resetAllDataBtn" class="btn btn-danger w-full sm:w-auto">
+                        <i class="ph ph-trash"></i> Reset Semua Data
+                    </button>
+                </div>
 
-            function rebuildCustomersFromSales() {
-                customers = {};
-                sales.forEach(s => {
-                    if (!customers[s.klien]) customers[s.klien] = { totalSpent: 0, transactionCount: 0,
-                        lastPurchase: '' };
-                    const c = customers[s.klien];
-                    c.totalSpent += s.qty * s.hargaJual;
-                    c.transactionCount += 1;
-                    if (!c.lastPurchase || s.tanggal > c.lastPurchase) c.lastPurchase = s.tanggal;
-                });
-            }
+                <!-- Backup & Keamanan -->
+                <div class="mt-6 card p-4">
+                    <h3 class="font-semibold mb-3 flex items-center gap-2"><i class="ph ph-cloud-arrow-up text-slate-500"></i> Backup & Keamanan</h3>
+                    <p class="text-sm opacity-70">Data Anda disimpan di browser. Lakukan backup manual secara berkala menggunakan tombol di pojok kanan atas, atau gunakan <kbd>Ctrl+B</kbd>.</p>
+                    <button onclick="CFS.App.backupData()" class="btn btn-primary mt-2"><i class="ph ph-download-simple"></i> Backup Sekarang</button>
+                </div>
 
-            /* ========== UI HELPERS ========== */
-            function formatRupiah(n) { return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
+                <!-- Placeholder dekoratif: Tanggal & Jam Sistem -->
+                <div class="mt-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm flex items-center gap-2">
+                    <i class="ph ph-clock-countdown text-slate-400"></i>
+                    <span class="opacity-60">Waktu sistem: <span id="systemDateTime">-</span></span>
+                </div>
+            </div>
+        </div>
 
-            function dateNow() { return new Date().toISOString().split('T')[0]; }
+    </main>
+</div>
 
-            /* Tab switching */
-            window.switchTab = function(tabId) {
-                $$('.tab-content').forEach(tc => tc.classList.remove('active'));
-                $$('.tab-btn').forEach(b => { b.classList.remove('active', 'bg-primary-50', 'text-primary-700',
-                        'font-semibold');
-                    b.classList.add('opacity-70'); });
-                const target = $('#' + tabId);
-                if (target) target.classList.add('active');
-                const btn = $(`.tab-btn[data-tab="${tabId}"]`);
-                if (btn) { btn.classList.add('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
-                    btn.classList.remove('opacity-70'); }
-                if (tabId === 'tab-dashboard') refreshDashboard();
-                if (tabId === 'tab-stock') refreshStockTab();
-                if (tabId === 'tab-sales') { refreshSalesTab();
-                    updateProductSelects(); }
-                if (tabId === 'tab-crm') refreshCRMTab();
-                if (tabId === 'tab-finance') refreshFinanceTab();
-                if (tabId === 'tab-history') refreshHistoryTab();
-                if (tabId === 'tab-reports') refreshReportsTab();
-                if (tabId === 'tab-settings') refreshSettingsTab();
-            };
+<!-- ==================== FOOTER ==================== -->
+<footer class="border-t mt-auto py-4" style="background: var(--surface); border-color: var(--border);">
+    <div class="container-main text-center text-xs opacity-50">
+        <p>&copy; 2025 <strong>Cibitung Frozen</strong> — ERP Ultimate v5.4</p>
+    </div>
+</footer>
 
-            /* ========== MODULE: STOCK ========== */
-            function getAvailableBatches(produk) {
-                return batches.filter(b => b.produk === produk && b.berat > b.used).sort((a, b) => {
-                    if (settings.fifoMethod === 'fefo') return new Date(a.tglKadaluarsa) - new Date(b
-                        .tglKadaluarsa);
-                    return new Date(a.tglProduksi) - new Date(b.tglProduksi);
-                });
-            }
-
-            function stockPerProduct() {
-                const map = {};
-                batches.forEach(b => {
-                    if (!map[b.produk]) map[b.produk] = 0;
-                    map[b.produk] += (b.berat - b.used);
-                });
-                defaultProducts.forEach(p => { if (!map[p]) map[p] = 0; });
-                return map;
-            }
-
-            function refreshStockTab() {
-                const tbody = $('#stockTableBody');
-                const map = stockPerProduct();
-                tbody.innerHTML = defaultProducts.map(p => {
-                    const stok = map[p] || 0;
-                    const activeBatches = batches.filter(b => b.produk === p && b.berat > b.used).length;
-                    const status = stok === 0 ? '<span class="text-red-500">Kosong</span>' : stok < 20 ?
-                        '<span class="text-amber-500">Menipis</span>' :
-                        '<span class="text-green-500">Aman</span>';
-                    return `<tr class="border-t">
-                    <td class="p-3">${p}</td>
-                    <td class="p-3 text-right">${stok} kg</td>
-                    <td class="p-3 text-right">${activeBatches}</td>
-                    <td class="p-3 text-center">${status}</td>
-                    <td class="p-3 text-center"><button onclick="CFS.Stock.deleteProduct('${p}')" class="text-red-500 text-xs">🗑️ Hapus</button></td>
-                  </tr>`;
-                }).join('');
-                updateBatchDetail();
-                updateUsedBatchesToday();
-            }
-
-            function updateBatchDetail() {
-                const sel = $('#batchProdukSelect');
-                sel.innerHTML = '<option value="">Semua Produk</option>' + defaultProducts.map(p =>
-                    `<option>${p}</option>`).join('');
-                const filter = sel.value;
-                const filtered = filter ? batches.filter(b => b.produk === filter) : batches;
-                $('#batchDetailContent').innerHTML = filtered.map(b => `
-                <div class="border rounded p-3 mb-2 text-sm">
-                  <strong>${b.produk}</strong> | ${b.berat} kg | Terpakai: ${b.used} kg | Sisa: ${b.berat - b.used} kg<br>
-                  Beli: ${formatRupiah(b.hargaBeli)}/kg | Ongkir: ${formatRupiah(b.ongkir)} | Bensin: ${formatRupiah(b.bensin)} | Bongkar: ${formatRupiah(b.bongkar)}<br>
-                  Produksi: ${b.tglProduksi} | Kadaluarsa: ${b.tglKadaluarsa}
-                </div>`).join('') || '<p class="opacity-50">Tidak ada batch.</p>';
-            }
-            $('#batchProdukSelect').addEventListener('change', updateBatchDetail);
-
-            function updateUsedBatchesToday() {
-                const today = dateNow();
-                const used = batches.filter(b => b.used > 0 && b.tglKadaluarsa >= today);
-                const el = $('#usedBatchesToday');
-                if (used.length === 0) el.innerHTML = '<p class="opacity-50">Belum ada batch terpakai hari ini.</p>';
-                else el.innerHTML = used.map(b =>
-                    `<p>${b.produk}: ${b.used} kg terpakai dari ${b.berat} kg</p>`).join('');
-            }
-
-            document.getElementById('addStockForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const produk = $('#stockProduk').value;
-                const berat = parseFloat($('#stockBerat').value);
-                const hargaBeli = parseFloat($('#stockHargaBeli').value);
-                const ongkir = parseFloat($('#stockOngkir').value) || 0;
-                const bensin = parseFloat($('#stockBensin').value) || 0;
-                const bongkar = document.getElementById('stockToggleBongkar').checked ? parseFloat($(
-                    '#stockBongkarNominal').value) || 0 : 0;
-                const pajakType = $('#stockPajakType').value;
-                const pajakValue = parseFloat($('#stockPajakValue').value) || 0;
-                const tglProduksi = $('#stockTglProduksi').value;
-                const tglKadaluarsa = $('#stockTglKadaluarsa').value;
-                if (!produk || !berat || !hargaBeli || !tglProduksi || !tglKadaluarsa) return showToast('Error',
-                    'Lengkapi data batch', 'error');
-                batches.push({
-                    id: 'b' + Date.now(),
-                    produk,
-                    berat,
-                    hargaBeli,
-                    ongkir,
-                    bensin,
-                    bongkar,
-                    pajakType,
-                    pajakValue,
-                    tglProduksi,
-                    tglKadaluarsa,
-                    used: 0
-                });
-                await saveAll();
-                refreshStockTab();
-                showToast('Sukses', 'Batch baru ditambahkan', 'success');
-                this.reset();
-            });
-
-            document.getElementById('stockToggleBongkar').addEventListener('change', function() {
-                $('#stockBongkarNominal').classList.toggle('hidden', !this.checked);
-            });
-            document.getElementById('stockPajakType').addEventListener('change', function() {
-                $('#stockPajakValue').classList.toggle('hidden', this.value === 'none');
-            });
-
-            window.CFS = window.CFS || {};
-            CFS.Stock = {
-                deleteProduct: async function(produk) {
-                    if (!confirm(`Hapus semua batch untuk ${produk}?`)) return;
-                    batches = batches.filter(b => b.produk !== produk);
-                    await saveAll();
-                    refreshStockTab();
-                    showToast('Dihapus', `Batch ${produk} dihapus`, 'success');
-                }
-            };
-
-            /* ========== MODULE: SALES ========== */
-            function updateProductSelects() {
-                const produkList = [...new Set(batches.map(b => b.produk))];
-                ['salesProduk', 'stockProduk', 'filterProduk'].forEach(id => {
-                    const sel = $('#' + id);
-                    if (!sel) return;
-                    sel.innerHTML = '<option value="">Pilih Produk</option>' + produkList.map(p =>
-                        `<option>${p}</option>`).join('');
-                });
-            }
-
-            function refreshSalesTab() {
-                const today = dateNow();
-                const todaySales = sales.filter(s => s.tanggal === today);
-                const el = $('#todaySalesList');
-                el.innerHTML = todaySales.length ? todaySales.map(s =>
-                    `<p>${s.klien} - ${s.produk} ${s.qty}kg @${formatRupiah(s.hargaJual)} (${s.tier})</p>`).join('') :
-                    '<p class="opacity-50">Belum ada penjualan hari ini.</p>';
-                updateProductSelects();
-            }
-
-            document.getElementById('previewPriceBtn').addEventListener('click', function() {
-                const produk = $('#salesProduk').value;
-                const qty = parseFloat($('#salesQty').value) || 0;
-                const tier = $('#salesTier').value;
-                const manual = $('#salesHargaManual').value;
-                const batchesAvail = getAvailableBatches(produk);
-                if (!batchesAvail.length) return showToast('Error', 'Stok tidak tersedia', 'error');
-                let hpp = batchesAvail[0].hargaBeli;
-                const margin = settings.marginDefault;
-                let harga = manual ? parseFloat(manual) : hpp + margin;
-                if (tier === 'grosir') harga -= settings.selisihGrosir;
-                if (tier === 'partai') harga -= settings.selisihGrosir * 2;
-                showToast('Preview', `HPP: ${formatRupiah(hpp)} → Harga Jual: ${formatRupiah(harga)}`, 'info');
-            });
-
-            document.getElementById('salesForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const klien = $('#salesKlien').value.trim();
-                const produk = $('#salesProduk').value;
-                const qty = parseFloat($('#salesQty').value);
-                const tier = $('#salesTier').value;
-                const manual = parseFloat($('#salesHargaManual').value) || 0;
-                const catatan = $('#salesCatatan').value;
-                if (!klien || !produk || !qty) return showToast('Error', 'Lengkapi data penjualan', 'error');
-                const avail = getAvailableBatches(produk);
-                let remaining = qty;
-                const usedBatches = [];
-                for (let b of avail) {
-                    if (remaining <= 0) break;
-                    const sisa = b.berat - b.used;
-                    const ambil = Math.min(sisa, remaining);
-                    b.used += ambil;
-                    remaining -= ambil;
-                    usedBatches.push({ id: b.id, qty: ambil, hpp: b.hargaBeli });
-                }
-                if (remaining > 0) {
-                    // rollback
-                    usedBatches.forEach(ub => {
-                        const batch = batches.find(b => b.id === ub.id);
-                        if (batch) batch.used -= ub.qty;
-                    });
-                    return showToast('Error', 'Stok tidak mencukupi', 'error');
-                }
-                const avgHpp = usedBatches.reduce((acc, ub) => acc + ub.hpp * ub.qty, 0) / qty;
-                const margin = settings.marginDefault;
-                let hargaJual = manual || (avgHpp + margin);
-                if (tier === 'grosir') hargaJual -= settings.selisihGrosir;
-                if (tier === 'partai') hargaJual -= settings.selisihGrosir * 2;
-                const sale = {
-                    id: 's' + Date.now(),
-                    tanggal: dateNow(),
-                    klien,
-                    produk,
-                    qty,
-                    tier,
-                    hargaJual,
-                    hpp: avgHpp,
-                    catatan,
-                    batchUsed: usedBatches[0]?.id
-                };
-                sales.push(sale);
-                rebuildCustomersFromSales();
-                await saveAll();
-                refreshSalesTab();
-                updateProductSelects();
-                showToast('Sukses', `Penjualan ${produk} ke ${klien} tercatat`, 'success');
-                $('#printInvoiceBtn').disabled = false;
-                $('#printInvoiceBtn').dataset.saleId = sale.id;
-                this.reset();
-            });
-
-            document.getElementById('printInvoiceBtn').addEventListener('click', function() {
-                const saleId = this.dataset.saleId;
-                const sale = sales.find(s => s.id === saleId);
-                if (!sale) return;
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                doc.setFontSize(16);
-                doc.text('INVOICE', 20, 20);
-                doc.setFontSize(12);
-                doc.text(`Tanggal: ${sale.tanggal}`, 20, 30);
-                doc.text(`Klien: ${sale.klien}`, 20, 40);
-                doc.text(`Produk: ${sale.produk}`, 20, 50);
-                doc.text(`Jumlah: ${sale.qty} kg`, 20, 60);
-                doc.text(`Harga: ${formatRupiah(sale.hargaJual)}/kg`, 20, 70);
-                doc.text(`Total: ${formatRupiah(sale.qty * sale.hargaJual)}`, 20, 80);
-                doc.save(`invoice_${sale.id}.pdf`);
-                showToast('Sukses', 'Invoice diunduh', 'success');
-            });
-
-            /* ========== MODULE: CRM ========== */
-            function refreshCRMTab() {
-                const names = Object.keys(customers);
-                $('#crmTotalCustomers').textContent = names.length;
-                const totalSpent = names.reduce((acc, n) => acc + customers[n].totalSpent, 0);
-                $('#crmTotalRevenue').textContent = formatRupiah(totalSpent);
-                const thirtyDaysAgo = new Date();
-                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-                const active = names.filter(n => customers[n].lastPurchase >= thirtyDaysAgo.toISOString().split(
-                    'T')[0]).length;
-                $('#crmActiveCustomers').textContent = active;
-                let top = 0,
-                    regular = 0,
-                    newC = 0,
-                    churn = 0;
-                names.forEach(n => {
-                    const c = customers[n];
-                    if (c.totalSpent > 10000000) top++;
-                    else if (c.totalSpent >= 2000000) regular++;
-                    if (c.transactionCount === 1) newC++;
-                    if (!c.lastPurchase || c.lastPurchase < thirtyDaysAgo.toISOString().split('T')[0]) churn++;
-                });
-                $('#segTop').textContent = top;
-                $('#segRegular').textContent = regular;
-                $('#segNew').textContent = newC;
-                $('#segChurn').textContent = churn;
-                const tbody = $('#crmTableBody');
-                tbody.innerHTML = names.map(n => {
-                    const c = customers[n];
-                    return `<tr class="border-t">
-                  <td class="p-2">${n}</td>
-                  <td class="p-2 text-right">${formatRupiah(c.totalSpent)}</td>
-                  <td class="p-2 text-right">${c.transactionCount}</td>
-                  <td class="p-2 text-right">${c.lastPurchase || '-'}</td>
-                  <td class="p-2 text-center">${c.totalSpent > 10000000 ? '🏆 Top' : '⭐ Regular'}</td>
-                  <td class="p-2 text-center"><button onclick="CFS.CRM.deleteCustomer('${n}')" class="text-red-500">🗑️</button></td>
-                </tr>`;
-                }).join('') || '<tr><td colspan="6" class="text-center p-4 opacity-50">Belum ada data</td></tr>';
-            }
-            CFS.CRM = {
-                deleteCustomer: function(name) {
-                    $('#deleteCustomerName').textContent = name;
-                    $('#deleteCustomerModal').classList.remove('hidden');
-                    $('#confirmDeleteCustomer').onclick = async function() {
-                        sales = sales.filter(s => s.klien !== name);
-                        rebuildCustomersFromSales();
-                        await saveAll();
-                        $('#deleteCustomerModal').classList.add('hidden');
-                        refreshCRMTab();
-                        showToast('Dihapus', 'Pelanggan dihapus', 'success');
-                    };
-                }
-            };
-            document.getElementById('exportCustomersCSV').addEventListener('click', () => {
-                const names = Object.keys(customers);
-                const csv = 'Nama,Total Pembelian,Transaksi,Terakhir\n' + names.map(n => {
-                    const c = customers[n];
-                    return `${n},${c.totalSpent},${c.transactionCount},${c.lastPurchase}`;
-                }).join('\n');
-                const blob = new Blob([csv], { type: 'text/csv' });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = 'pelanggan.csv';
-                a.click();
-                showToast('Sukses', 'CSV diunduh', 'success');
-            });
-
-            /* ========== MODULE: FINANCE ========== */
-            function refreshFinanceTab() {
-                const now = new Date();
-                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-                const monthSales = sales.filter(s => s.tanggal >= monthStart);
-                const pendapatan = monthSales.reduce((acc, s) => acc + s.qty * s.hargaJual, 0);
-                const hpp = monthSales.reduce((acc, s) => acc + s.qty * s.hpp, 0);
-                const beban = expenses.filter(e => e.tanggal >= monthStart).reduce((acc, e) => acc + e.jumlah, 0);
-                const labaKotor = pendapatan - hpp;
-                const labaBersih = labaKotor - beban;
-                $('#financeSummaryContainer').innerHTML = `
-                <div class="card p-3 text-center"><span class="opacity-60">Pendapatan</span><p class="font-bold">${formatRupiah(pendapatan)}</p></div>
-                <div class="card p-3 text-center"><span class="opacity-60">HPP</span><p class="font-bold">${formatRupiah(hpp)}</p></div>
-                <div class="card p-3 text-center"><span class="opacity-60">Laba Kotor</span><p class="font-bold">${formatRupiah(labaKotor)}</p></div>
-                <div class="card p-3 text-center"><span class="opacity-60">Laba Bersih</span><p class="font-bold">${formatRupiah(labaBersih)}</p></div>`;
-                updateYearlyChart();
-            }
-
-            document.getElementById('expenseForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const akun = $('#expenseAkun').value;
-                const jumlah = parseFloat($('#expenseJumlah').value);
-                const deskripsi = $('#expenseDeskripsi').value;
-                expenses.push({ id: 'e' + Date.now(), tanggal: dateNow(), akun, jumlah, deskripsi });
-                await saveAll();
-                refreshFinanceTab();
-                showToast('Sukses', 'Beban tercatat', 'success');
-                this.reset();
-            });
-
-            document.getElementById('viewJournalBtn').addEventListener('click', () => {
-                const viewer = $('#journalViewer');
-                viewer.classList.toggle('hidden');
-                if (!viewer.classList.contains('hidden')) {
-                    const tbody = $('#journalTableBody');
-                    const jurnal = [];
-                    sales.forEach(s => jurnal.push({ tgl: s.tanggal, desk: 'Penjualan', akun: 'Kas',
-                        debet: s.qty * s.hargaJual, kredit: 0 }));
-                    expenses.forEach(e => jurnal.push({ tgl: e.tanggal, desk: e.deskripsi || e.akun, akun: e
-                            .akun, debet: 0, kredit: e.jumlah }));
-                    tbody.innerHTML = jurnal.map(j =>
-                        `<tr><td class="p-2">${j.tgl}</td><td>${j.desk}</td><td>${j.akun}</td><td>${j.debet ? formatRupiah(j.debet) : ''}</td><td>${j.kredit ? formatRupiah(j.kredit) : ''}</td></tr>`
-                    ).join('');
-                }
-            });
-
-            document.getElementById('exportExcelBtn').addEventListener('click', () => {
-                const data = [
-                    ['Tanggal', 'Deskripsi', 'Akun', 'Debet', 'Kredit']
-                ];
-                sales.forEach(s => data.push([s.tanggal, 'Penjualan', 'Kas', s.qty * s.hargaJual, 0]));
-                expenses.forEach(e => data.push([e.tanggal, e.deskripsi, e.akun, 0, e.jumlah]));
-                const ws = XLSX.utils.aoa_to_sheet(data);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Jurnal');
-                XLSX.writeFile(wb, 'jurnal_bulan_ini.xlsx');
-                showToast('Sukses', 'Excel diunduh', 'success');
-            });
-
-            let yearlyChart;
-            function updateYearlyChart() {
-                const ctx = $('#chartYearlyPL')?.getContext('2d');
-                if (!ctx) return;
-                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-                const rev = Array(12).fill(0);
-                const exp = Array(12).fill(0);
-                sales.forEach(s => { const m = new Date(s.tanggal).getMonth();
-                    rev[m] += s.qty * s.hargaJual; });
-                expenses.forEach(e => { const m = new Date(e.tanggal).getMonth();
-                    exp[m] += e.jumlah; });
-                if (yearlyChart) yearlyChart.destroy();
-                yearlyChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: months,
-                        datasets: [
-                            { label: 'Pendapatan', data: rev, backgroundColor: '#22c55e' },
-                            { label: 'Beban', data: exp, backgroundColor: '#ef4444' }
-                        ]
-                    }
-                });
-            }
-
-            /* ========== MODULE: HISTORY ========== */
-            function refreshHistoryTab() {
-                const filterProduk = $('#filterProduk').value;
-                const filterKlien = $('#filterKlien').value.toLowerCase();
-                const start = $('#filterStart').value;
-                const end = $('#filterEnd').value;
-                let filtered = [...sales];
-                if (filterProduk) filtered = filtered.filter(s => s.produk === filterProduk);
-                if (filterKlien) filtered = filtered.filter(s => s.klien.toLowerCase().includes(filterKlien));
-                if (start) filtered = filtered.filter(s => s.tanggal >= start);
-                if (end) filtered = filtered.filter(s => s.tanggal <= end);
-                const tbody = $('#historyTableBody');
-                tbody.innerHTML = filtered.map(s => `
-                <tr>
-                  <td class="p-2">${s.tanggal}</td>
-                  <td class="p-2">${s.klien}</td>
-                  <td class="p-2">${s.produk}</td>
-                  <td class="p-2 text-right">${s.qty} kg</td>
-                  <td class="p-2 text-right">${formatRupiah(s.qty * s.hargaJual)}</td>
-                  <td class="p-2 text-center">${s.tier}</td>
-                  <td class="p-2 text-center"><button onclick="CFS.History.deleteSale('${s.id}')" class="text-red-500">🗑️</button></td>
-                </tr>`).join('') || '<tr><td colspan="7" class="text-center p-4 opacity-50">Belum ada transaksi</td></tr>';
-                const totalTrx = filtered.length;
-                const totalRev = filtered.reduce((a, s) => a + s.qty * s.hargaJual, 0);
-                const days = [...new Set(filtered.map(s => s.tanggal))].length || 1;
-                $('#historyTotalTrx').textContent = totalTrx;
-                $('#historyTotalRevenue').textContent = formatRupiah(totalRev);
-                $('#historyAvgDaily').textContent = formatRupiah(totalRev / days);
-                $('#historyTodayTrx').textContent = filtered.filter(s => s.tanggal === dateNow()).length;
-                updateHistoryChart();
-            }
-            document.getElementById('filterTransaksi').addEventListener('submit', e => { e.preventDefault();
-                refreshHistoryTab(); });
-            CFS.History = {
-                deleteSale: async function(id) {
-                    if (!confirm('Hapus transaksi ini?')) return;
-                    const sale = sales.find(s => s.id === id);
-                    if (sale) {
-                        const batch = batches.find(b => b.id === sale.batchUsed);
-                        if (batch) batch.used = Math.max(0, batch.used - sale.qty);
-                    }
-                    sales = sales.filter(s => s.id !== id);
-                    rebuildCustomersFromSales();
-                    await saveAll();
-                    refreshHistoryTab();
-                    showToast('Dihapus', 'Transaksi dihapus', 'success');
-                }
-            };
-            document.getElementById('clearAllHistoryBtn').addEventListener('click', async () => {
-                if (!confirm('Hapus SEMUA riwayat transaksi? Data batch tidak dikembalikan.')) return;
-                sales = [];
-                rebuildCustomersFromSales();
-                await saveAll();
-                refreshHistoryTab();
-                showToast('Dihapus', 'Semua riwayat dibersihkan', 'success');
-            });
-            let historyChart;
-            function updateHistoryChart() {
-                const ctx = $('#chartHistoryRevenue')?.getContext('2d');
-                if (!ctx) return;
-                const last30 = [];
-                for (let i = 29; i >= 0; i--) {
-                    const d = new Date();
-                    d.setDate(d.getDate() - i);
-                    const ds = d.toISOString().split('T')[0];
-                    const total = sales.filter(s => s.tanggal === ds).reduce((a, s) => a + s.qty * s.hargaJual, 0);
-                    last30.push({ date: ds, total });
-                }
-                if (historyChart) historyChart.destroy();
-                historyChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: last30.map(d => d.date.slice(5)),
-                        datasets: [{ label: 'Pendapatan', data: last30.map(d => d.total),
-                            borderColor: '#2563eb' }]
-                    }
-                });
-            }
-
-            /* ========== MODULE: REPORTS ========== */
-            function refreshReportsTab() {
-                const map = stockPerProduct();
-                $('#reportStok').innerHTML = defaultProducts.map(p =>
-                    `<p>${p}: <strong>${map[p] || 0} kg</strong></p>`).join('');
-                const marginData = {};
-                sales.forEach(s => {
-                    if (!marginData[s.produk]) marginData[s.produk] = { revenue: 0, hpp: 0 };
-                    marginData[s.produk].revenue += s.qty * s.hargaJual;
-                    marginData[s.produk].hpp += s.qty * s.hpp;
-                });
-                $('#reportMargin').innerHTML = Object.entries(marginData).map(([p, d]) =>
-                    `<p>${p}: ${formatRupiah(d.revenue - d.hpp)} (${((d.revenue-d.hpp)/d.revenue*100||0).toFixed(1)}%)</p>`
-                ).join('') || '<p class="opacity-50">Belum ada data</p>';
-                const totalPendapatan = sales.reduce((a, s) => a + s.qty * s.hargaJual, 0);
-                const avgMonthly = totalPendapatan / Math.max(1, new Date().getMonth() + 1);
-                $('#reportProyeksi').innerHTML = [1, 2, 3].map(i =>
-                    `<p>Bulan ke-${i}: ${formatRupiah(avgMonthly * i)}</p>`).join('');
-                // Laba Rugi & Neraca
-                const pendapatan = sales.reduce((a, s) => a + s.qty * s.hargaJual, 0);
-                const hpp = sales.reduce((a, s) => a + s.qty * s.hpp, 0);
-                const beban = expenses.reduce((a, e) => a + e.jumlah, 0);
-                const labaKotor = pendapatan - hpp;
-                const labaBersih = labaKotor - beban;
-                $('#reportLabaRugi').innerHTML = `
-                <p>Pendapatan: ${formatRupiah(pendapatan)}</p>
-                <p>HPP: ${formatRupiah(hpp)}</p>
-                <p>Laba Kotor: ${formatRupiah(labaKotor)}</p>
-                <p>Beban: ${formatRupiah(beban)}</p>
-                <p><strong>Laba Bersih: ${formatRupiah(labaBersih)}</strong></p>`;
-                const aset = batches.reduce((a, b) => a + (b.berat - b.used) * b.hargaBeli, 0);
-                $('#reportNeraca').innerHTML = `
-                <p>Aset (Stok): ${formatRupiah(aset)}</p>
-                <p>Kewajiban: Rp 0</p>
-                <p>Ekuitas: ${formatRupiah(labaBersih + aset)}</p>`;
-            }
-
-            /* ========== MODULE: SETTINGS ========== */
-            function refreshSettingsTab() {
-                $('#setPPN').value = settings.ppn;
-                $('#setPPh25').value = settings.pph25;
-                $('#setPPh21').value = settings.pph21;
-                $('#setPTShare').value = settings.ptShare;
-                $('#setMinGrosir').value = settings.minGrosir;
-                $('#setMinPartai').value = settings.minPartai;
-                $('#setSelisihGrosir').value = settings.selisihGrosir;
-                $('#setMarginDefault').value = settings.marginDefault;
-                $('#setFifoMethod').value = settings.fifoMethod;
-            }
-            document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
-                settings.ppn = parseFloat($('#setPPN').value) || 0;
-                settings.pph25 = parseFloat($('#setPPh25').value) || 0;
-                settings.pph21 = parseFloat($('#setPPh21').value) || 0;
-                settings.ptShare = parseFloat($('#setPTShare').value) || 0;
-                settings.minGrosir = parseFloat($('#setMinGrosir').value) || 0;
-                settings.minPartai = parseFloat($('#setMinPartai').value) || 0;
-                settings.selisihGrosir = parseFloat($('#setSelisihGrosir').value) || 0;
-                settings.marginDefault = parseFloat($('#setMarginDefault').value) || 0;
-                settings.fifoMethod = $('#setFifoMethod').value;
-                await saveAll();
-                showToast('Sukses', 'Pengaturan disimpan', 'success');
-            });
-
-            document.getElementById('resetAllDataBtn').addEventListener('click', async () => {
-                if (!confirm('HAPUS SEMUA DATA? Tindakan ini tidak bisa dibatalkan.')) return;
-                batches = [];
-                sales = [];
-                expenses = [];
-                settings = { ...defaultSettings };
-                company = { ...defaultCompany };
-                customers = {};
-                await saveAll();
-                refreshAll();
-                showToast('Reset', 'Semua data dihapus', 'success');
-            });
-
-            /* ========== DASHBOARD ========== */
-            function refreshDashboard() {
-                const map = stockPerProduct();
-                $('#dashboardSummaryCards').innerHTML = defaultProducts.map(p => `
-                <div class="card p-3 text-center hover-lift">
-                  <p class="text-xs opacity-60">${p}</p>
-                  <p class="font-bold text-lg">${map[p] || 0} kg</p>
-                </div>`).join('');
-                const today = dateNow();
-                const weekLater = new Date();
-                weekLater.setDate(weekLater.getDate() + 7);
-                const critical = batches.filter(b => new Date(b.tglKadaluarsa) <= weekLater && b.berat > b.used);
-                $('#expiringBatches').innerHTML = critical.length ? critical.map(b =>
-                    `<p>⚠️ ${b.produk}: sisa ${b.berat - b.used} kg (exp: ${b.tglKadaluarsa})</p>`).join('') :
-                    '<p class="text-green-600">✅ Tidak ada batch kritis</p>';
-                $('#statusTotalStock').textContent = Object.values(map).reduce((a, b) => a + b, 0) + ' kg';
-                $('#statusActiveBatches').textContent = batches.filter(b => b.berat > b.used).length;
-                $('#statusCriticalBatches').textContent = critical.length;
-                const last7 = [];
-                for (let i = 6; i >= 0; i--) {
-                    const d = new Date();
-                    d.setDate(d.getDate() - i);
-                    const ds = d.toISOString().split('T')[0];
-                    last7.push(sales.filter(s => s.tanggal === ds).reduce((a, s) => a + s.qty * s.hargaJual, 0));
-                }
-                const ctx = $('#chartRevenue')?.getContext('2d');
-                if (ctx) {
-                    if (window._revChart) window._revChart.destroy();
-                    window._revChart = new Chart(ctx, {
-                        type: 'bar',
-                        data: { labels: last7.map((_, i) => 'H-' + (6 - i)), datasets: [{ label: 'Pendapatan',
-                                data: last7, backgroundColor: '#3b82f6' }] }
-                    });
-                }
-                const topProds = {};
-                sales.forEach(s => { if (!topProds[s.produk]) topProds[s.produk] = 0;
-                    topProds[s.produk] += s.qty; });
-                const sorted = Object.entries(topProds).sort((a, b) => b[1] - a[1]).slice(0, 5);
-                $('#topProductsList').innerHTML = sorted.length ? sorted.map(([p, q], i) =>
-                    `<p>${i+1}. ${p} — ${q} kg</p>`).join('') : '<p class="opacity-50">Belum ada data</p>';
-                const recent = [...sales].slice(-5).reverse();
-                $('#recentActivityList').innerHTML = recent.length ? recent.map(s =>
-                    `<p>${s.tanggal} — ${s.klien} beli ${s.produk} ${s.qty}kg</p>`).join('') :
-                    '<p class="opacity-50">Belum ada aktivitas</p>';
-                const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split(
-                    'T')[0];
-                const monthSales = sales.filter(s => s.tanggal >= monthStart);
-                const pendapatan = monthSales.reduce((a, s) => a + s.qty * s.hargaJual, 0);
-                const hpp = monthSales.reduce((a, s) => a + s.qty * s.hpp, 0);
-                const beban = expenses.filter(e => e.tanggal >= monthStart).reduce((a, e) => a + e.jumlah, 0);
-                $('#financeSummary').innerHTML = `
-                <div class="card p-3 text-center"><span class="opacity-60">Pendapatan</span><p class="font-bold">${formatRupiah(pendapatan)}</p></div>
-                <div class="card p-3 text-center"><span class="opacity-60">HPP</span><p class="font-bold">${formatRupiah(hpp)}</p></div>
-                <div class="card p-3 text-center"><span class="opacity-60">Laba Kotor</span><p class="font-bold">${formatRupiah(pendapatan-hpp)}</p></div>
-                <div class="card p-3 text-center"><span class="opacity-60">Laba Bersih</span><p class="font-bold">${formatRupiah(pendapatan-hpp-beban)}</p></div>`;
-                $('#storedBatchesCount').textContent = batches.length;
-                $('#storedTransactionsCount').textContent = sales.length;
-                $('#storedCustomersCount').textContent = Object.keys(customers).length;
-                $('#dashDate').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric',
-                    month: 'long', year: 'numeric' });
-            }
-
-            /* Widget toggle */
-            document.addEventListener('change', function(e) {
-                if (e.target.classList.contains('widget-toggle')) {
-                    const widget = e.target.dataset.widget;
-                    const el = document.getElementById('widget-' + widget);
-                    if (el) el.style.display = e.target.checked ? '' : 'none';
-                }
-            });
-
-            /* ========== APP GLOBAL ========== */
-            CFS.App = {
-                backupData: async function() {
-                    const data = { batches, sales, expenses, settings, company, customers };
-                    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-                    const a = document.createElement('a');
-                    a.href = URL.createObjectURL(blob);
-                    a.download = `cibitung_frozen_backup_${dateNow()}.json`;
-                    a.click();
-                    showToast('Backup', 'Data diunduh', 'success');
-                },
-                restorePrompt: function() {
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = '.json';
-                    input.onchange = async function(e) {
-                        const file = e.target.files[0];
-                        if (!file) return;
-                        const text = await file.text();
-                        try {
-                            const data = JSON.parse(text);
-                            batches = data.batches || [];
-                            sales = data.sales || [];
-                            expenses = data.expenses || [];
-                            settings = data.settings || defaultSettings;
-                            company = data.company || defaultCompany;
-                            customers = data.customers || {};
-                            await saveAll();
-                            refreshAll();
-                            showToast('Restore', 'Data dipulihkan', 'success');
-                        } catch (err) {
-                            showToast('Error', 'File tidak valid', 'error');
-                        }
-                    };
-                    input.click();
-                }
-            };
-
-            function refreshAll() {
-                refreshDashboard();
-                refreshStockTab();
-                refreshSalesTab();
-                refreshCRMTab();
-                refreshFinanceTab();
-                refreshHistoryTab();
-                refreshReportsTab();
-                refreshSettingsTab();
-                updateProductSelects();
-            }
-
-            /* Dark mode */
-            window.toggleDarkMode = function() {
-                document.documentElement.classList.toggle('dark');
-                localStorage.setItem('cfs_dark', document.documentElement.classList.contains('dark') ? '1' : '0');
-                const icon = $('#darkIcon');
-                icon.className = document.documentElement.classList.contains('dark') ?
-                    'ph ph-sun text-lg text-yellow-400' : 'ph ph-moon text-lg';
-                $('#sidebar-mode').textContent = document.documentElement.classList.contains('dark') ? 'Gelap' :
-                    'Terang';
-            };
-
-            /* Init */
-            (async function init() {
-                await loadData();
-                if (localStorage.getItem('cfs_dark') === '1') {
-                    document.documentElement.classList.add('dark');
-                    $('#darkIcon').className = 'ph ph-sun text-lg text-yellow-400';
-                    $('#sidebar-mode').textContent = 'Gelap';
-                }
-                updateProductSelects();
-                refreshAll();
-                setInterval(() => {
-                    $('#lastUpdate').textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit',
-                        minute: '2-digit' });
-                }, 1000);
-            })();
-
-        })();
-    </script>
+<!-- ==================== JAVASCRIPT EXTERNAL ==================== -->
+<script src="js/app.js"></script>
 </body>
 </html>
