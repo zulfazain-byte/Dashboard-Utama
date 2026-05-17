@@ -1,5 +1,5 @@
 /* ============================================================
-   Cibitung Frozen ERP Ultimate v5.4 — Main Application (FULL)
+   Cibitung Frozen ERP Ultimate v5.4 — Main Application (FIX)
    ============================================================ */
 window.CFS = window.CFS || {};
 
@@ -9,7 +9,7 @@ window.CFS = window.CFS || {};
     const Storage = CFS.Storage;
     const modulesInitialized = {};
 
-    // --------------- TOAST NOTIFICATION ---------------
+    // --------------- TOAST ---------------
     const toast = document.getElementById('toast');
     const toastIcon = document.getElementById('toastIcon');
     const toastTitle = document.getElementById('toastTitle');
@@ -38,28 +38,24 @@ window.CFS = window.CFS || {};
     }
     window.showToast = showToast;
 
-    // --------------- SWITCH TAB (MAIN) ---------------
+    // --------------- SWITCH TAB (SATU FUNGSI) ---------------
     function switchTab(tabId) {
-        // Hide all tab contents
         document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-        // Remove active from all buttons
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.classList.remove('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
             btn.classList.add('opacity-70');
         });
 
-        // Show target tab
         const target = document.getElementById(tabId);
         if (target) target.classList.add('active');
 
-        // Mark button active
         const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
         if (btn) {
             btn.classList.add('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
             btn.classList.remove('opacity-70');
         }
 
-        // Initialize/refresh module based on tab
+        // Inisialisasi modul
         switch (tabId) {
             case 'tab-dashboard':
                 if (CFS.Dashboard) {
@@ -203,7 +199,7 @@ window.CFS = window.CFS || {};
         input.click();
     }
 
-    // --------------- DARK MODE TOGGLE ---------------
+    // --------------- DARK MODE ---------------
     window.toggleDarkMode = function() {
         document.documentElement.classList.toggle('dark');
         localStorage.setItem('cfs_dark', document.documentElement.classList.contains('dark') ? '1' : '0');
@@ -213,7 +209,7 @@ window.CFS = window.CFS || {};
         if (sidebarMode) sidebarMode.textContent = document.documentElement.classList.contains('dark') ? 'Gelap' : 'Terang';
     };
 
-    // ===================== FULL FALLBACK FUNCTIONS =====================
+    // ===================== FALLBACK FUNCTIONS =====================
 
     function initPurchaseTabFull() {
         const form = document.getElementById('purchaseForm');
@@ -230,14 +226,15 @@ window.CFS = window.CFS || {};
 
         function populateSuppliers() {
             const sups = Storage.getSuppliers();
-            supplierSelect.innerHTML = '<option value="">Pilih Supplier</option>' + sups.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            if (supplierSelect) supplierSelect.innerHTML = '<option value="">Pilih Supplier</option>' + sups.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
         }
         function populateProducts() {
             const prods = Storage.getProducts().length ? Storage.getProducts().map(p => p.name) : Storage.defaultProducts;
-            produkSelect.innerHTML = '<option value="">Pilih Produk</option>' + prods.map(p => `<option>${p}</option>`).join('');
+            if (produkSelect) produkSelect.innerHTML = '<option value="">Pilih Produk</option>' + prods.map(p => `<option>${p}</option>`).join('');
         }
         function renderPOList() {
-            const pos = Storage.getBatches().filter(b => b.supplier && b.used === 0); // batch yang belum terpakai
+            if (!tbody) return;
+            const pos = Storage.getBatches().filter(b => b.supplier && b.used === 0);
             tbody.innerHTML = pos.length === 0 ? '<tr><td colspan="8" class="text-center p-4 opacity-50">Belum ada PO</td></tr>' :
             pos.map(b => {
                 const sup = Storage.getSuppliers().find(s => s.id === b.supplier);
@@ -285,11 +282,9 @@ window.CFS = window.CFS || {};
             renderPOList();
             if (CFS.Dashboard) CFS.Dashboard.refresh();
         });
-        // Expose accept PO
         CFS.App.acceptPO = async (batchId) => {
             const batch = Storage.getBatches().find(b => b.id === batchId);
             if (!batch) return;
-            // Tandai sebagai diterima (tidak ada status khusus, hanya used tetap 0)
             showToast('Sukses', 'PO diterima. Batch siap digunakan.', 'success');
             renderPOList();
         };
@@ -309,6 +304,7 @@ window.CFS = window.CFS || {};
         const tbody = document.getElementById('supplierTableBody');
 
         function renderSuppliers() {
+            if (!tbody) return;
             const sups = Storage.getSuppliers();
             tbody.innerHTML = sups.length === 0 ? '<tr><td colspan="6" class="text-center p-4 opacity-50">Belum ada supplier</td></tr>' :
             sups.map(s => `<tr class="border-t"><td class="p-2">${s.name}</td><td class="p-2">${s.contact || '-'}</td><td class="p-2">${s.address || '-'}</td><td class="p-2">${s.email || '-'}</td><td class="p-2">${s.totalPO || 0}</td><td class="p-2"><button onclick="CFS.App.deleteSupplier('${s.id}')" class="text-red-500">🗑️</button></td></tr>`).join('');
@@ -317,14 +313,14 @@ window.CFS = window.CFS || {};
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const name = nameInput.value.trim();
+            const name = nameInput?.value.trim();
             if (!name) return;
             await Storage.addSupplier({
                 name,
-                contact: contactInput.value,
-                address: addressInput.value,
-                email: emailInput.value,
-                bank: bankInput.value,
+                contact: contactInput?.value || '',
+                address: addressInput?.value || '',
+                email: emailInput?.value || '',
+                bank: bankInput?.value || '',
                 npwp: npwpInput?.value || '',
                 notes: notesInput?.value || '',
                 totalPO: 0
@@ -350,6 +346,7 @@ window.CFS = window.CFS || {};
         const tbody = document.getElementById('productTableBody');
 
         function renderProducts() {
+            if (!tbody) return;
             const prods = Storage.getProducts();
             tbody.innerHTML = prods.length === 0 ? '<tr><td colspan="8" class="text-center p-4 opacity-50">Belum ada produk kustom</td></tr>' :
             prods.map(p => {
@@ -360,15 +357,15 @@ window.CFS = window.CFS || {};
         renderProducts();
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const name = nameInput.value.trim();
+            const name = nameInput?.value.trim();
             if (!name) return;
             await Storage.addProduct({
                 name,
-                category: categoryInput.value,
-                minStock: parseInt(minStockInput.value) || 10,
-                unit: unitInput.value || 'kg',
-                brand: brandInput.value,
-                sku: skuInput.value
+                category: categoryInput?.value || '',
+                minStock: parseInt(minStockInput?.value) || 10,
+                unit: unitInput?.value || 'kg',
+                brand: brandInput?.value || '',
+                sku: skuInput?.value || ''
             });
             showToast('Sukses', 'Produk baru ditambahkan.', 'success');
             form.reset();
@@ -382,6 +379,7 @@ window.CFS = window.CFS || {};
     function initCRMTabFull() {
         const tbody = document.getElementById('crmTableBody');
         function renderCRM() {
+            if (!tbody) return;
             const custs = Storage.getCustomers(); const names = Object.keys(custs);
             if (names.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center p-4 opacity-50">Belum ada pelanggan</td></tr>'; return; }
             const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -415,14 +413,15 @@ window.CFS = window.CFS || {};
         const tbody = document.getElementById('customerDetailTableBody');
 
         function renderDetail() {
+            if (!tbody) return;
             const custs = Storage.getCustomers(); const names = Object.keys(custs);
             tbody.innerHTML = names.length === 0 ? '<tr><td colspan="7" class="text-center p-4 opacity-50">Belum ada pelanggan</td></tr>' :
             names.map(n => { const c = custs[n]; return `<tr class="border-t"><td class="p-2">${n}</td><td class="p-2">${c.phone || '-'}</td><td class="p-2">${c.email || '-'}</td><td class="p-2">${c.ktp || '-'}</td><td class="p-2">${c.type || '-'}</td><td class="p-2">${c.preferredChannel || '-'}</td><td class="p-2"><button onclick="CFS.App.deleteCustomerDetail('${n}')" class="text-red-500">🗑️</button></td></tr>`; }).join('');
         }
         renderDetail();
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); const name = fullName.value.trim(); if (!name) return;
-            await Storage.saveCustomerDetail(name, { phone: phone.value, email: email.value, address: address.value, ktp: ktp.value, npwp: npwp.value, type: type.value, preferredChannel: channel.value, notes: notes.value });
+            e.preventDefault(); const name = fullName?.value.trim(); if (!name) return;
+            await Storage.saveCustomerDetail(name, { phone: phone?.value, email: email?.value, address: address?.value, ktp: ktp?.value, npwp: npwp?.value, type: type?.value, preferredChannel: channel?.value, notes: notes?.value });
             showToast('Sukses', 'Detail pelanggan disimpan.', 'success'); form.reset(); renderDetail();
         });
         CFS.App.deleteCustomerDetail = async (name) => { if (confirm('Hapus pelanggan?')) { await Storage.deleteCustomer(name); renderDetail(); } };
@@ -431,12 +430,12 @@ window.CFS = window.CFS || {};
     function initPricingTabFull() {
         const tbody = document.getElementById('pricingTableBody');
         function renderPricing() {
+            if (!tbody) return;
             const prods = Storage.getProducts().length ? Storage.getProducts().map(p=>p.name) : Storage.defaultProducts;
             const pricing = Storage.getPricing();
             tbody.innerHTML = prods.map(p => {
                 const price = pricing[p] || {};
-                const hpp = CFS.Inventory?.getStockPerProduct?.() ? (CFS.Inventory.calculateHPP?.(Storage.getBatches().find(b=>b.produk===p))||0) : 0;
-                return `<tr class="border-t"><td class="p-2">${p}</td><td class="p-2 text-right">${hpp ? 'Rp '+hpp.toLocaleString('id-ID') : '-'}</td><td class="p-2 text-right"><input type="number" id="price_offline_${p}" value="${price.offline || ''}" class="w-20 text-right" placeholder="Rp"></td><td class="p-2 text-right"><input type="number" id="price_online_${p}" value="${price.online || ''}" class="w-20 text-right" placeholder="Rp"></td><td class="p-2 text-right"><input type="number" id="price_fee_${p}" value="${price.onlineFee || ''}" class="w-16 text-right" placeholder="%"></td><td class="p-2 text-center"><button onclick="CFS.App.saveProductPricing('${p}')" class="btn btn-xs btn-primary">Simpan</button></td></tr>`;
+                return `<tr class="border-t"><td class="p-2">${p}</td><td class="p-2 text-right">${price.avgBuy ? 'Rp '+price.avgBuy.toLocaleString('id-ID') : '-'}</td><td class="p-2 text-right"><input type="number" id="price_offline_${p}" value="${price.offline || ''}" class="w-20 text-right" placeholder="Rp"></td><td class="p-2 text-right"><input type="number" id="price_online_${p}" value="${price.online || ''}" class="w-20 text-right" placeholder="Rp"></td><td class="p-2 text-right"><input type="number" id="price_fee_${p}" value="${price.onlineFee || ''}" class="w-16 text-right" placeholder="%"></td><td class="p-2 text-center"><button onclick="CFS.App.saveProductPricing('${p}')" class="btn btn-xs btn-primary">Simpan</button></td></tr>`;
             }).join('');
         }
         renderPricing();
@@ -471,15 +470,16 @@ window.CFS = window.CFS || {};
         const tbody = document.getElementById('deliveryTableBody');
 
         function renderDeliveries() {
+            if (!tbody) return;
             const deliveries = Storage.getDeliveries();
             tbody.innerHTML = deliveries.length === 0 ? '<tr><td colspan="6" class="text-center p-4 opacity-50">Belum ada pengiriman</td></tr>' :
             deliveries.map(d => { const sale = Storage.getSales().find(s=>s.id===d.saleId); return `<tr class="border-t"><td class="p-2">${d.saleId}</td><td class="p-2">${sale?.klien||'-'}</td><td class="p-2">${d.courier}</td><td class="p-2">${d.tracking||'-'}</td><td class="p-2">${d.status}</td><td class="p-2">${d.estimasi||'-'}</td></tr>`; }).join('');
         }
         renderDeliveries();
-        saleSelect.innerHTML = '<option value="">Pilih Transaksi</option>' + Storage.getSales().map(s => `<option value="${s.id}">${s.tanggal} - ${s.klien} (${s.produk})</option>`).join('');
+        if (saleSelect) saleSelect.innerHTML = '<option value="">Pilih Transaksi</option>' + Storage.getSales().map(s => `<option value="${s.id}">${s.tanggal} - ${s.klien} (${s.produk})</option>`).join('');
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); if (!saleSelect.value || !courier.value) return;
-            await Storage.addDelivery({ saleId: saleSelect.value, courier: courier.value, tracking: tracking.value, status: status.value, estimasi: estimasi.value, tglKirim: tglKirim?.value, notes: notes?.value });
+            e.preventDefault(); if (!saleSelect?.value || !courier?.value) return;
+            await Storage.addDelivery({ saleId: saleSelect.value, courier: courier.value, tracking: tracking?.value, status: status?.value, estimasi: estimasi?.value, tglKirim: tglKirim?.value, notes: notes?.value });
             showToast('Sukses', 'Pengiriman dicatat.', 'success'); form.reset(); renderDeliveries(); if (CFS.Dashboard) CFS.Dashboard.refresh();
         });
     }
@@ -495,17 +495,18 @@ window.CFS = window.CFS || {};
         const tbody = document.getElementById('opnameTableBody');
 
         function renderOpname() {
+            if (!tbody) return;
             const list = Storage.getOpname();
             tbody.innerHTML = list.length === 0 ? '<tr><td colspan="6" class="text-center p-4 opacity-50">Belum ada opname</td></tr>' :
             list.map(o => { const stockSistem = (CFS.Inventory?.getStockPerProduct()||{})[o.produk]||0; return `<tr class="border-t"><td class="p-2">${o.tanggal}</td><td class="p-2">${o.produk}</td><td class="p-2">${o.sistem||stockSistem} kg</td><td class="p-2">${o.fisik} kg</td><td class="p-2 ${o.selisih<0?'text-red-600':'text-green-600'}">${o.selisih} kg</td><td class="p-2">${o.catatan||''}</td></tr>`; }).join('');
         }
         renderOpname();
-        produkSelect.innerHTML = '<option value="">Pilih Produk</option>' + (Storage.getProducts().length ? Storage.getProducts().map(p=>`<option>${p.name}</option>`).join('') : Storage.defaultProducts.map(p=>`<option>${p}</option>`).join(''));
+        if (produkSelect) produkSelect.innerHTML = '<option value="">Pilih Produk</option>' + (Storage.getProducts().length ? Storage.getProducts().map(p=>`<option>${p.name}</option>`).join('') : Storage.defaultProducts.map(p=>`<option>${p}</option>`).join(''));
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); const produk = produkSelect.value; const fisik = parseFloat(fisikInput.value); const tanggal = tglInput.value;
+            e.preventDefault(); const produk = produkSelect?.value; const fisik = parseFloat(fisikInput?.value); const tanggal = tglInput?.value;
             if (!produk || isNaN(fisik) || !tanggal) return;
             const sistem = CFS.Inventory?.getStockPerProduct()?.[produk]||0;
-            await Storage.addOpname({ produk, sistem, fisik, selisih: fisik-sistem, tanggal, catatan: notesInput.value });
+            await Storage.addOpname({ produk, sistem, fisik, selisih: fisik-sistem, tanggal, catatan: notesInput?.value || '' });
             showToast('Sukses', 'Stock opname disimpan.', 'success'); form.reset(); renderOpname();
         });
     }
@@ -520,14 +521,15 @@ window.CFS = window.CFS || {};
         const tbody = document.getElementById('returnTableBody');
 
         function renderReturns() {
+            if (!tbody) return;
             const list = Storage.getReturns();
             tbody.innerHTML = list.length === 0 ? '<tr><td colspan="5" class="text-center p-4 opacity-50">Belum ada retur</td></tr>' :
             list.map(r => { const sale = Storage.getSales().find(s=>s.id===r.saleId); return `<tr class="border-t"><td class="p-2">${r.tanggal||'-'}</td><td class="p-2">${sale?.klien||'-'}</td><td class="p-2">${sale?.produk||'-'}</td><td class="p-2">${r.qty} kg</td><td class="p-2">${r.alasan}</td></tr>`; }).join('');
         }
         renderReturns();
-        saleSelect.innerHTML = '<option value="">Pilih Transaksi</option>' + Storage.getSales().map(s => `<option value="${s.id}">${s.tanggal} - ${s.klien} (${s.produk} ${s.qty}kg)</option>`).join('');
+        if (saleSelect) saleSelect.innerHTML = '<option value="">Pilih Transaksi</option>' + Storage.getSales().map(s => `<option value="${s.id}">${s.tanggal} - ${s.klien} (${s.produk} ${s.qty}kg)</option>`).join('');
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); const saleId = saleSelect.value; const qty = parseFloat(qtyInput.value); const alasan = alasanInput.value.trim();
+            e.preventDefault(); const saleId = saleSelect?.value; const qty = parseFloat(qtyInput?.value); const alasan = alasanInput?.value.trim();
             if (!saleId || !qty || !alasan) return;
             const sale = Storage.getSales().find(s=>s.id===saleId); if (!sale) return;
             await Storage.addReturn({ saleId, qty, alasan, tanggal: new Date().toISOString().split('T')[0], produk: sale.produk, batchUsed: sale.batchUsed });
@@ -539,6 +541,7 @@ window.CFS = window.CFS || {};
         const tbody = document.getElementById('historyTableBody');
         const form = document.getElementById('filterTransaksi');
         function renderHistory(filter = {}) {
+            if (!tbody) return;
             let sales = Storage.getSales();
             if (filter.produk) sales = sales.filter(s => s.produk === filter.produk);
             if (filter.klien) sales = sales.filter(s => s.klien.toLowerCase().includes(filter.klien.toLowerCase()));
@@ -547,10 +550,12 @@ window.CFS = window.CFS || {};
             if (filter.channel) sales = sales.filter(s => s.channel === filter.channel);
             tbody.innerHTML = sales.length === 0 ? '<tr><td colspan="8" class="text-center p-4 opacity-50">Tidak ada transaksi</td></tr>' :
             sales.map(s => `<tr class="border-t"><td class="p-2">${s.tanggal}</td><td class="p-2">${s.klien}</td><td class="p-2">${s.produk}</td><td class="p-2 text-right">${s.qty} kg</td><td class="p-2 text-right">Rp ${(s.qty*s.hargaJual - (s.diskon||0)).toLocaleString('id-ID')}</td><td class="p-2 text-center">${s.channel==='online'?'🌐':'🏪'}</td><td class="p-2 text-center">${s.tier}</td><td class="p-2 text-center"><button onclick="CFS.App.deleteSale('${s.id}')" class="text-red-500">🗑️</button></td></tr>`).join('');
-            document.getElementById('historyTotalTrx').textContent = sales.length;
-            document.getElementById('historyTotalRevenue').textContent = 'Rp ' + sales.reduce((a,s) => a + (s.qty*s.hargaJual - (s.diskon||0)), 0).toLocaleString('id-ID');
+            const totalTrx = document.getElementById('historyTotalTrx');
+            const totalRev = document.getElementById('historyTotalRevenue');
+            if (totalTrx) totalTrx.textContent = sales.length;
+            if (totalRev) totalRev.textContent = 'Rp ' + sales.reduce((a,s) => a + (s.qty*s.hargaJual - (s.diskon||0)), 0).toLocaleString('id-ID');
         }
-        if (form) form.addEventListener('submit', (e) => { e.preventDefault(); renderHistory({ produk: document.getElementById('filterProduk').value, klien: document.getElementById('filterKlien').value, start: document.getElementById('filterStart').value, end: document.getElementById('filterEnd').value, channel: document.getElementById('filterChannel').value }); });
+        if (form) form.addEventListener('submit', (e) => { e.preventDefault(); renderHistory({ produk: document.getElementById('filterProduk')?.value, klien: document.getElementById('filterKlien')?.value, start: document.getElementById('filterStart')?.value, end: document.getElementById('filterEnd')?.value, channel: document.getElementById('filterChannel')?.value }); });
         renderHistory();
         CFS.App.deleteSale = async (id) => { if (confirm('Hapus transaksi?')) { await Storage.deleteSale(id); renderHistory(); if (CFS.Dashboard) CFS.Dashboard.refresh(); } };
         document.getElementById('clearAllHistoryBtn')?.addEventListener('click', async () => { if (confirm('Hapus SEMUA riwayat?')) { for (const s of Storage.getSales()) await Storage.deleteSale(s.id); renderHistory(); showToast('Sukses', 'Semua riwayat dihapus.', 'success'); } });
@@ -559,6 +564,7 @@ window.CFS = window.CFS || {};
     function initAuditTabFull() {
         const tbody = document.getElementById('auditTrailTableBody');
         function renderAudit() {
+            if (!tbody) return;
             const trail = Storage.getAuditTrail();
             tbody.innerHTML = trail.length === 0 ? '<tr><td colspan="3" class="text-center p-4 opacity-50">Belum ada log.</td></tr>' :
             trail.map(t => `<tr class="border-t text-sm"><td class="p-2">${new Date(t.waktu).toLocaleString('id-ID')}</td><td class="p-2">${t.aksi}</td><td class="p-2">${t.detail}</td></tr>`).join('');
@@ -568,7 +574,6 @@ window.CFS = window.CFS || {};
 
     function initReportsTabFull() {
         if (CFS.Reports && CFS.Reports.init) { CFS.Reports.init(); return; }
-        // Fallback minimal
         const reportStok = document.getElementById('reportStok');
         if (reportStok) {
             const map = CFS.Inventory?.getStockPerProduct() || {};
@@ -586,19 +591,19 @@ window.CFS = window.CFS || {};
         }
     }
 
-    // --------------- GLOBAL ACTIONS ---------------
+    // --------------- GLOBAL ACTIONS (INITIALISASI) ---------------
     CFS.App = {
-        backupData,
-        restorePrompt,
-        showToast,
-        switchTab,
-        acceptPO: (id) => {}, // akan di-overwrite oleh purchase
-        deleteSupplier: (id) => {},
-        deleteProduct: (id) => {},
-        deleteCustomer: (name) => {},
-        saveProductPricing: (produk) => {},
-        deleteSale: (id) => {},
-        deleteCustomerDetail: (name) => {}
+        backupData: backupData,
+        restorePrompt: restorePrompt,
+        showToast: showToast,
+        switchTab: switchTab,
+        acceptPO: function(id) {},
+        deleteSupplier: function(id) {},
+        deleteProduct: function(id) {},
+        deleteCustomer: function(name) {},
+        saveProductPricing: function(produk) {},
+        deleteSale: function(id) {},
+        deleteCustomerDetail: function(name) {}
     };
 
     // --------------- INIT ---------------
