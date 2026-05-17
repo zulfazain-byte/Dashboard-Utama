@@ -1,9 +1,7 @@
 /* ============================================================
-   Cibitung Frozen ERP Ultimate v5.4 — Audit Module
-   Mengelola tampilan Audit Trail dengan filter dan statistik
+   Cibitung Frozen ERP Ultimate v5.4 — Audit Module (FIX)
    ============================================================ */
 window.CFS = window.CFS || {};
-
 (function() {
     'use strict';
     const Storage = CFS.Storage;
@@ -24,7 +22,6 @@ window.CFS = window.CFS || {};
         const showingInfo = document.getElementById('auditShowingInfo');
         const loadMoreBtn = document.getElementById('loadMoreAudit');
 
-        // Set default tanggal (1 bulan terakhir)
         const today = new Date();
         const oneMonthAgo = new Date(today);
         oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
@@ -49,15 +46,11 @@ window.CFS = window.CFS || {};
                 return true;
             });
 
-            // Statistik
             const totalLog = logs.length;
             const todayStr = today.toISOString().split('T')[0];
             const todayLog = logs.filter(l => l.waktu.startsWith(todayStr)).length;
             const actionCount = {};
-            logs.forEach(l => {
-                const action = l.aksi.split(' ')[0];
-                actionCount[action] = (actionCount[action] || 0) + 1;
-            });
+            logs.forEach(l => { const a = l.aksi.split(' ')[0]; actionCount[a] = (actionCount[a] || 0) + 1; });
             const topAction = Object.entries(actionCount).sort((a,b) => b[1] - a[1])[0]?.[0] || '-';
             const lastTime = logs[0]?.waktu ? new Date(logs[0].waktu).toLocaleString('id-ID') : '-';
 
@@ -66,7 +59,6 @@ window.CFS = window.CFS || {};
             if (topActionEl) topActionEl.textContent = topAction;
             if (lastTimeEl) lastTimeEl.textContent = lastTime;
 
-            // Pagination
             const totalPages = Math.ceil(logs.length / perPage);
             const pageLogs = logs.slice(0, currentPage * perPage);
 
@@ -75,11 +67,8 @@ window.CFS = window.CFS || {};
                     tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4 opacity-50">Tidak ada log yang sesuai.</td></tr>';
                 } else {
                     tbody.innerHTML = pageLogs.map(log => {
-                        const time = new Date(log.waktu).toLocaleString('id-ID', {
-                            day: 'numeric', month: 'short', year: 'numeric',
-                            hour: '2-digit', minute: '2-digit', second: '2-digit'
-                        });
-                        const categoryBadge = log.aksi.includes('TAMBAH') ? 'bg-green-100 text-green-700' :
+                        const time = new Date(log.waktu).toLocaleString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
+                        const badgeClass = log.aksi.includes('TAMBAH') ? 'bg-green-100 text-green-700' :
                             log.aksi.includes('EDIT') ? 'bg-blue-100 text-blue-700' :
                             log.aksi.includes('HAPUS') ? 'bg-red-100 text-red-700' :
                             log.aksi.includes('PENJUALAN') ? 'bg-emerald-100 text-emerald-700' :
@@ -88,26 +77,32 @@ window.CFS = window.CFS || {};
                             log.aksi.includes('RESET') ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700';
                         return `<tr class="border-t hover:bg-slate-50 dark:hover:bg-slate-700 transition">
                             <td class="p-2 text-xs">${time}</td>
-                            <td class="p-2"><span class="badge text-xs ${categoryBadge}">${log.aksi}</span></td>
+                            <td class="p-2"><span class="badge text-xs ${badgeClass}">${log.aksi}</span></td>
                             <td class="p-2">${log.detail}</td>
-                            <td class="p-2 text-center"><button onclick="CFS.App.showToast('Detail','${log.detail.replace(/'/g, "\\'")}','info')" class="text-blue-500 text-xs">🔍</button></td>
+                            <td class="p-2 text-center"><button class="text-blue-500 text-xs audit-detail-btn" data-detail="${log.detail.replace(/"/g, '&quot;')}">🔍</button></td>
                         </tr>`;
                     }).join('');
+
+                    // Pasang event listener ke tombol 🔍 (hindari inline function)
+                    tbody.querySelectorAll('.audit-detail-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            if (typeof showToast === 'function') {
+                                showToast('Detail Log', this.dataset.detail, 'info');
+                            } else {
+                                alert(this.dataset.detail);
+                            }
+                        });
+                    });
                 }
             }
 
-            if (showingInfo) {
-                showingInfo.textContent = `Menampilkan ${pageLogs.length} dari ${totalLog} entri`;
-            }
-            if (loadMoreBtn) {
-                loadMoreBtn.classList.toggle('hidden', currentPage >= totalPages);
-            }
+            if (showingInfo) showingInfo.textContent = `Menampilkan ${pageLogs.length} dari ${totalLog} entri`;
+            if (loadMoreBtn) loadMoreBtn.classList.toggle('hidden', currentPage >= totalPages);
         }
 
         if (applyBtn) applyBtn.addEventListener('click', () => renderAudit(true));
         if (loadMoreBtn) loadMoreBtn.addEventListener('click', () => { currentPage++; renderAudit(false); });
 
-        // Ekspor CSV
         if (exportBtn) {
             exportBtn.addEventListener('click', () => {
                 const logs = Storage.getAuditTrail();
@@ -117,23 +112,26 @@ window.CFS = window.CFS || {};
                 a.href = URL.createObjectURL(blob);
                 a.download = `audit_trail_${new Date().toISOString().slice(0,10)}.csv`;
                 a.click();
-                showToast('Sukses', 'Log audit diunduh sebagai CSV.', 'success');
+                if (typeof showToast === 'function') showToast('Sukses', 'Log audit diunduh.', 'success');
             });
         }
 
-        // Bersihkan log
         if (clearBtn) {
             clearBtn.addEventListener('click', async () => {
-                if (confirm('Hapus semua log audit? Data lain tidak terpengaruh.')) {
+                if (!confirm('Hapus semua log audit? Data lain tetap aman.')) return;
+                try {
                     await localforage.setItem('cfs_audit_trail', []);
-                    Storage.getAuditTrail().length = 0;
+                    // Kosongkan array di storage juga
+                    const arr = Storage.getAuditTrail();
+                    arr.length = 0;
                     renderAudit(true);
-                    showToast('Sukses', 'Log audit dibersihkan.', 'success');
+                    if (typeof showToast === 'function') showToast('Sukses', 'Log audit dibersihkan.', 'success');
+                } catch (e) {
+                    console.error(e);
                 }
             });
         }
 
-        // Render awal
         renderAudit(true);
     }
 
