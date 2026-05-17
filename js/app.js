@@ -738,6 +738,26 @@ window.CFS = window.CFS || {};
             reportDelivery.innerHTML = dels.length === 0 ? '<p class="opacity-50">-</p>' : dels.map(d => `<p>${d.saleId} - ${d.courier} (${d.status})</p>`).join('');
         }
     }
+   // Sub-tab Pengaturan
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('settings-tab-btn')) {
+        const tab = e.target.dataset.settingsTab;
+        document.querySelectorAll('.settings-tab-btn').forEach(b => {
+            b.classList.remove('btn-primary', 'active');
+            b.classList.add('btn-secondary');
+        });
+        e.target.classList.add('btn-primary', 'active');
+        e.target.classList.remove('btn-secondary');
+        document.querySelectorAll('.settings-tab-content').forEach(c => c.classList.add('hidden'));
+        document.getElementById(tab)?.classList.remove('hidden');
+    }
+});
+
+// Toggle biaya gudang
+document.getElementById('setStorageMethod')?.addEventListener('change', function() {
+    document.getElementById('storageFlatInput')?.classList.toggle('hidden', this.value !== 'flat_monthly');
+    document.getElementById('storagePerKgInput')?.classList.toggle('hidden', this.value !== 'per_kg_day');
+});
 
     function initNotificationsTab() {
         const container = document.getElementById('notificationList');
