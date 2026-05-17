@@ -591,20 +591,19 @@ window.CFS = window.CFS || {};
         }
     }
 
-    // --------------- GLOBAL ACTIONS (INITIALISASI) ---------------
-    CFS.App = {
-        backupData: backupData,
-        restorePrompt: restorePrompt,
-        showToast: showToast,
-        switchTab: switchTab,
-        acceptPO: function(id) {},
-        deleteSupplier: function(id) {},
-        deleteProduct: function(id) {},
-        deleteCustomer: function(name) {},
-        saveProductPricing: function(produk) {},
-        deleteSale: function(id) {},
-        deleteCustomerDetail: function(name) {}
-    };
+    // --------------- GLOBAL ACTIONS (INITIALIZATION) ---------------
+CFS.App = {};
+CFS.App.backupData = backupData;
+CFS.App.restorePrompt = restorePrompt;
+CFS.App.showToast = showToast;
+CFS.App.switchTab = switchTab;
+CFS.App.acceptPO = function(id) {};
+CFS.App.deleteSupplier = function(id) {};
+CFS.App.deleteProduct = function(id) {};
+CFS.App.deleteCustomer = function(name) {};
+CFS.App.saveProductPricing = function(produk) {};
+CFS.App.deleteSale = function(id) {};
+CFS.App.deleteCustomerDetail = function(name) {};
 
     // --------------- INIT ---------------
     window.addEventListener('DOMContentLoaded', () => {
