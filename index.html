@@ -805,13 +805,88 @@
             </div>
         </div>
 
-        <!-- ==================== TAB AUDIT TRAIL ==================== -->
-        <div id="tab-audit" class="tab-content space-y-6">
-            <div class="card p-6">
-                <h2 class="text-xl font-bold mb-4"><i class="ph ph-files text-slate-600"></i> Audit Trail (Log Aktivitas)</h2>
-                <div class="overflow-x-auto max-h-96"><table class="w-full text-sm"><thead><tr><th class="p-2">Waktu</th><th class="p-2">Aksi</th><th class="p-2">Detail</th></tr></thead><tbody id="auditTrailTableBody"><tr><td colspan="3" class="text-center p-4 opacity-50">Belum ada log.</td></tr></tbody></table></div>
+        <!-- ==================== TAB AUDIT TRAIL (UPGRADE KOMPLEKS) ==================== -->
+<div id="tab-audit" class="tab-content space-y-6">
+    <div class="card p-6">
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-files text-slate-600"></i> Audit Trail & Log Aktivitas</h2>
+        
+        <!-- Penjelasan -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6 text-sm flex items-start gap-3">
+            <i class="ph ph-info text-blue-600 text-xl mt-0.5"></i>
+            <div>
+                <p class="font-medium">🔍 Audit Trail Mencatat Semua Perubahan</p>
+                <p class="opacity-70 mt-1">
+                    Setiap aksi penting seperti penambahan batch, penjualan, perubahan data, dan penghapusan dicatat di sini.
+                    Gunakan filter dan pencarian untuk melacak aktivitas tertentu. Log disimpan maksimal 500 entri terbaru.
+                </p>
             </div>
         </div>
+
+        <!-- Filter & Pencarian -->
+        <div class="flex flex-wrap gap-3 mb-6 items-end">
+            <div>
+                <label class="text-xs font-medium block mb-1">Dari Tanggal</label>
+                <input type="date" id="auditStartDate" class="w-36">
+            </div>
+            <div>
+                <label class="text-xs font-medium block mb-1">Sampai Tanggal</label>
+                <input type="date" id="auditEndDate" class="w-36">
+            </div>
+            <div>
+                <label class="text-xs font-medium block mb-1">Kategori</label>
+                <select id="auditCategoryFilter" class="w-40">
+                    <option value="all">Semua Kategori</option>
+                    <option value="TAMBAH">Tambah Data</option>
+                    <option value="EDIT">Edit Data</option>
+                    <option value="HAPUS">Hapus Data</option>
+                    <option value="PENJUALAN">Penjualan</option>
+                    <option value="BEBAN">Beban</option>
+                    <option value="BACKUP">Backup</option>
+                    <option value="PENGATURAN">Pengaturan</option>
+                    <option value="RESET">Reset</option>
+                </select>
+            </div>
+            <div>
+                <label class="text-xs font-medium block mb-1">Cari</label>
+                <input type="text" id="auditSearch" placeholder="Kata kunci..." class="w-40">
+            </div>
+            <button id="applyAuditFilter" class="btn btn-primary btn-sm h-9">🔍 Tampilkan</button>
+            <button id="exportAuditCSV" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-csv"></i> CSV</button>
+            <button id="clearAuditBtn" class="btn btn-danger btn-sm h-9"><i class="ph ph-trash"></i> Bersihkan Log</button>
+        </div>
+
+        <!-- Statistik Audit -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="auditStats">
+            <div class="card p-3 text-center"><span class="text-xs opacity-60">Total Log</span><p class="font-bold text-lg" id="auditTotalLog">0</p></div>
+            <div class="card p-3 text-center"><span class="text-xs opacity-60">Hari Ini</span><p class="font-bold text-lg" id="auditTodayLog">0</p></div>
+            <div class="card p-3 text-center"><span class="text-xs opacity-60">Aksi Terbanyak</span><p class="font-bold text-lg" id="auditTopAction">-</p></div>
+            <div class="card p-3 text-center"><span class="text-xs opacity-60">Terakhir</span><p class="font-bold text-lg" id="auditLastTime">-</p></div>
+        </div>
+
+        <!-- Tabel Audit Trail -->
+        <div class="overflow-x-auto max-h-[500px] border rounded-lg bg-white dark:bg-slate-800">
+            <table class="w-full text-sm">
+                <thead class="bg-slate-100 dark:bg-slate-700 sticky top-0 z-10">
+                    <tr>
+                        <th class="p-2 text-left w-40">Waktu</th>
+                        <th class="p-2 text-left w-32">Kategori</th>
+                        <th class="p-2 text-left">Detail</th>
+                        <th class="p-2 text-center w-20">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="auditTrailTableBody">
+                    <tr><td colspan="4" class="text-center p-4 opacity-50">Memuat data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex justify-between items-center mt-3 text-sm">
+            <span class="opacity-50" id="auditShowingInfo">Menampilkan 0 entri</span>
+            <button id="loadMoreAudit" class="btn btn-xs btn-secondary hidden">Muat Lebih Banyak</button>
+        </div>
+    </div>
+</div>
 
        <!-- ==================== TAB LAPORAN (UPGRADE KOMPLEKS) ==================== -->
 <div id="tab-reports" class="tab-content space-y-6">
@@ -1756,6 +1831,7 @@
 <script src="js/accounting.js"></script>
 <script src="js/dashboard.js"></script>
 <script src="js/reports.js"></script>
+<script src="js/audit.js"></script>
 <script src="js/app.js"></script>
 
 <!-- ==================== INLINE SCRIPTS ==================== -->
