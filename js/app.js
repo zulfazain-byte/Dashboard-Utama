@@ -52,6 +52,9 @@ window.CFS = window.CFS || {};
          case 'tab-reports':
           if (CFS.Reports) CFS.Reports.init();
           break;
+           case 'tab-audit':
+          if (CFS.Audit) CFS.Audit.init();
+          break;
         });
         const target = document.getElementById(tabId);
         if (target) target.classList.add('active');
