@@ -43,27 +43,103 @@ window.CFS = window.CFS || {};
     }
     window.showToast = showToast;
 
-    // --------------- SWITCHING TAB + LAZY INIT ---------------
     function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
-            btn.classList.add('opacity-70');
-         case 'tab-reports':
-          if (CFS.Reports) CFS.Reports.init();
-          break;
-           case 'tab-audit':
-          if (CFS.Audit) CFS.Audit.init();
-          break;
-        });
-        const target = document.getElementById(tabId);
-        if (target) target.classList.add('active');
-        const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
-        if (btn) {
-            btn.classList.add('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
-            btn.classList.remove('opacity-70');
-        }
+    // Hapus class active dari semua tab content dan tombol
+    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
+        btn.classList.add('opacity-70');
+    });
 
+    // Tampilkan konten tab yang dipilih
+    const target = document.getElementById(tabId);
+    if (target) target.classList.add('active');
+
+    // Tandai tombol yang aktif
+    const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+    if (btn) {
+        btn.classList.add('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
+        btn.classList.remove('opacity-70');
+    }
+
+    // Lazy initialization / refresh setiap modul
+    switch (tabId) {
+        case 'tab-dashboard':
+            if (CFS.Dashboard) {
+                if (!modulesInitialized.dashboard) { CFS.Dashboard.init(); modulesInitialized.dashboard = true; }
+                else CFS.Dashboard.refresh();
+            }
+            break;
+        case 'tab-stock':
+            if (CFS.Inventory) {
+                if (!modulesInitialized.stock) { CFS.Inventory.init(); modulesInitialized.stock = true; }
+                else CFS.Inventory.refreshStockTable();
+            }
+            break;
+        case 'tab-sales':
+            if (CFS.Sales) {
+                if (!modulesInitialized.sales) { CFS.Sales.init(); modulesInitialized.sales = true; }
+                else { CFS.Sales.refreshTodaySales(); if (CFS.Inventory) CFS.Inventory.populateProductDropdowns(); }
+            }
+            break;
+        case 'tab-finance':
+            if (CFS.Accounting) {
+                if (!modulesInitialized.finance) { CFS.Accounting.init(); modulesInitialized.finance = true; }
+                else CFS.Accounting.refreshFinanceSummary();
+            }
+            break;
+        case 'tab-settings':
+            if (CFS.Settings) {
+                if (!modulesInitialized.settings) { CFS.Settings.init(); modulesInitialized.settings = true; }
+                else CFS.Settings.loadSettingsToForm();
+            }
+            break;
+        case 'tab-reports':
+            if (CFS.Reports && CFS.Reports.init) CFS.Reports.init();
+            break;
+        case 'tab-audit':
+            if (CFS.Audit && CFS.Audit.init) CFS.Audit.init();
+            break;
+        case 'tab-history':
+            if (CFS.History && CFS.History.init) CFS.History.init();
+            break;
+        // Tab lainnya yang diimplementasikan di dalam app.js sendiri
+        case 'tab-purchase':
+            initPurchaseTab(); // fungsi lokal di app.js
+            break;
+        case 'tab-supplier':
+            initSupplierTab();
+            break;
+        case 'tab-products':
+            initProductsTab();
+            break;
+        case 'tab-crm':
+            initCRMTab();
+            break;
+        case 'tab-crm-detail':
+            initCRMDetailTab();
+            break;
+        case 'tab-pricing':
+            initPricingTab();
+            break;
+        case 'tab-delivery':
+            initDeliveryTab();
+            break;
+        case 'tab-opname':
+            initOpnameTab();
+            break;
+        case 'tab-return':
+            initReturnTab();
+            break;
+        case 'tab-notifications':
+            // Jika tidak ada modul khusus, biarkan konten statis
+            break;
+        case 'tab-help':
+            break;
+        default:
+            break;
+    }
+}
         // Lazy initialization / refresh
         const initMap = {
             'tab-dashboard': () => CFS.Dashboard ? (modulesInitialized.dashboard ? CFS.Dashboard.refresh() : (CFS.Dashboard.init(), modulesInitialized.dashboard = true)) : null,
