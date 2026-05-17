@@ -49,6 +49,9 @@ window.CFS = window.CFS || {};
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.classList.remove('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
             btn.classList.add('opacity-70');
+         case 'tab-reports':
+          if (CFS.Reports) CFS.Reports.init();
+          break;
         });
         const target = document.getElementById(tabId);
         if (target) target.classList.add('active');
