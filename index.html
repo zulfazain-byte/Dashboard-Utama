@@ -782,29 +782,143 @@
             </div>
         </div>
 
-        <!-- ==================== TAB RIWAYAT ==================== -->
-        <div id="tab-history" class="tab-content space-y-6">
-            <div class="card p-6">
-                <h2 class="text-xl font-bold mb-4"><i class="ph ph-clock-counter-clockwise text-amber-600"></i> Riwayat Transaksi</h2>
-                <form id="filterTransaksi" class="flex flex-wrap gap-3 mb-4">
-                    <select id="filterProduk"><option value="">Semua Produk</option></select>
-                    <input type="text" id="filterKlien" placeholder="Nama Klien">
-                    <select id="filterChannel"><option value="">Semua Channel</option><option value="online">Online</option><option value="offline">Offline</option></select>
-                    <input type="date" id="filterStart"> <input type="date" id="filterEnd">
-                    <button type="submit" class="btn btn-primary">Filter</button>
-                </form>
-                <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th class="p-2">Tanggal</th><th>Klien</th><th>Produk</th><th class="text-right">Qty</th><th class="text-right">Invoice</th><th class="text-center">Channel</th><th class="text-center">Tier</th><th class="text-center">Aksi</th></tr></thead><tbody id="historyTableBody"><tr><td colspan="8" class="text-center p-4 opacity-50">Belum ada transaksi</td></tr></tbody></table></div>
-                <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm" id="historyStats">
-                    <div class="card p-3 text-center hover-lift"><span class="opacity-60">Total Transaksi</span><p class="font-bold" id="historyTotalTrx">0</p></div>
-                    <div class="card p-3 text-center hover-lift"><span class="opacity-60">Total Pendapatan</span><p class="font-bold" id="historyTotalRevenue">Rp 0</p></div>
-                    <div class="card p-3 text-center hover-lift"><span class="opacity-60">Rata-rata/hari</span><p class="font-bold" id="historyAvgDaily">Rp 0</p></div>
-                    <div class="card p-3 text-center hover-lift"><span class="opacity-60">Transaksi Hari Ini</span><p class="font-bold" id="historyTodayTrx">0</p></div>
-                </div>
-                <div class="mt-4 card p-4"><h3 class="font-semibold mb-2"><i class="ph ph-chart-line text-blue-500"></i> Grafik Riwayat Pendapatan (30 Hari)</h3><canvas id="chartHistoryRevenue" height="150"></canvas></div>
-                <div class="mt-4 flex justify-end"><button id="clearAllHistoryBtn" class="btn btn-danger btn-sm"><i class="ph ph-trash"></i> Hapus Semua Riwayat</button></div>
+        <!-- ==================== TAB RIWAYAT (UPGRADE KOMPLEKS) ==================== -->
+<div id="tab-history" class="tab-content space-y-6">
+    <div class="card p-6">
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-clock-counter-clockwise text-amber-600"></i> Riwayat Transaksi Lengkap</h2>
+        
+        <!-- Penjelasan -->
+        <div class="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg mb-6 text-sm flex items-start gap-3">
+            <i class="ph ph-info text-amber-600 text-xl mt-0.5"></i>
+            <div>
+                <p class="font-medium">📜 Pusat Riwayat Transaksi</p>
+                <p class="opacity-70 mt-1">
+                    Semua transaksi penjualan tercatat di sini. Gunakan filter di bawah untuk mencari transaksi spesifik.
+                    Klik ikon 🔍 untuk melihat detail, 🖨️ untuk cetak invoice, atau 🗑️ untuk menghapus transaksi.
+                </p>
             </div>
         </div>
 
+        <!-- Filter & Pencarian Lanjutan -->
+        <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+                <div>
+                    <label class="text-xs font-medium block mb-1">Dari Tanggal</label>
+                    <input type="date" id="historyStartDate" class="w-full">
+                </div>
+                <div>
+                    <label class="text-xs font-medium block mb-1">Sampai Tanggal</label>
+                    <input type="date" id="historyEndDate" class="w-full">
+                </div>
+                <div>
+                    <label class="text-xs font-medium block mb-1">Produk</label>
+                    <select id="historyFilterProduk" class="w-full">
+                        <option value="">Semua Produk</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-medium block mb-1">Channel</label>
+                    <select id="historyFilterChannel" class="w-full">
+                        <option value="">Semua Channel</option>
+                        <option value="online">🌐 Online</option>
+                        <option value="offline">🏪 Offline</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-medium block mb-1">Tier</label>
+                    <select id="historyFilterTier" class="w-full">
+                        <option value="">Semua Tier</option>
+                        <option value="ecer">Ecer</option>
+                        <option value="grosir">Grosir</option>
+                        <option value="partai">Partai Besar</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-medium block mb-1">Klien</label>
+                    <input type="text" id="historyFilterKlien" placeholder="Nama klien..." class="w-full">
+                </div>
+                <div class="flex items-end gap-2">
+                    <button id="applyHistoryFilter" class="btn btn-primary btn-sm h-9">🔍 Tampilkan</button>
+                    <button id="resetHistoryFilter" class="btn btn-secondary btn-sm h-9">↺ Reset</button>
+                </div>
+                <div class="flex items-end gap-2 justify-end">
+                    <button id="exportHistoryCSV" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-csv"></i> CSV</button>
+                    <button id="exportHistoryExcel" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-xls"></i> Excel</button>
+                </div>
+            </div>
+            <p class="text-xs opacity-50 mt-2" id="historyFilterInfo">Menampilkan semua transaksi</p>
+        </div>
+
+        <!-- Statistik Riwayat 6 Kartu -->
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6" id="historyStats">
+            <div class="card p-3 text-center hover-lift">
+                <span class="text-xs opacity-60">Total Transaksi</span>
+                <p class="font-bold text-lg" id="historyTotalTrx">0</p>
+            </div>
+            <div class="card p-3 text-center hover-lift">
+                <span class="text-xs opacity-60">Total Pendapatan</span>
+                <p class="font-bold text-lg text-green-600" id="historyTotalRevenue">Rp 0</p>
+            </div>
+            <div class="card p-3 text-center hover-lift">
+                <span class="text-xs opacity-60">Rata-rata/hari</span>
+                <p class="font-bold text-lg" id="historyAvgDaily">Rp 0</p>
+            </div>
+            <div class="card p-3 text-center hover-lift">
+                <span class="text-xs opacity-60">Transaksi Hari Ini</span>
+                <p class="font-bold text-lg" id="historyTodayTrx">0</p>
+            </div>
+            <div class="card p-3 text-center hover-lift">
+                <span class="text-xs opacity-60">Online</span>
+                <p class="font-bold text-lg text-indigo-600" id="historyOnlineTrx">0</p>
+            </div>
+            <div class="card p-3 text-center hover-lift">
+                <span class="text-xs opacity-60">Offline</span>
+                <p class="font-bold text-lg text-amber-600" id="historyOfflineTrx">0</p>
+            </div>
+        </div>
+
+        <!-- Grafik Riwayat Pendapatan 30 Hari -->
+        <div class="mb-6">
+            <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-chart-line text-blue-500"></i> Tren Pendapatan 30 Hari Terakhir</h3>
+            <canvas id="chartHistoryRevenue" height="180"></canvas>
+        </div>
+
+        <!-- Tabel Riwayat Transaksi -->
+        <div class="overflow-x-auto max-h-[500px] border rounded-lg bg-white dark:bg-slate-800">
+            <table class="w-full text-sm">
+                <thead class="bg-slate-100 dark:bg-slate-700 sticky top-0 z-10">
+                    <tr>
+                        <th class="p-2 text-left w-24">Tanggal</th>
+                        <th class="p-2 text-left">Klien</th>
+                        <th class="p-2 text-left">Produk</th>
+                        <th class="p-2 text-right">Qty</th>
+                        <th class="p-2 text-right">Harga/kg</th>
+                        <th class="p-2 text-right">Total</th>
+                        <th class="p-2 text-right">HPP/kg</th>
+                        <th class="p-2 text-center">Channel</th>
+                        <th class="p-2 text-center">Tier</th>
+                        <th class="p-2 text-center w-28">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <tr><td colspan="10" class="text-center p-4 opacity-50">Memuat data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination & Info -->
+        <div class="flex justify-between items-center mt-3 text-sm">
+            <span class="opacity-50" id="historyShowingInfo">Menampilkan 0 transaksi</span>
+            <button id="loadMoreHistory" class="btn btn-xs btn-secondary hidden">Muat Lebih Banyak</button>
+        </div>
+
+        <!-- Tombol Hapus Semua Riwayat -->
+        <div class="mt-6 flex justify-between items-center">
+            <button id="clearAllHistoryBtn" class="btn btn-danger btn-sm"><i class="ph ph-trash"></i> Hapus Semua Riwayat</button>
+            <span class="text-xs opacity-40">* Menghapus riwayat tidak mengembalikan stok batch</span>
+        </div>
+    </div>
+</div>
         <!-- ==================== TAB AUDIT TRAIL (UPGRADE KOMPLEKS) ==================== -->
 <div id="tab-audit" class="tab-content space-y-6">
     <div class="card p-6">
@@ -1830,6 +1944,7 @@
 <script src="js/sales.js"></script>
 <script src="js/accounting.js"></script>
 <script src="js/dashboard.js"></script>
+<script src="js/history.js"></script>
 <script src="js/reports.js"></script>
 <script src="js/audit.js"></script>
 <script src="js/app.js"></script>
