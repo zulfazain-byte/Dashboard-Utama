@@ -1,20 +1,15 @@
 /* ============================================================
-   Cibitung Frozen ERP Ultimate v5.4 — Main Application
-   Penghubung semua modul, switching tab, notifikasi, backup,
-   restore, dan inisialisasi global.
+   Cibitung Frozen ERP Ultimate v5.4 — Main Application (Revisi)
    ============================================================ */
-
 window.CFS = window.CFS || {};
 
 (function() {
     'use strict';
 
     const Storage = CFS.Storage;
-
-    // Status inisialisasi modul (agar tidak init berulang)
     const modulesInitialized = {};
 
-    // --------------- TOAST NOTIFICATION ---------------
+    // --------------- TOAST ---------------
     const toast = document.getElementById('toast');
     const toastIcon = document.getElementById('toastIcon');
     const toastTitle = document.getElementById('toastTitle');
@@ -43,126 +38,99 @@ window.CFS = window.CFS || {};
     }
     window.showToast = showToast;
 
+    // --------------- SWITCH TAB (SATU FUNGSI) ---------------
     function switchTab(tabId) {
-    // Hapus class active dari semua tab content dan tombol
-    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
-        btn.classList.add('opacity-70');
-    });
+        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
+            btn.classList.add('opacity-70');
+        });
 
-    // Tampilkan konten tab yang dipilih
-    const target = document.getElementById(tabId);
-    if (target) target.classList.add('active');
+        const target = document.getElementById(tabId);
+        if (target) target.classList.add('active');
 
-    // Tandai tombol yang aktif
-    const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
-    if (btn) {
-        btn.classList.add('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
-        btn.classList.remove('opacity-70');
-    }
+        const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+        if (btn) {
+            btn.classList.add('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
+            btn.classList.remove('opacity-70');
+        }
 
-    // Lazy initialization / refresh setiap modul
-    switch (tabId) {
-        case 'tab-dashboard':
-            if (CFS.Dashboard) {
-                if (!modulesInitialized.dashboard) { CFS.Dashboard.init(); modulesInitialized.dashboard = true; }
-                else CFS.Dashboard.refresh();
-            }
-            break;
-        case 'tab-stock':
-            if (CFS.Inventory) {
-                if (!modulesInitialized.stock) { CFS.Inventory.init(); modulesInitialized.stock = true; }
-                else CFS.Inventory.refreshStockTable();
-            }
-            break;
-        case 'tab-sales':
-            if (CFS.Sales) {
-                if (!modulesInitialized.sales) { CFS.Sales.init(); modulesInitialized.sales = true; }
-                else { CFS.Sales.refreshTodaySales(); if (CFS.Inventory) CFS.Inventory.populateProductDropdowns(); }
-            }
-            break;
-        case 'tab-finance':
-            if (CFS.Accounting) {
-                if (!modulesInitialized.finance) { CFS.Accounting.init(); modulesInitialized.finance = true; }
-                else CFS.Accounting.refreshFinanceSummary();
-            }
-            break;
-        case 'tab-settings':
-            if (CFS.Settings) {
-                if (!modulesInitialized.settings) { CFS.Settings.init(); modulesInitialized.settings = true; }
-                else CFS.Settings.loadSettingsToForm();
-            }
-            break;
-        case 'tab-reports':
-            if (CFS.Reports && CFS.Reports.init) CFS.Reports.init();
-            break;
-        case 'tab-audit':
-            if (CFS.Audit && CFS.Audit.init) CFS.Audit.init();
-            break;
-        case 'tab-history':
-            if (CFS.History && CFS.History.init) CFS.History.init();
-            break;
-        // Tab lainnya yang diimplementasikan di dalam app.js sendiri
-        case 'tab-purchase':
-            initPurchaseTab(); // fungsi lokal di app.js
-            break;
-        case 'tab-supplier':
-            initSupplierTab();
-            break;
-        case 'tab-products':
-            initProductsTab();
-            break;
-        case 'tab-crm':
-            initCRMTab();
-            break;
-        case 'tab-crm-detail':
-            initCRMDetailTab();
-            break;
-        case 'tab-pricing':
-            initPricingTab();
-            break;
-        case 'tab-delivery':
-            initDeliveryTab();
-            break;
-        case 'tab-opname':
-            initOpnameTab();
-            break;
-        case 'tab-return':
-            initReturnTab();
-            break;
-        case 'tab-notifications':
-            // Jika tidak ada modul khusus, biarkan konten statis
-            break;
-        case 'tab-help':
-            break;
-        default:
-            break;
-    }
-}
-        // Lazy initialization / refresh
-        const initMap = {
-            'tab-dashboard': () => CFS.Dashboard ? (modulesInitialized.dashboard ? CFS.Dashboard.refresh() : (CFS.Dashboard.init(), modulesInitialized.dashboard = true)) : null,
-            'tab-stock': () => CFS.Inventory ? (modulesInitialized.stock ? CFS.Inventory.refreshStockTable() : (CFS.Inventory.init(), modulesInitialized.stock = true)) : null,
-            'tab-sales': () => CFS.Sales ? (modulesInitialized.sales ? (CFS.Sales.refreshTodaySales(), CFS.Inventory?.populateProductDropdowns()) : (CFS.Sales.init(), modulesInitialized.sales = true)) : null,
-            'tab-purchase': () => initPurchaseTab(),
-            'tab-supplier': () => initSupplierTab(),
-            'tab-products': () => initProductsTab(),
-            'tab-crm': () => initCRMTab(),
-            'tab-crm-detail': () => initCRMDetailTab(),
-            'tab-pricing': () => initPricingTab(),
-            'tab-finance': () => CFS.Accounting ? (modulesInitialized.finance ? CFS.Accounting.refreshFinanceSummary() : (CFS.Accounting.init(), modulesInitialized.finance = true)) : null,
-            'tab-delivery': () => initDeliveryTab(),
-            'tab-opname': () => initOpnameTab(),
-            'tab-return': () => initReturnTab(),
-            'tab-history': () => initHistoryTab(),
-            'tab-audit': () => initAuditTab(),
-            'tab-reports': () => initReportsTab(),
-            'tab-notifications': () => initNotificationsTab(),
-            'tab-settings': () => CFS.Settings ? (modulesInitialized.settings ? CFS.Settings.loadSettingsToForm() : (CFS.Settings.init(), modulesInitialized.settings = true)) : null,
-            'tab-help': () => {}
-        };
-        if (initMap[tabId]) initMap[tabId]();
+        // Inisialisasi modul sesuai tab
+        switch (tabId) {
+            case 'tab-dashboard':
+                if (CFS.Dashboard) {
+                    if (!modulesInitialized.dashboard) { CFS.Dashboard.init(); modulesInitialized.dashboard = true; }
+                    else CFS.Dashboard.refresh();
+                }
+                break;
+            case 'tab-stock':
+                if (CFS.Inventory) {
+                    if (!modulesInitialized.stock) { CFS.Inventory.init(); modulesInitialized.stock = true; }
+                    else CFS.Inventory.refreshStockTable();
+                }
+                break;
+            case 'tab-sales':
+                if (CFS.Sales) {
+                    if (!modulesInitialized.sales) { CFS.Sales.init(); modulesInitialized.sales = true; }
+                    else { CFS.Sales.refreshTodaySales(); if (CFS.Inventory) CFS.Inventory.populateProductDropdowns(); }
+                }
+                break;
+            case 'tab-finance':
+                if (CFS.Accounting) {
+                    if (!modulesInitialized.finance) { CFS.Accounting.init(); modulesInitialized.finance = true; }
+                    else CFS.Accounting.refreshFinanceSummary();
+                }
+                break;
+            case 'tab-settings':
+                if (CFS.Settings) {
+                    if (!modulesInitialized.settings) { CFS.Settings.init(); modulesInitialized.settings = true; }
+                    else CFS.Settings.loadSettingsToForm();
+                }
+                break;
+            case 'tab-reports':
+                if (CFS.Reports && CFS.Reports.init) CFS.Reports.init();
+                break;
+            case 'tab-audit':
+                if (CFS.Audit && CFS.Audit.init) CFS.Audit.init();
+                break;
+            case 'tab-history':
+                if (CFS.History && CFS.History.init) CFS.History.init();
+                break;
+            case 'tab-purchase':
+                initPurchaseTab();
+                break;
+            case 'tab-supplier':
+                initSupplierTab();
+                break;
+            case 'tab-products':
+                initProductsTab();
+                break;
+            case 'tab-crm':
+                initCRMTab();
+                break;
+            case 'tab-crm-detail':
+                initCRMDetailTab();
+                break;
+            case 'tab-pricing':
+                initPricingTab();
+                break;
+            case 'tab-delivery':
+                initDeliveryTab();
+                break;
+            case 'tab-opname':
+                initOpnameTab();
+                break;
+            case 'tab-return':
+                initReturnTab();
+                break;
+            case 'tab-notifications':
+                // Konten statis, tidak perlu inisialisasi
+                break;
+            case 'tab-help':
+                break;
+            default:
+                break;
+        }
     }
     window.switchTab = switchTab;
 
@@ -235,7 +203,7 @@ window.CFS = window.CFS || {};
 
     CFS.App = { backupData, restorePrompt, showToast, refreshAll, switchTab };
 
-    // --------------- DARK MODE TOGGLE ---------------
+    // --------------- DARK MODE ---------------
     window.toggleDarkMode = function() {
         document.documentElement.classList.toggle('dark');
         localStorage.setItem('cfs_dark', document.documentElement.classList.contains('dark') ? '1' : '0');
@@ -245,7 +213,8 @@ window.CFS = window.CFS || {};
         if (sidebarMode) sidebarMode.textContent = document.documentElement.classList.contains('dark') ? 'Gelap' : 'Terang';
     };
 
-    // --------------- IMPLEMENTASI TAB SEDERHANA (jika modul belum ada) ---------------
+    // --------------- FUNGSI INISIALISASI TAB LOKAL ---------------
+
     function initPurchaseTab() {
         const form = document.getElementById('purchaseForm');
         if (!form || form.dataset.listener) return;
@@ -267,8 +236,6 @@ window.CFS = window.CFS || {};
             produkSelect.innerHTML = '<option value="">Pilih Produk</option>' + prods.map(p => `<option>${p}</option>`).join('');
         }
         function renderPOList() {
-            const pos = Storage.getSales().filter(s => s.channel === 'purchase'); // kita bisa pakai flag khusus
-            // Karena belum ada fitur PO, kita tampilkan kosong saja.
             tbody.innerHTML = '<tr><td colspan="7" class="text-center p-4 opacity-50">Belum ada PO</td></tr>';
         }
 
@@ -283,12 +250,10 @@ window.CFS = window.CFS || {};
             const qty = parseFloat(qtyInput.value);
             const harga = parseFloat(hargaInput.value);
             const tanggal = tglInput.value;
-            const catatan = catatanInput.value;
             if (!supplierId || !produk || !qty || !harga || !tanggal) {
                 showToast('Error', 'Lengkapi data pembelian.', 'error');
                 return;
             }
-            // Simpan sebagai batch langsung? Atau sebagai PO terpisah. Kita simpan sebagai batch baru.
             const newBatch = {
                 id: 'b' + Date.now(),
                 produk,
@@ -418,10 +383,6 @@ window.CFS = window.CFS || {};
             }
         };
     }
-
-    // CRM & detail, pricing, delivery, opname, return, history, audit, reports, notifications bisa dibuat serupa.
-    // Agar file tidak terlalu panjang, kita gunakan pendekatan minimalis yang langsung memanfaatkan Storage.
-    // Namun untuk memenuhi "lengkap", saya tambahkan implementasi sederhana untuk masing-masing.
 
     function initCRMTab() {
         const tbody = document.getElementById('crmTableBody');
@@ -706,191 +667,27 @@ window.CFS = window.CFS || {};
         });
     }
 
-    function initHistoryTab() {
-        const tbody = document.getElementById('historyTableBody');
-        const form = document.getElementById('filterTransaksi');
-        function renderHistory(filter = {}) {
-            let sales = Storage.getSales();
-            if (filter.produk) sales = sales.filter(s => s.produk === filter.produk);
-            if (filter.klien) sales = sales.filter(s => s.klien.toLowerCase().includes(filter.klien.toLowerCase()));
-            if (filter.start) sales = sales.filter(s => s.tanggal >= filter.start);
-            if (filter.end) sales = sales.filter(s => s.tanggal <= filter.end);
-            if (filter.channel) sales = sales.filter(s => s.channel === filter.channel);
-            tbody.innerHTML = sales.length === 0 ? '<tr><td colspan="8" class="text-center p-4 opacity-50">Tidak ada transaksi</td></tr>' :
-            sales.map(s => `<tr class="border-t">
-                <td class="p-2">${s.tanggal}</td>
-                <td class="p-2">${s.klien}</td>
-                <td class="p-2">${s.produk}</td>
-                <td class="p-2 text-right">${s.qty} kg</td>
-                <td class="p-2 text-right">Rp ${(s.qty*s.hargaJual).toLocaleString('id-ID')}</td>
-                <td class="p-2 text-center">${s.channel === 'online' ? '🌐' : '🏪'}</td>
-                <td class="p-2 text-center">${s.tier}</td>
-                <td class="p-2 text-center"><button onclick="CFS.App.deleteSale('${s.id}')" class="text-red-500">🗑️</button></td>
-            </tr>`).join('');
-            document.getElementById('historyTotalTrx').textContent = sales.length;
-            document.getElementById('historyTotalRevenue').textContent = 'Rp ' + sales.reduce((a,s) => a + s.qty*s.hargaJual, 0).toLocaleString('id-ID');
-        }
-        if (form) {
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                renderHistory({
-                    produk: document.getElementById('filterProduk').value,
-                    klien: document.getElementById('filterKlien').value,
-                    start: document.getElementById('filterStart').value,
-                    end: document.getElementById('filterEnd').value,
-                    channel: document.getElementById('filterChannel').value
-                });
-            });
-        }
-        renderHistory();
-        CFS.App.deleteSale = async (id) => {
-            if (confirm('Hapus transaksi?')) {
-                await Storage.deleteSale(id);
-                renderHistory();
-                if (CFS.Dashboard) CFS.Dashboard.refresh();
-            }
-        };
-        document.getElementById('clearAllHistoryBtn')?.addEventListener('click', async () => {
-            if (confirm('Hapus SEMUA riwayat?')) {
-                const sales = Storage.getSales();
-                for (const s of sales) await Storage.deleteSale(s.id);
-                renderHistory();
-                showToast('Sukses', 'Semua riwayat dihapus.', 'success');
-            }
-        });
-    }
-
-    function initAuditTab() {
-        const tbody = document.getElementById('auditTrailTableBody');
-        function renderAudit() {
-            const trail = Storage.getAuditTrail();
-            tbody.innerHTML = trail.length === 0 ? '<tr><td colspan="3" class="text-center p-4 opacity-50">Belum ada log.</td></tr>' :
-            trail.map(t => `<tr class="border-t text-sm">
-                <td class="p-2">${new Date(t.waktu).toLocaleString('id-ID')}</td>
-                <td class="p-2">${t.aksi}</td>
-                <td class="p-2">${t.detail}</td>
-            </tr>`).join('');
-        }
-        renderAudit();
-    }
-
-    function initReportsTab() {
-        // Gunakan fungsi yang sudah ada di modul lain
-        if (CFS.Accounting) {
-            CFS.Accounting.refreshFinanceSummary();
-            CFS.Accounting.renderYearlyChart();
-        }
-        if (CFS.Dashboard) {
-            CFS.Dashboard.refreshStockSummary();
-            CFS.Dashboard.refreshTopProducts();
-        }
-        // Isi laporan stok, margin, proyeksi
-        const reportStok = document.getElementById('reportStok');
-        const reportMargin = document.getElementById('reportMargin');
-        const reportProyeksi = document.getElementById('reportProyeksi');
-        const reportChannel = document.getElementById('reportChannelSales');
-        const reportDelivery = document.getElementById('reportDelivery');
-        if (reportStok) {
-            const map = CFS.Inventory?.getStockPerProduct() || {};
-            const prods = Storage.getProducts().length ? Storage.getProducts().map(p=>p.name) : Storage.defaultProducts;
-            reportStok.innerHTML = prods.map(p => `<p>${p}: <strong>${map[p]||0} kg</strong></p>`).join('');
-        }
-        if (reportMargin) {
-            const sales = Storage.getSales();
-            const marginMap = {};
-            sales.forEach(s => {
-                if (!marginMap[s.produk]) marginMap[s.produk] = { revenue: 0, hpp: 0 };
-                marginMap[s.produk].revenue += s.qty * s.hargaJual;
-                marginMap[s.produk].hpp += s.qty * s.hpp;
-            });
-            reportMargin.innerHTML = Object.entries(marginMap).map(([p,d]) => `<p>${p}: Rp ${(d.revenue-d.hpp).toLocaleString('id-ID')} (${d.revenue>0?((d.revenue-d.hpp)/d.revenue*100).toFixed(1):0}%)</p>`).join('') || '<p class="opacity-50">-</p>';
-        }
-        if (reportProyeksi) {
-            const total = Storage.getSales().reduce((a,s)=>a+s.qty*s.hargaJual,0);
-            const avg = total / Math.max(1, (new Date()).getMonth()+1);
-            reportProyeksi.innerHTML = [1,2,3].map(i => `<p>Bulan ke-${i}: Rp ${(avg*i).toLocaleString('id-ID')}</p>`).join('');
-        }
-        if (reportChannel) {
-            const online = Storage.getSales().filter(s=>s.channel==='online').reduce((a,s)=>a+s.qty*s.hargaJual,0);
-            const offline = Storage.getSales().filter(s=>s.channel==='offline').reduce((a,s)=>a+s.qty*s.hargaJual,0);
-            reportChannel.innerHTML = `<p>Online: Rp ${online.toLocaleString('id-ID')}</p><p>Offline: Rp ${offline.toLocaleString('id-ID')}</p>`;
-        }
-        if (reportDelivery) {
-            const dels = Storage.getDeliveries();
-            reportDelivery.innerHTML = dels.length === 0 ? '<p class="opacity-50">-</p>' : dels.map(d => `<p>${d.saleId} - ${d.courier} (${d.status})</p>`).join('');
-        }
-    }
-   // Sub-tab Pengaturan
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('settings-tab-btn')) {
-        const tab = e.target.dataset.settingsTab;
-        document.querySelectorAll('.settings-tab-btn').forEach(b => {
-            b.classList.remove('btn-primary', 'active');
-            b.classList.add('btn-secondary');
-        });
-        e.target.classList.add('btn-primary', 'active');
-        e.target.classList.remove('btn-secondary');
-        document.querySelectorAll('.settings-tab-content').forEach(c => c.classList.add('hidden'));
-        document.getElementById(tab)?.classList.remove('hidden');
-    }
-});
-
-// Toggle biaya gudang
-document.getElementById('setStorageMethod')?.addEventListener('change', function() {
-    document.getElementById('storageFlatInput')?.classList.toggle('hidden', this.value !== 'flat_monthly');
-    document.getElementById('storagePerKgInput')?.classList.toggle('hidden', this.value !== 'per_kg_day');
-});
-
-    function initNotificationsTab() {
-        const container = document.getElementById('notificationList');
-        function renderNotifications() {
-            const trail = Storage.getAuditTrail().slice(0, 20);
-            container.innerHTML = trail.length === 0 ? '<p class="opacity-50">Tidak ada notifikasi.</p>' :
-            trail.map(t => `<div class="card p-3 flex items-center gap-3 bg-slate-50 dark:bg-slate-800"><i class="ph ph-info text-blue-500"></i><div><strong class="text-sm">${t.aksi}</strong><p class="text-xs opacity-70">${t.detail} - ${new Date(t.waktu).toLocaleString('id-ID')}</p></div></div>`).join('');
-        }
-        renderNotifications();
-        document.getElementById('clearNotifications')?.addEventListener('click', async () => {
-            await Storage.resetAllData(); // terlalu drastis, sebaiknya hanya hapus audit trail
-            // Untuk demo, kita kosongkan audit trail
-            const empty = [];
-            await localforage.setItem('cfs_audit_trail', empty);
-            renderNotifications();
-            showToast('Info', 'Notifikasi dibersihkan.', 'info');
-        });
-    }
-
     // --------------- INISIALISASI APLIKASI ---------------
     window.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
-            // Inisialisasi default
             if (localStorage.getItem('cfs_dark') === '1') {
                 document.documentElement.classList.add('dark');
                 const darkIcon = document.getElementById('darkIcon');
                 if (darkIcon) darkIcon.className = 'ph ph-sun text-lg text-yellow-400';
                 document.getElementById('sidebar-mode').textContent = 'Gelap';
             }
-            // Tampilkan dashboard
             switchTab('tab-dashboard');
-            // Update waktu
             setInterval(() => {
                 const el = document.getElementById('lastUpdate');
                 if (el) el.textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
                 const sysEl = document.getElementById('systemDateTime');
                 if (sysEl) sysEl.textContent = new Date().toLocaleString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
             }, 1000);
-            // Shortcut
             document.addEventListener('keydown', function(e) {
                 if (e.ctrlKey && e.key === 'd') { e.preventDefault(); switchTab('tab-dashboard'); }
                 if (e.ctrlKey && e.key === 's') { e.preventDefault(); switchTab('tab-stock'); }
                 if (e.ctrlKey && e.key === 'b') { e.preventDefault(); backupData(); }
             });
-            // Notifikasi badge
-            const notifBadge = document.getElementById('notifBadge');
-            const notifItems = document.querySelectorAll('#notificationList .card');
-            if (notifBadge && notifItems.length > 0) {
-                notifBadge.textContent = notifItems.length;
-                notifBadge.classList.remove('hidden');
-            }
         }, 200);
     });
 
