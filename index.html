@@ -922,74 +922,742 @@
     </div>
 </div>
 
-        <!-- ==================== TAB NOTIFIKASI ==================== -->
-        <div id="tab-notifications" class="tab-content space-y-6">
-            <div class="card p-6">
-                <h2 class="text-xl font-bold mb-4"><i class="ph ph-bell text-red-600"></i> Notifikasi & Alert</h2>
-                <div class="space-y-2" id="notificationList"></div>
-                <button id="clearNotifications" class="btn btn-secondary mt-4">🗑️ Bersihkan Notifikasi</button>
+        <!-- ==================== TAB NOTIFIKASI (LENGKAP) ==================== -->
+<div id="tab-notifications" class="tab-content space-y-6">
+    <div class="card p-6">
+        <h2 class="text-xl font-bold mb-4"><i class="ph ph-bell text-red-600"></i> Pusat Notifikasi & Alert</h2>
+
+        <!-- Penjelasan Sistem Notifikasi -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6 text-sm flex items-start gap-3">
+            <i class="ph ph-info text-blue-600 text-xl mt-0.5"></i>
+            <div>
+                <p class="font-medium">🔔 Sistem Notifikasi Otomatis</p>
+                <p class="opacity-70 mt-1">
+                    Notifikasi dihasilkan secara otomatis berdasarkan kondisi data terkini. 
+                    Anda akan mendapatkan peringatan saat stok menipis, batch mendekati kadaluarsa, target penjualan tercapai, 
+                    atau aktivitas penting lainnya terjadi. Pantau halaman ini secara berkala agar operasional tetap lancar.
+                </p>
             </div>
         </div>
 
-        <!-- ==================== TAB PENGATURAN ==================== -->
-        <div id="tab-settings" class="tab-content space-y-6">
-            <div class="card p-6">
-                <h2 class="text-xl font-bold mb-6"><i class="ph ph-gear text-slate-600"></i> Pengaturan Bisnis</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-3">
-                        <div><label class="text-sm font-medium">PPN (%)</label><input type="number" id="setPPN" value="12"></div>
-                        <div><label class="text-sm font-medium">PPh 25 (%)</label><input type="number" id="setPPh25" value="2"></div>
-                        <div><label class="text-sm font-medium">PPh 21 (%)</label><input type="number" id="setPPh21" value="5"></div>
-                        <div><label class="text-sm font-medium">PT Share (%)</label><input type="number" id="setPTShare" value="60"></div>
-                        <div><label class="text-sm font-medium">Min Grosir (kg)</label><input type="number" id="setMinGrosir" value="10"></div>
-                        <div><label class="text-sm font-medium">Komisi Marketplace (%)</label><input type="number" id="setMarketplaceFee" value="5"></div>
+        <!-- Filter Jenis Notifikasi -->
+        <div class="flex flex-wrap gap-2 mb-6">
+            <button class="btn btn-sm btn-primary notif-filter-btn" data-filter="all">Semua</button>
+            <button class="btn btn-sm btn-secondary notif-filter-btn" data-filter="stock">📦 Stok</button>
+            <button class="btn btn-sm btn-secondary notif-filter-btn" data-filter="expired">⚠️ Kadaluarsa</button>
+            <button class="btn btn-sm btn-secondary notif-filter-btn" data-filter="sales">💰 Penjualan</button>
+            <button class="btn btn-sm btn-secondary notif-filter-btn" data-filter="system">⚙️ Sistem</button>
+            <button class="btn btn-sm btn-secondary notif-filter-btn" data-filter="opname">📋 Opname</button>
+            <button class="btn btn-sm btn-secondary notif-filter-btn" data-filter="retur">↩️ Retur</button>
+        </div>
+
+        <!-- Daftar Notifikasi -->
+        <div class="space-y-3" id="notificationList">
+            <!-- Notifikasi Stok Menipis -->
+            <div class="card p-4 flex items-start gap-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 animate-fadeIn notif-item" data-type="stock">
+                <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-800 flex items-center justify-center flex-shrink-0">
+                    <i class="ph ph-package text-red-600 text-xl"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-start">
+                        <h4 class="font-semibold text-red-700 dark:text-red-400">Stok Menipis!</h4>
+                        <span class="text-xs opacity-50">Hari ini, 08:30</span>
                     </div>
-                    <div class="space-y-3">
-                        <div><label class="text-sm font-medium">Min Partai (kg)</label><input type="number" id="setMinPartai" value="500"></div>
-                        <div><label class="text-sm font-medium">Selisih Grosir dari Ecer (Rp)</label><input type="number" id="setSelisihGrosir" value="5000"></div>
-                        <div><label class="text-sm font-medium">Margin Default (Rp/kg)</label><input type="number" id="setMarginDefault" value="15000"></div>
-                        <div><label class="text-sm font-medium">Alokasi Stok</label><select id="setFifoMethod"><option value="fefo">FEFO</option><option value="fifo">FIFO</option></select></div>
-                        <div><label class="text-sm font-medium">Auto Backup (hari)</label><input type="number" id="setAutoBackup" value="7"></div>
+                    <p class="text-sm opacity-80 mt-1">
+                        <strong>Ikan Salmon</strong> tersisa <strong>5 kg</strong> di Gudang Utama. 
+                        Stok minimum yang disarankan adalah 10 kg. Segera lakukan pemesanan ke supplier untuk menghindari kekosongan.
+                    </p>
+                    <div class="flex gap-2 mt-2">
+                        <button onclick="switchTab('tab-stock')" class="btn btn-xs btn-primary">Lihat Stok</button>
+                        <button onclick="switchTab('tab-purchase')" class="btn btn-xs btn-secondary">Buat PO</button>
                     </div>
                 </div>
-                <button id="saveSettingsBtn" class="btn btn-primary mt-6">💾 Simpan Pengaturan</button>
-                <div class="mt-8 card p-4">
-                    <h3 class="font-semibold mb-3"><i class="ph ph-storefront"></i> Profil Usaha (Invoice)</h3>
-                    <form id="companyProfileForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" id="companyName" placeholder="Nama Usaha" value="Cibitung Frozen">
-                        <input type="text" id="companyAddress" placeholder="Alamat" value="Jl. Industri No.1">
-                        <input type="text" id="companyPhone" placeholder="Telepon" value="0812-3456-7890">
-                        <input type="text" id="companyEmail" placeholder="Email" value="info@cibitungfrozen.com">
-                        <input type="text" id="companyWebsite" placeholder="Website (opsional)">
-                        <button type="button" id="saveCompanyBtn" class="btn btn-primary col-span-full sm:col-span-1">Simpan Profil</button>
-                    </form>
+            </div>
+
+            <!-- Notifikasi Batch Kadaluarsa -->
+            <div class="card p-4 flex items-start gap-4 bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 animate-fadeIn notif-item" data-type="expired">
+                <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-800 flex items-center justify-center flex-shrink-0">
+                    <i class="ph ph-clock-countdown text-amber-600 text-xl"></i>
                 </div>
-                <div class="mt-8 card p-4 border-red-200 dark:border-red-800 bg-red-50/30">
-                    <h3 class="font-semibold mb-3 text-red-700"><i class="ph ph-warning-circle"></i> Reset Semua Data</h3>
-                    <p class="text-sm text-red-700/80 mb-4">Menghapus seluruh data. Harap backup terlebih dahulu.</p>
+                <div class="flex-1">
+                    <div class="flex justify-between items-start">
+                        <h4 class="font-semibold text-amber-700 dark:text-amber-400">Batch Hampir Kadaluarsa</h4>
+                        <span class="text-xs opacity-50">Hari ini, 07:15</span>
+                    </div>
+                    <p class="text-sm opacity-80 mt-1">
+                        <strong>Udang Vaname</strong> (Batch #b123) akan kadaluarsa pada <strong>3 hari lagi</strong>. 
+                        Sisa stok: 12 kg. Prioritaskan penjualan produk ini atau pertimbangkan untuk memberikan diskon khusus.
+                    </p>
+                    <div class="flex gap-2 mt-2">
+                        <button onclick="switchTab('tab-sales')" class="btn btn-xs btn-warning">Jual Sekarang</button>
+                        <button onclick="switchTab('tab-pricing')" class="btn btn-xs btn-secondary">Atur Diskon</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifikasi Target Penjualan -->
+            <div class="card p-4 flex items-start gap-4 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 animate-fadeIn notif-item" data-type="sales">
+                <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-800 flex items-center justify-center flex-shrink-0">
+                    <i class="ph ph-target text-green-600 text-xl"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-start">
+                        <h4 class="font-semibold text-green-700 dark:text-green-400">Target Penjualan Tercapai 80%!</h4>
+                        <span class="text-xs opacity-50">Kemarin, 22:00</span>
+                    </div>
+                    <p class="text-sm opacity-80 mt-1">
+                        Penjualan bulan ini telah mencapai <strong>Rp 40.000.000</strong> dari target Rp 50.000.000. 
+                        Tersisa 20% lagi. Pertahankan momentum penjualan hingga akhir bulan!
+                    </p>
+                    <div class="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                        <div class="bg-green-500 h-2.5 rounded-full" style="width: 80%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifikasi Backup -->
+            <div class="card p-4 flex items-start gap-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 animate-fadeIn notif-item" data-type="system">
+                <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-800 flex items-center justify-center flex-shrink-0">
+                    <i class="ph ph-cloud-arrow-up text-blue-600 text-xl"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-start">
+                        <h4 class="font-semibold text-blue-700 dark:text-blue-400">Backup Data Mingguan Disarankan</h4>
+                        <span class="text-xs opacity-50">2 hari yang lalu</span>
+                    </div>
+                    <p class="text-sm opacity-80 mt-1">
+                        Anda belum melakukan backup data selama <strong>7 hari</strong>. 
+                        Backup rutin melindungi data dari kehilangan akibat kerusakan browser atau kesalahan teknis.
+                    </p>
+                    <button onclick="CFS.App.backupData()" class="btn btn-xs btn-primary mt-2">Backup Sekarang</button>
+                </div>
+            </div>
+
+            <!-- Notifikasi Opname -->
+            <div class="card p-4 flex items-start gap-4 bg-purple-50 dark:bg-purple-900/20 border-l-4 border-purple-500 animate-fadeIn notif-item" data-type="opname">
+                <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-800 flex items-center justify-center flex-shrink-0">
+                    <i class="ph ph-clipboard-text text-purple-600 text-xl"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-start">
+                        <h4 class="font-semibold text-purple-700 dark:text-purple-400">Stock Opname Terjadwal</h4>
+                        <span class="text-xs opacity-50">3 hari yang lalu</span>
+                    </div>
+                    <p class="text-sm opacity-80 mt-1">
+                        Sudah <strong>2 minggu</strong> sejak stock opname terakhir. 
+                        Disarankan untuk melakukan opname rutin setiap minggu untuk menjaga akurasi stok.
+                    </p>
+                    <button onclick="switchTab('tab-opname')" class="btn btn-xs btn-primary mt-2">Mulai Opname</button>
+                </div>
+            </div>
+
+            <!-- Notifikasi Retur -->
+            <div class="card p-4 flex items-start gap-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 animate-fadeIn notif-item" data-type="retur">
+                <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-800 flex items-center justify-center flex-shrink-0">
+                    <i class="ph ph-arrow-u-up-left text-red-600 text-xl"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-start">
+                        <h4 class="font-semibold text-red-700 dark:text-red-400">Retur Penjualan Baru</h4>
+                        <span class="text-xs opacity-50">5 hari yang lalu</span>
+                    </div>
+                    <p class="text-sm opacity-80 mt-1">
+                        <strong>Budi Santoso</strong> mengembalikan <strong>2 kg Ikan Kakap</strong> dengan alasan: 
+                        <em>"Kualitas tidak sesuai"</em>. Stok telah dikembalikan ke sistem. Tindak lanjuti dengan evaluasi supplier.
+                    </p>
+                    <button onclick="switchTab('tab-return')" class="btn btn-xs btn-primary mt-2">Lihat Detail</button>
+                </div>
+            </div>
+
+            <!-- Notifikasi Stok Kosong -->
+            <div class="card p-4 flex items-start gap-4 bg-gray-100 dark:bg-gray-800 border-l-4 border-gray-500 animate-fadeIn notif-item" data-type="stock">
+                <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+                    <i class="ph ph-x-circle text-gray-600 text-xl"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-start">
+                        <h4 class="font-semibold text-gray-700 dark:text-gray-400">Stok Habis!</h4>
+                        <span class="text-xs opacity-50">1 minggu yang lalu</span>
+                    </div>
+                    <p class="text-sm opacity-80 mt-1">
+                        <strong>Kepiting</strong> saat ini kosong di semua gudang. Produk ini sudah tidak tersedia untuk dijual. 
+                        Jika permintaan tinggi, segera lakukan pembelian ke supplier.
+                    </p>
+                    <button onclick="switchTab('tab-purchase')" class="btn btn-xs btn-primary mt-2">Pesan Sekarang</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="flex gap-4 mt-6">
+            <button id="clearNotifications" class="btn btn-secondary"><i class="ph ph-check-circle"></i> Tandai Semua Dibaca</button>
+            <button id="deleteAllNotifications" class="btn btn-danger"><i class="ph ph-trash"></i> Hapus Semua Notifikasi</button>
+        </div>
+    </div>
+</div>
+
+        <!-- ==================== TAB PENGATURAN (UPGRADE KOMPLEKS) ==================== -->
+<div id="tab-settings" class="tab-content space-y-6">
+    <div class="card p-6">
+        <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="ph ph-gear text-slate-600"></i> Pengaturan Bisnis & Kustomisasi</h2>
+        
+        <!-- Tab Navigasi Pengaturan -->
+        <div class="flex flex-wrap gap-2 mb-6 border-b pb-3" id="settingsTabs">
+            <button class="btn btn-sm btn-primary settings-tab-btn active" data-settings-tab="settings-umum">Umum</button>
+            <button class="btn btn-sm btn-secondary settings-tab-btn" data-settings-tab="settings-pajak">Pajak & Legal</button>
+            <button class="btn btn-sm btn-secondary settings-tab-btn" data-settings-tab="settings-margin">Margin & Harga</button>
+            <button class="btn btn-sm btn-secondary settings-tab-btn" data-settings-tab="settings-stok">Stok & Gudang</button>
+            <button class="btn btn-sm btn-secondary settings-tab-btn" data-settings-tab="settings-backup">Backup & Data</button>
+            <button class="btn btn-sm btn-secondary settings-tab-btn" data-settings-tab="settings-tampilan">Tampilan</button>
+            <button class="btn btn-sm btn-secondary settings-tab-btn" data-settings-tab="settings-profil">Profil Usaha</button>
+            <button class="btn btn-sm btn-secondary settings-tab-btn" data-settings-tab="settings-reset">Reset</button>
+        </div>
+
+        <!-- KONTEN SUB-TAB: UMUM -->
+        <div id="settings-umum" class="settings-tab-content">
+            <h3 class="font-semibold text-lg mb-4 flex items-center gap-2"><i class="ph ph-sliders text-blue-600"></i> Pengaturan Umum</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-medium flex items-center gap-1">
+                            Nama Bisnis
+                            <span class="tooltip"><i class="ph ph-info text-xs text-slate-400"></i><span class="tooltip-text">Nama yang akan muncul di invoice dan header aplikasi</span></span>
+                        </label>
+                        <input type="text" id="setNamaBisnis" value="Cibitung Frozen" class="w-full">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Mata Uang</label>
+                        <select id="setMataUang" class="w-full">
+                            <option value="IDR">IDR - Rupiah Indonesia</option>
+                            <option value="USD">USD - US Dollar</option>
+                            <option value="SGD">SGD - Singapore Dollar</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Zona Waktu</label>
+                        <select id="setZonaWaktu" class="w-full">
+                            <option value="Asia/Jakarta">Asia/Jakarta (WIB)</option>
+                            <option value="Asia/Makassar">Asia/Makassar (WITA)</option>
+                            <option value="Asia/Jayapura">Asia/Jayapura (WIT)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Format Tanggal</label>
+                        <select id="setFormatTanggal" class="w-full">
+                            <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                            <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                            <option value="YYYY-MM-DD">YYYY-MM-DD (ISO)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-medium flex items-center gap-1">
+                            Target Penjualan Bulanan (Rp)
+                            <span class="tooltip"><i class="ph ph-info text-xs text-slate-400"></i><span class="tooltip-text">Target yang akan dilacak di dashboard</span></span>
+                        </label>
+                        <input type="number" id="setTargetBulanan" value="50000000" class="w-full">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Minimal Stok Peringatan (kg)</label>
+                        <input type="number" id="setMinStokWarning" value="10" class="w-full">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Satuan Default</label>
+                        <select id="setSatuanDefault" class="w-full">
+                            <option value="kg">Kilogram (kg)</option>
+                            <option value="gram">Gram (g)</option>
+                            <option value="ton">Ton</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm font-medium">Aktifkan Notifikasi Browser</label>
+                        <div class="toggle-wrapper"><input type="checkbox" id="setNotifBrowser" class="toggle-checkbox"><div class="toggle-label"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KONTEN SUB-TAB: PAJAK & LEGAL -->
+        <div id="settings-pajak" class="settings-tab-content hidden">
+            <h3 class="font-semibold text-lg mb-4 flex items-center gap-2"><i class="ph ph-scales text-red-600"></i> Pengaturan Pajak & Legal</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-medium">PPN (%)</label>
+                        <input type="number" id="setPPN" value="12" class="w-full" step="0.1">
+                        <p class="text-xs opacity-50 mt-1">Pajak Pertambahan Nilai yang berlaku</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">PPh 25 (%)</label>
+                        <input type="number" id="setPPh25" value="2" class="w-full" step="0.1">
+                        <p class="text-xs opacity-50 mt-1">Pajak Penghasilan Pasal 25</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">PPh 21 (%)</label>
+                        <input type="number" id="setPPh21" value="5" class="w-full" step="0.1">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">PT Share (%)</label>
+                        <input type="number" id="setPTShare" value="60" class="w-full" step="0.1">
+                        <p class="text-xs opacity-50 mt-1">Persentase kepemilikan PT (untuk laporan)</p>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-medium">NPWP Perusahaan</label>
+                        <input type="text" id="setNPWP" placeholder="00.000.000.0-000.000" class="w-full">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Nomor SIUP</label>
+                        <input type="text" id="setSIUP" placeholder="Nomor Surat Izin Usaha" class="w-full">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Nomor NIB</label>
+                        <input type="text" id="setNIB" placeholder="Nomor Induk Berusaha" class="w-full">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Tahun Pajak Aktif</label>
+                        <input type="number" id="setTahunPajak" value="2025" class="w-full">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KONTEN SUB-TAB: MARGIN & HARGA -->
+        <div id="settings-margin" class="settings-tab-content hidden">
+            <h3 class="font-semibold text-lg mb-4 flex items-center gap-2"><i class="ph ph-currency-circle-dollar text-green-600"></i> Pengaturan Margin & Harga</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-medium">Margin Default (Rp/kg)</label>
+                        <input type="number" id="setMarginDefault" value="15000" class="w-full">
+                        <p class="text-xs opacity-50 mt-1">Keuntungan dasar yang ditambahkan di atas HPP</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Margin Minimum (Rp/kg)</label>
+                        <input type="number" id="setMarginMin" value="5000" class="w-full">
+                        <p class="text-xs opacity-50 mt-1">Batas bawah margin agar tidak rugi</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Min Grosir (kg)</label>
+                        <input type="number" id="setMinGrosir" value="10" class="w-full">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Min Partai (kg)</label>
+                        <input type="number" id="setMinPartai" value="500" class="w-full">
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-medium">Selisih Grosir dari Ecer (Rp)</label>
+                        <input type="number" id="setSelisihGrosir" value="5000" class="w-full">
+                        <p class="text-xs opacity-50 mt-1">Potongan harga untuk pembelian grosir</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Komisi Marketplace Default (%)</label>
+                        <input type="number" id="setMarketplaceFee" value="5" class="w-full" step="0.1">
+                        <p class="text-xs opacity-50 mt-1">Biaya komisi untuk penjualan online (Shopee, Tokopedia, dll)</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Harga Pembulatan</label>
+                        <select id="setPembulatan" class="w-full">
+                            <option value="100">Kelipatan 100</option>
+                            <option value="500">Kelipatan 500</option>
+                            <option value="1000">Kelipatan 1.000</option>
+                            <option value="none">Tanpa Pembulatan</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KONTEN SUB-TAB: STOK & GUDANG -->
+        <div id="settings-stok" class="settings-tab-content hidden">
+            <h3 class="font-semibold text-lg mb-4 flex items-center gap-2"><i class="ph ph-package text-amber-600"></i> Pengaturan Stok & Gudang</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-medium">Alokasi Stok</label>
+                        <select id="setFifoMethod" class="w-full">
+                            <option value="fefo">FEFO (Kadaluarsa Terdekat)</option>
+                            <option value="fifo">FIFO (Masuk Pertama)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Metode Biaya Gudang</label>
+                        <select id="setStorageMethod" class="w-full">
+                            <option value="none">Tidak Ada</option>
+                            <option value="flat_monthly">Flat Bulanan</option>
+                            <option value="per_kg_day">Harian per Kg</option>
+                        </select>
+                    </div>
+                    <div id="storageFlatInput">
+                        <label class="text-sm font-medium">Biaya Sewa Gudang Bulanan (Rp)</label>
+                        <input type="number" id="setStorageFlat" value="0" class="w-full">
+                    </div>
+                    <div id="storagePerKgInput" class="hidden">
+                        <label class="text-sm font-medium">Biaya per Kg per Hari (Rp)</label>
+                        <input type="number" id="setStoragePerKg" value="0" class="w-full">
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-medium">Nama Gudang Utama</label>
+                        <input type="text" id="setNamaGudangUtama" value="Gudang Utama" class="w-full">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Nama Cold Storage</label>
+                        <input type="text" id="setNamaColdStorage" value="Cold Storage" class="w-full">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Kapasitas Maksimal Cold Storage (kg)</label>
+                        <input type="number" id="setKapasitasCold" value="5000" class="w-full">
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm font-medium">Peringatan Kapasitas Gudang</label>
+                        <div class="toggle-wrapper"><input type="checkbox" id="setWarningKapasitas" class="toggle-checkbox" checked><div class="toggle-label"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KONTEN SUB-TAB: BACKUP & DATA -->
+        <div id="settings-backup" class="settings-tab-content hidden">
+            <h3 class="font-semibold text-lg mb-4 flex items-center gap-2"><i class="ph ph-cloud-arrow-up text-purple-600"></i> Pengaturan Backup & Data</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-medium">Interval Auto Backup (hari)</label>
+                        <input type="number" id="setAutoBackup" value="7" class="w-full">
+                        <p class="text-xs opacity-50 mt-1">0 = nonaktifkan backup otomatis</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm font-medium">Kompresi Backup</label>
+                        <div class="toggle-wrapper"><input type="checkbox" id="setBackupKompresi" class="toggle-checkbox"><div class="toggle-label"></div></div>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Lokasi Penyimpanan</label>
+                        <select id="setStorageBackend" class="w-full">
+                            <option value="indexeddb">IndexedDB (Browser)</option>
+                            <option value="localstorage">LocalStorage</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm font-medium">Hapus Data Kuno Otomatis</label>
+                        <div class="toggle-wrapper"><input type="checkbox" id="setAutoClean" class="toggle-checkbox"><div class="toggle-label"></div></div>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Batas Umur Data (bulan)</label>
+                        <input type="number" id="setMaxDataAge" value="12" class="w-full">
+                        <p class="text-xs opacity-50 mt-1">Data lebih tua akan dihapus otomatis</p>
+                    </div>
+                    <button onclick="CFS.App.backupData()" class="btn btn-primary w-full"><i class="ph ph-download-simple"></i> Backup Manual Sekarang</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- KONTEN SUB-TAB: TAMPILAN -->
+        <div id="settings-tampilan" class="settings-tab-content hidden">
+            <h3 class="font-semibold text-lg mb-4 flex items-center gap-2"><i class="ph ph-palette text-pink-600"></i> Pengaturan Tampilan</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-medium">Tema Default</label>
+                        <select id="setTemaDefault" class="w-full">
+                            <option value="light">Terang</option>
+                            <option value="dark">Gelap</option>
+                            <option value="auto">Otomatis (Sistem)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Ukuran Font</label>
+                        <select id="setFontSize" class="w-full">
+                            <option value="small">Kecil</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="large">Besar</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm font-medium">Animasi UI</label>
+                        <div class="toggle-wrapper"><input type="checkbox" id="setAnimasi" class="toggle-checkbox" checked><div class="toggle-label"></div></div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm font-medium">Tampilkan Tips di Sidebar</label>
+                        <div class="toggle-wrapper"><input type="checkbox" id="setTipsSidebar" class="toggle-checkbox" checked><div class="toggle-label"></div></div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm font-medium">Suara Notifikasi</label>
+                        <div class="toggle-wrapper"><input type="checkbox" id="setSuaraNotif" class="toggle-checkbox"><div class="toggle-label"></div></div>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Jumlah Baris per Halaman</label>
+                        <input type="number" id="setRowsPerPage" value="20" class="w-full">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KONTEN SUB-TAB: PROFIL USAHA -->
+        <div id="settings-profil" class="settings-tab-content hidden">
+            <h3 class="font-semibold text-lg mb-4 flex items-center gap-2"><i class="ph ph-storefront text-indigo-600"></i> Profil Usaha untuk Invoice</h3>
+            <form id="companyProfileForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="text" id="companyName" placeholder="Nama Usaha*" value="Cibitung Frozen" required>
+                <input type="text" id="companyAddress" placeholder="Alamat Lengkap*" value="Jl. Industri No.1, Bekasi" required>
+                <input type="text" id="companyPhone" placeholder="Telepon*" value="0812-3456-7890" required>
+                <input type="email" id="companyEmail" placeholder="Email" value="info@cibitungfrozen.com">
+                <input type="text" id="companyWebsite" placeholder="Website (opsional)">
+                <input type="text" id="companyLogo" placeholder="URL Logo (opsional)">
+                <div class="col-span-full">
+                    <label class="text-sm font-medium">Catatan Kaki Invoice</label>
+                    <input type="text" id="companyFooterNote" placeholder="Misal: Terima kasih atas kepercayaan Anda." value="Terima kasih atas kepercayaan Anda.">
+                </div>
+                <button type="button" id="saveCompanyBtn" class="btn btn-primary col-span-full sm:col-span-1">Simpan Profil</button>
+            </form>
+        </div>
+
+        <!-- KONTEN SUB-TAB: RESET -->
+        <div id="settings-reset" class="settings-tab-content hidden">
+            <h3 class="font-semibold text-lg mb-4 flex items-center gap-2"><i class="ph ph-warning-circle text-red-600"></i> Reset & Pemeliharaan</h3>
+            <div class="space-y-4">
+                <div class="card p-4 border-red-200 dark:border-red-800 bg-red-50/30 dark:bg-red-900/10">
+                    <h4 class="font-semibold mb-2 text-red-700 dark:text-red-400"><i class="ph ph-trash mr-2"></i> Reset Semua Data</h4>
+                    <p class="text-sm text-red-700/80 dark:text-red-400/80 mb-3">
+                        Menghapus <strong>seluruh data</strong>: batch, transaksi, jurnal, pelanggan, supplier, dan pengaturan. 
+                        Data yang dihapus <strong>tidak dapat dikembalikan</strong>. Pastikan Anda sudah melakukan backup.
+                    </p>
                     <button id="resetAllDataBtn" class="btn btn-danger"><i class="ph ph-trash"></i> Reset Semua Data</button>
                 </div>
+                <div class="card p-4 border-amber-200 dark:border-amber-800 bg-amber-50/30 dark:bg-amber-900/10">
+                    <h4 class="font-semibold mb-2 text-amber-700 dark:text-amber-400"><i class="ph ph-arrows-clockwise mr-2"></i> Reset ke Pengaturan Default</h4>
+                    <p class="text-sm text-amber-700/80 dark:text-amber-400/80 mb-3">
+                        Mengembalikan pengaturan ke nilai awal tanpa menghapus data transaksi, batch, atau pelanggan.
+                    </p>
+                    <button id="resetSettingsBtn" class="btn btn-warning"><i class="ph ph-arrows-clockwise"></i> Reset Pengaturan Saja</button>
+                </div>
+                <div class="card p-4 border-blue-200 dark:border-blue-800 bg-blue-50/30 dark:bg-blue-900/10">
+                    <h4 class="font-semibold mb-2 text-blue-700 dark:text-blue-400"><i class="ph ph-database mr-2"></i> Informasi Penyimpanan</h4>
+                    <p class="text-sm text-blue-700/80 dark:text-blue-400/80">
+                        Data disimpan di browser menggunakan <strong id="storageInfoBackend">IndexedDB</strong>. 
+                        Estimasi ukuran data: <strong id="storageInfoSize">~0 KB</strong>. 
+                        <button id="clearCacheBtn" class="underline text-blue-600">Bersihkan cache</button>
+                    </p>
+                </div>
             </div>
         </div>
 
-        <!-- ==================== TAB BANTUAN ==================== -->
-        <div id="tab-help" class="tab-content space-y-6">
-            <div class="card p-6">
-                <h2 class="text-xl font-bold mb-4"><i class="ph ph-question text-blue-600"></i> Pusat Bantuan & FAQ</h2>
-                <div class="space-y-4">
-                    <details class="border rounded-lg p-4"><summary class="font-semibold cursor-pointer">📘 Bagaimana cara menambah stok baru?</summary><p class="mt-2 text-sm opacity-80">Buka tab <strong>Stok & Batch</strong>, isi form Tambah Batch Baru dengan data produk, berat, harga beli, dan tanggal kadaluarsa. Klik Simpan Batch.</p></details>
-                    <details class="border rounded-lg p-4"><summary class="font-semibold cursor-pointer">📗 Apa perbedaan FEFO dan FIFO?</summary><p class="mt-2 text-sm opacity-80">FEFO (First Expired First Out) mengeluarkan stok yang paling dekat kadaluarsa lebih dulu. FIFO (First In First Out) berdasarkan urutan masuk. Ubah di Pengaturan.</p></details>
-                    <details class="border rounded-lg p-4"><summary class="font-semibold cursor-pointer">📙 Bagaimana cara backup data?</summary><p class="mt-2 text-sm opacity-80">Klik tombol <strong>Backup</strong> di pojok kanan atas. File JSON akan diunduh. Untuk memulihkan, klik <strong>Restore</strong> dan pilih file backup.</p></details>
-                    <details class="border rounded-lg p-4"><summary class="font-semibold cursor-pointer">📕 Apa itu HPP dan margin?</summary><p class="mt-2 text-sm opacity-80">HPP (Harga Pokok Penjualan) adalah biaya dasar produk. Margin adalah keuntungan per kg yang ditambahkan di atas HPP. Atur margin default di Pengaturan.</p></details>
-                    <details class="border rounded-lg p-4"><summary class="font-semibold cursor-pointer">📒 Bagaimana cara menentukan harga online vs offline?</summary><p class="mt-2 text-sm opacity-80">Buka tab <strong>Harga Jual (Online/Offline)</strong>. Anda dapat mengatur harga berbeda untuk setiap channel. Harga online biasanya lebih tinggi karena komisi marketplace.</p></details>
-                    <details class="border rounded-lg p-4"><summary class="font-semibold cursor-pointer">📓 Bagaimana cara melakukan stock opname?</summary><p class="mt-2 text-sm opacity-80">Buka tab <strong>Stock Opname</strong>, pilih produk, masukkan jumlah fisik yang ada di gudang, dan sistem akan menghitung selisihnya.</p></details>
+        <!-- Tombol Simpan Utama -->
+        <div class="mt-8 border-t pt-4 flex gap-3">
+            <button id="saveSettingsBtn" class="btn btn-primary"><i class="ph ph-floppy-disk"></i> Simpan Semua Pengaturan</button>
+            <button id="discardSettingsBtn" class="btn btn-secondary"><i class="ph ph-x-circle"></i> Batal</button>
+        </div>
+    </div>
+</div>
+
+        <!-- ==================== TAB BANTUAN (LENGKAP) ==================== -->
+<div id="tab-help" class="tab-content space-y-6">
+    <div class="card p-6">
+        <h2 class="text-xl font-bold mb-4"><i class="ph ph-question text-blue-600"></i> Pusat Bantuan & Panduan</h2>
+
+        <!-- FAQ Umum -->
+        <div class="mb-8">
+            <h3 class="font-semibold text-lg mb-3"><i class="ph ph-files text-blue-500"></i> Pertanyaan Umum (FAQ)</h3>
+            <div class="space-y-3">
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
+                        <i class="ph ph-caret-right text-blue-500 transition-transform duration-200"></i>
+                        📘 Bagaimana cara menambah stok baru?
+                    </summary>
+                    <p class="mt-2 text-sm opacity-80 pl-6">
+                        Buka tab <strong>Stok & Batch</strong>, isi form <strong>Tambah Batch Baru</strong> dengan:
+                        <ul class="list-disc list-inside ml-4 mt-1">
+                            <li>Pilih produk dari dropdown</li>
+                            <li>Masukkan berat kotor batch (kg)</li>
+                            <li>Masukkan harga beli per kg dari supplier</li>
+                            <li>Isi ongkir, bensin, dan bongkar muat jika ada</li>
+                            <li>Pilih tanggal produksi dan kadaluarsa</li>
+                            <li>Klik <strong>Simpan Batch</strong></li>
+                        </ul>
+                        Batch baru akan langsung masuk ke sistem dan stok produk bertambah.
+                    </p>
+                </details>
+
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
+                        <i class="ph ph-caret-right text-blue-500 transition-transform duration-200"></i>
+                        📗 Apa perbedaan FEFO dan FIFO?
+                    </summary>
+                    <p class="mt-2 text-sm opacity-80 pl-6">
+                        <strong>FEFO</strong> (First Expired First Out) – Batch dengan tanggal kadaluarsa terdekat akan dijual lebih dulu. Cocok untuk produk frozen yang sensitif terhadap masa simpan.<br>
+                        <strong>FIFO</strong> (First In First Out) – Batch yang masuk pertama akan dikeluarkan lebih dulu. Cocok untuk produk non‑perishable.<br>
+                        Anda bisa mengubah metode ini di tab <strong>Pengaturan</strong>.
+                    </p>
+                </details>
+
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
+                        <i class="ph ph-caret-right text-blue-500 transition-transform duration-200"></i>
+                        📙 Bagaimana cara backup dan restore data?
+                    </summary>
+                    <p class="mt-2 text-sm opacity-80 pl-6">
+                        Klik tombol <strong>Backup</strong> di pojok kanan atas → file JSON akan terunduh.<br>
+                        Untuk memulihkan, klik <strong>Restore</strong> → pilih file backup → data akan dikembalikan dan halaman dimuat ulang.<br>
+                        <em>Tips: Backup setiap minggu untuk keamanan.</em>
+                    </p>
+                </details>
+
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
+                        <i class="ph ph-caret-right text-blue-500 transition-transform duration-200"></i>
+                        📕 Apa itu HPP dan bagaimana cara menghitungnya?
+                    </summary>
+                    <p class="mt-2 text-sm opacity-80 pl-6">
+                        HPP (Harga Pokok Penjualan) adalah total biaya yang dikeluarkan untuk memperoleh produk per kg. Sistem menghitungnya dari:<br>
+                        <code>(Harga Beli × Berat) + Ongkir + Bensin + Bongkar</code> dibagi <code>Berat</code>.<br>
+                        Anda bisa melihat HPP setiap batch di modal <strong>Detail Batch</strong>.
+                    </p>
+                </details>
+
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
+                        <i class="ph ph-caret-right text-blue-500 transition-transform duration-200"></i>
+                        📒 Bagaimana mengatur harga jual online vs offline?
+                    </summary>
+                    <p class="mt-2 text-sm opacity-80 pl-6">
+                        Buka tab <strong>Harga Jual (Online/Offline)</strong>. Di sana Anda bisa menentukan harga per kg untuk masing‑masing channel. Harga online biasanya lebih tinggi untuk menutupi komisi marketplace. Jika dikosongkan, sistem otomatis menghitung dari HPP + margin.
+                    </p>
+                </details>
+
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
+                        <i class="ph ph-caret-right text-blue-500 transition-transform duration-200"></i>
+                        📓 Bagaimana cara melakukan Stock Opname?
+                    </summary>
+                    <p class="mt-2 text-sm opacity-80 pl-6">
+                        Buka tab <strong>Stock Opname</strong>, pilih produk, masukkan jumlah fisik yang ada di gudang (hasil timbangan), dan sistem akan mencatat selisih dengan stok sistem. Lakukan ini secara berkala untuk menjaga akurasi data.
+                    </p>
+                </details>
+            </div>
+        </div>
+
+        <!-- Panduan Modul -->
+        <div class="mb-8">
+            <h3 class="font-semibold text-lg mb-3"><i class="ph ph-book-open text-purple-500"></i> Panduan Modul Utama</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="border rounded-lg p-4 bg-white dark:bg-slate-800">
+                    <h4 class="font-semibold flex items-center gap-1"><i class="ph ph-package text-primary-600"></i> Stok & Batch</h4>
+                    <ul class="text-sm opacity-80 mt-2 space-y-1 list-disc list-inside">
+                        <li>Tambah batch baru lengkap dengan landed cost.</li>
+                        <li>Lihat ringkasan stok per produk dan status (aman/menipis/kosong).</li>
+                        <li>Detail batch: edit, hapus, dan pantau HPP.</li>
+                        <li>Batch terpakai hari ini ditampilkan otomatis.</li>
+                    </ul>
                 </div>
-                <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                    <p class="text-sm"><i class="ph ph-info mr-2 text-blue-600"></i> Untuk bantuan lebih lanjut, hubungi support di <strong>support@cibitungfrozen.com</strong> atau klik tombol WhatsApp di bawah.</p>
-                    <a href="https://wa.me/6281234567890" target="_blank" class="btn btn-success mt-3"><i class="ph ph-whatsapp-logo"></i> Chat via WhatsApp</a>
+                <div class="border rounded-lg p-4 bg-white dark:bg-slate-800">
+                    <h4 class="font-semibold flex items-center gap-1"><i class="ph ph-shopping-cart text-emerald-600"></i> Penjualan</h4>
+                    <ul class="text-sm opacity-80 mt-2 space-y-1 list-disc list-inside">
+                        <li>Catat penjualan offline (toko) dan online (marketplace).</li>
+                        <li>Preview harga sebelum memproses transaksi.</li>
+                        <li>Invoice PDF profesional dengan DPP & PPN.</li>
+                        <li>Bagikan invoice via WhatsApp langsung.</li>
+                    </ul>
+                </div>
+                <div class="border rounded-lg p-4 bg-white dark:bg-slate-800">
+                    <h4 class="font-semibold flex items-center gap-1"><i class="ph ph-wallet text-blue-600"></i> Keuangan</h4>
+                    <ul class="text-sm opacity-80 mt-2 space-y-1 list-disc list-inside">
+                        <li>Ringkasan pendapatan, HPP, laba kotor, dan laba bersih bulan berjalan.</li>
+                        <li>Catat beban operasional (listrik, sewa, gaji, dll).</li>
+                        <li>Buku besar (jurnal) dengan ekspor Excel dan PDF.</li>
+                        <li>Grafik laba rugi tahunan.</li>
+                    </ul>
+                </div>
+                <div class="border rounded-lg p-4 bg-white dark:bg-slate-800">
+                    <h4 class="font-semibold flex items-center gap-1"><i class="ph ph-file-text text-violet-600"></i> Laporan</h4>
+                    <ul class="text-sm opacity-80 mt-2 space-y-1 list-disc list-inside">
+                        <li>Laba rugi detail, neraca, dan stok per gudang.</li>
+                        <li>Penjualan per channel, top pelanggan, retur.</li>
+                        <li>Proyeksi keuangan 3 bulan ke depan.</li>
+                        <li>Grafik tren penjualan bulanan.</li>
+                    </ul>
                 </div>
             </div>
         </div>
+
+        <!-- Tips & Trik -->
+        <div class="mb-8">
+            <h3 class="font-semibold text-lg mb-3"><i class="ph ph-lightbulb text-yellow-500"></i> Tips & Trik</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="border rounded-lg p-4 bg-white dark:bg-slate-800">
+                    <h4 class="font-semibold text-sm">🚀 Efisiensi Operasional</h4>
+                    <ul class="text-sm opacity-80 mt-2 space-y-1 list-disc list-inside">
+                        <li>Gunakan shortcut <kbd>Ctrl+D</kbd> (Dashboard), <kbd>Ctrl+S</kbd> (Stok), <kbd>Ctrl+B</kbd> (Backup).</li>
+                        <li>Setel target penjualan bulanan di Pengaturan untuk memantau progres di dashboard.</li>
+                        <li>Manfaatkan widget toggle di dashboard untuk menampilkan hanya informasi yang Anda butuhkan.</li>
+                    </ul>
+                </div>
+                <div class="border rounded-lg p-4 bg-white dark:bg-slate-800">
+                    <h4 class="font-semibold text-sm">💰 Margin & Harga</h4>
+                    <ul class="text-sm opacity-80 mt-2 space-y-1 list-disc list-inside">
+                        <li>Tetapkan margin default di Pengaturan, lalu sesuaikan harga online/offline secara manual jika perlu.</li>
+                        <li>Gunakan fitur Preview Harga sebelum menjual untuk melihat estimasi laba.</li>
+                        <li>Pantau laporan Margin per Produk untuk mengidentifikasi produk paling menguntungkan.</li>
+                    </ul>
+                </div>
+                <div class="border rounded-lg p-4 bg-white dark:bg-slate-800">
+                    <h4 class="font-semibold text-sm">📦 Manajemen Stok</h4>
+                    <ul class="text-sm opacity-80 mt-2 space-y-1 list-disc list-inside">
+                        <li>Lakukan stock opname rutin untuk mendeteksi selisih sejak dini.</li>
+                        <li>Perhatikan indikator warna di tabel stok: 🔴 Kosong, 🟡 Menipis, 🟢 Aman.</li>
+                        <li>Batch hampir kadaluarsa akan muncul di dashboard agar segera diprioritaskan.</li>
+                    </ul>
+                </div>
+                <div class="border rounded-lg p-4 bg-white dark:bg-slate-800">
+                    <h4 class="font-semibold text-sm">📊 Pelaporan</h4>
+                    <ul class="text-sm opacity-80 mt-2 space-y-1 list-disc list-inside">
+                        <li>Gunakan filter tanggal di tab Laporan untuk melihat periode tertentu.</li>
+                        <li>Ekspor laporan ke Excel atau PDF untuk keperluan akuntansi atau pajak.</li>
+                        <li>Audit Trail mencatat semua perubahan data – berguna untuk investigasi kesalahan.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Troubleshooting -->
+        <div>
+            <h3 class="font-semibold text-lg mb-3"><i class="ph ph-wrench text-red-500"></i> Pemecahan Masalah Umum</h3>
+            <div class="space-y-3">
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer">❌ Tombol di sidebar tidak bisa diklik</summary>
+                    <p class="mt-2 text-sm opacity-80 pl-6">
+                        Lakukan <strong>hard reload</strong> (Ctrl+Shift+R) untuk membersihkan cache. Jika masih bermasalah, periksa Console browser (F12) – biasanya ada file JavaScript yang gagal dimuat. Pastikan semua file .js di folder <code>js/</code> tersedia.
+                    </p>
+                </details>
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer">💾 Data tidak tersimpan setelah refresh</summary>
+                    <p class="mt-2 text-sm opacity-80 pl-6">
+                        Data disimpan di browser menggunakan <strong>localforage</strong> (IndexedDB). Pastikan browser tidak dalam mode Private/Incognito. Jika penyimpanan browser penuh, hapus data aplikasi lain atau lakukan backup manual.
+                    </p>
+                </details>
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer">🖨️ Invoice PDF tidak muncul</summary>
+                    <p class="mt-2 text-sm opacity-80 pl-6">
+                        Pastikan pop‑up tidak diblokir. Browser mungkin meminta izin untuk mengunduh file. Coba nonaktifkan pemblokir pop‑up sementara.
+                    </p>
+                </details>
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer">📈 Grafik tidak tampil</summary>
+                    <p class="mt-2 text-sm opacity-80 pl-6">
+                        Grafik menggunakan Chart.js yang dimuat dari CDN. Periksa koneksi internet. Jika offline, grafik tidak akan dirender, tetapi data tetap bisa diakses melalui tabel.
+                    </p>
+                </details>
+            </div>
+        </div>
+    </div>
+</div>
 
     </main>
 </div>
