@@ -595,35 +595,39 @@ window.CFS = window.CFS || {};
         }
     }
 
-    // --------------- GLOBAL ACTIONS ---------------
-    // Inisialisasi dengan fungsi-fungsi dasar
-    CFS.App = {};
-    CFS.App.backupData = backupData;
-    CFS.App.restorePrompt = restorePrompt;
-    CFS.App.showToast = showToast;
-    CFS.App.switchTab = switchTab;
-    CFS.App.acceptPO = function(id) {};
-    CFS.App.deleteSupplier = function(id) {};
-    CFS.App.deleteProduct = function(id) {};
-    CFS.App.deleteCustomer = function(name) {};
-    CFS.App.saveProductPricing = function(produk) {};
-    CFS.App.deleteSale = function(id) {};
-    CFS.App.deleteCustomerDetail = function(name) {};
+        // ===================== GLOBAL ACTIONS =====================
+    // Buat objek CFS.App jika belum ada
+    if (!window.CFS) window.CFS = {};
+    window.CFS.App = {};
+
+    // Isi properti satu per satu (cara paling aman)
+    window.CFS.App.backupData = backupData;
+    window.CFS.App.restorePrompt = restorePrompt;
+    window.CFS.App.showToast = showToast;
+    window.CFS.App.switchTab = switchTab;
+    window.CFS.App.acceptPO = function(id) {};
+    window.CFS.App.deleteSupplier = function(id) {};
+    window.CFS.App.deleteProduct = function(id) {};
+    window.CFS.App.deleteCustomer = function(name) {};
+    window.CFS.App.saveProductPricing = function(produk) {};
+    window.CFS.App.deleteSale = function(id) {};
+    window.CFS.App.deleteCustomerDetail = function(name) {};
 
     // --------------- INIT ---------------
-    window.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => {
+    window.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
             if (localStorage.getItem('cfs_dark') === '1') {
                 document.documentElement.classList.add('dark');
-                const darkIcon = document.getElementById('darkIcon');
+                var darkIcon = document.getElementById('darkIcon');
                 if (darkIcon) darkIcon.className = 'ph ph-sun text-lg text-yellow-400';
-                document.getElementById('sidebar-mode').textContent = 'Gelap';
+                var sidebarMode = document.getElementById('sidebar-mode');
+                if (sidebarMode) sidebarMode.textContent = 'Gelap';
             }
             switchTab('tab-dashboard');
-            setInterval(() => {
-                const el = document.getElementById('lastUpdate');
+            setInterval(function() {
+                var el = document.getElementById('lastUpdate');
                 if (el) el.textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                const sysEl = document.getElementById('systemDateTime');
+                var sysEl = document.getElementById('systemDateTime');
                 if (sysEl) sysEl.textContent = new Date().toLocaleString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
             }, 1000);
             document.addEventListener('keydown', function(e) {
@@ -634,4 +638,4 @@ window.CFS = window.CFS || {};
         }, 200);
     });
 
-})();
+})(); // ← INI PENUTUP IIFE, HARUS ADA
