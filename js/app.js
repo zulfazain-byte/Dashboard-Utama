@@ -1,5 +1,5 @@
 /* ============================================================
-   Cibitung Frozen ERP Ultimate v5.4 — Main Application (STABLE)
+   Cibitung Frozen ERP Ultimate v5.4 — Main Application (FIX)
    ============================================================ */
 window.CFS = window.CFS || {};
 
@@ -9,7 +9,7 @@ window.CFS = window.CFS || {};
     const Storage = CFS.Storage;
     const modulesInitialized = {};
 
-    // --------------- TOAST NOTIFICATION ---------------
+    // --------------- TOAST ---------------
     const toast = document.getElementById('toast');
     const toastIcon = document.getElementById('toastIcon');
     const toastTitle = document.getElementById('toastTitle');
@@ -38,28 +38,23 @@ window.CFS = window.CFS || {};
     }
     window.showToast = showToast;
 
-    // --------------- SWITCH TAB (MAIN) ---------------
+    // --------------- SWITCH TAB ---------------
     function switchTab(tabId) {
-        // Hide all tab contents
         document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-        // Remove active from all buttons
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.classList.remove('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
             btn.classList.add('opacity-70');
         });
 
-        // Show target tab
         const target = document.getElementById(tabId);
         if (target) target.classList.add('active');
 
-        // Mark button active
         const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
         if (btn) {
             btn.classList.add('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
             btn.classList.remove('opacity-70');
         }
 
-        // Initialize/refresh module based on tab
         switch (tabId) {
             case 'tab-dashboard':
                 if (CFS.Dashboard) {
@@ -203,7 +198,7 @@ window.CFS = window.CFS || {};
         input.click();
     }
 
-    // --------------- DARK MODE TOGGLE ---------------
+    // --------------- DARK MODE ---------------
     window.toggleDarkMode = function() {
         document.documentElement.classList.toggle('dark');
         localStorage.setItem('cfs_dark', document.documentElement.classList.contains('dark') ? '1' : '0');
@@ -213,8 +208,7 @@ window.CFS = window.CFS || {};
         if (sidebarMode) sidebarMode.textContent = document.documentElement.classList.contains('dark') ? 'Gelap' : 'Terang';
     };
 
-    // ===================== FULL FALLBACK FUNCTIONS =====================
-
+    // ===================== FALLBACK FUNGSI TAB =====================
     function initPurchaseTabFull() {
         const form = document.getElementById('purchaseForm');
         if (!form || form.dataset.listener) return;
@@ -224,8 +218,6 @@ window.CFS = window.CFS || {};
         const qtyInput = document.getElementById('purchaseQty');
         const hargaInput = document.getElementById('purchaseHarga');
         const tglInput = document.getElementById('purchaseTgl');
-        const estimasiInput = document.getElementById('purchaseEstimasi');
-        const catatanInput = document.getElementById('purchaseCatatan');
         const tbody = document.getElementById('purchaseTableBody');
 
         function populateSuppliers() {
@@ -239,10 +231,10 @@ window.CFS = window.CFS || {};
         function renderPOList() {
             if (!tbody) return;
             const pos = Storage.getBatches().filter(b => b.supplier && b.used === 0);
-            tbody.innerHTML = pos.length === 0 ? '<tr><td colspan="8" class="text-center p-4 opacity-50">Belum ada PO</td></tr>' :
+            tbody.innerHTML = pos.length === 0 ? '<tr><td colspan="7" class="text-center p-4 opacity-50">Belum ada PO</td></tr>' :
             pos.map(b => {
                 const sup = Storage.getSuppliers().find(s => s.id === b.supplier);
-                return `<tr class="border-t"><td class="p-2">${b.tglProduksi}</td><td class="p-2">${sup?.name||'-'}</td><td class="p-2">${b.produk}</td><td class="p-2 text-right">${b.berat} kg</td><td class="p-2 text-right">Rp ${b.hargaBeli.toLocaleString('id-ID')}</td><td class="p-2 text-right">Rp ${(b.berat*b.hargaBeli).toLocaleString('id-ID')}</td><td class="p-2 text-center"><span class="badge bg-blue-100 text-blue-700">Draft</span></td><td class="p-2 text-center"><button class="btn btn-xs btn-success" onclick="CFS.App.acceptPO('${b.id}')">✅</button></td></tr>`;
+                return `<tr class="border-t"><td class="p-2">${b.tglProduksi}</td><td class="p-2">${sup?.name||'-'}</td><td class="p-2">${b.produk}</td><td class="p-2 text-right">${b.berat} kg</td><td class="p-2 text-right">Rp ${(b.berat*b.hargaBeli).toLocaleString('id-ID')}</td><td class="p-2 text-center"><span class="badge bg-blue-100 text-blue-700">Draft</span></td><td class="p-2 text-center"><button class="btn btn-xs btn-success" onclick="CFS.App.acceptPO('${b.id}')">✅</button></td></tr>`;
             }).join('');
         }
         populateSuppliers();
@@ -256,29 +248,16 @@ window.CFS = window.CFS || {};
             const qty = parseFloat(qtyInput.value);
             const harga = parseFloat(hargaInput.value);
             const tanggal = tglInput.value;
-            const estimasi = estimasiInput?.value || '';
-            const catatan = catatanInput?.value || '';
             if (!supplierId || !produk || !qty || !harga || !tanggal) {
                 showToast('Error', 'Lengkapi data pembelian.', 'error');
                 return;
             }
             const newBatch = {
-                id: 'b' + Date.now(),
-                produk,
-                berat: qty,
-                hargaBeli: harga,
-                ongkir: 0,
-                bensin: 0,
-                bongkar: 0,
-                pajakType: 'none',
-                pajakValue: 0,
+                id: 'b' + Date.now(), produk, berat: qty, hargaBeli: harga,
+                ongkir: 0, bensin: 0, bongkar: 0, pajakType: 'none', pajakValue: 0,
                 tglProduksi: tanggal,
                 tglKadaluarsa: new Date(new Date(tanggal).getTime() + 90*24*60*60*1000).toISOString().split('T')[0],
-                used: 0,
-                supplier: supplierId,
-                warehouse: 'gudang_utama',
-                estimasi,
-                catatan
+                used: 0, supplier: supplierId, warehouse: 'gudang_utama'
             };
             await Storage.addBatch(newBatch);
             showToast('Sukses', 'Purchase Order dibuat dan batch ditambahkan.', 'success');
@@ -289,7 +268,7 @@ window.CFS = window.CFS || {};
         CFS.App.acceptPO = async (batchId) => {
             const batch = Storage.getBatches().find(b => b.id === batchId);
             if (!batch) return;
-            showToast('Sukses', 'PO diterima. Batch siap digunakan.', 'success');
+            showToast('Sukses', 'PO diterima.', 'success');
             renderPOList();
         };
     }
@@ -303,8 +282,6 @@ window.CFS = window.CFS || {};
         const addressInput = document.getElementById('supplierAddress');
         const emailInput = document.getElementById('supplierEmail');
         const bankInput = document.getElementById('supplierBank');
-        const npwpInput = document.getElementById('supplierNPWP');
-        const notesInput = document.getElementById('supplierNotes');
         const tbody = document.getElementById('supplierTableBody');
 
         function renderSuppliers() {
@@ -319,16 +296,7 @@ window.CFS = window.CFS || {};
             e.preventDefault();
             const name = nameInput?.value.trim();
             if (!name) return;
-            await Storage.addSupplier({
-                name,
-                contact: contactInput?.value || '',
-                address: addressInput?.value || '',
-                email: emailInput?.value || '',
-                bank: bankInput?.value || '',
-                npwp: npwpInput?.value || '',
-                notes: notesInput?.value || '',
-                totalPO: 0
-            });
+            await Storage.addSupplier({ name, contact: contactInput?.value || '', address: addressInput?.value || '', email: emailInput?.value || '', bank: bankInput?.value || '', totalPO: 0 });
             showToast('Sukses', 'Supplier ditambahkan.', 'success');
             form.reset();
             renderSuppliers();
@@ -352,25 +320,15 @@ window.CFS = window.CFS || {};
         function renderProducts() {
             if (!tbody) return;
             const prods = Storage.getProducts();
-            tbody.innerHTML = prods.length === 0 ? '<tr><td colspan="8" class="text-center p-4 opacity-50">Belum ada produk kustom</td></tr>' :
-            prods.map(p => {
-                const stok = CFS.Inventory?.getStockPerProduct()?.[p.name] || 0;
-                return `<tr class="border-t"><td class="p-2">${p.name}</td><td class="p-2">${p.category || '-'}</td><td class="p-2">${p.sku || '-'}</td><td class="p-2">${p.brand || '-'}</td><td class="p-2 text-right">${p.minStock || 10}</td><td class="p-2">${p.unit || 'kg'}</td><td class="p-2 text-center"><span class="${stok===0?'text-red-500':stok<(p.minStock||10)?'text-amber-500':'text-green-500'}">${stok} kg</span></td><td class="p-2 text-center"><button onclick="CFS.App.deleteProduct('${p.id}')" class="text-red-500">🗑️</button></td></tr>`;
-            }).join('');
+            tbody.innerHTML = prods.length === 0 ? '<tr><td colspan="6" class="text-center p-4 opacity-50">Belum ada produk kustom</td></tr>' :
+            prods.map(p => `<tr class="border-t"><td class="p-2">${p.name}</td><td class="p-2">${p.category || '-'}</td><td class="p-2">${p.sku || '-'}</td><td class="p-2">${p.minStock || 10} kg</td><td class="p-2">${p.unit || 'kg'}</td><td class="p-2"><button onclick="CFS.App.deleteProduct('${p.id}')" class="text-red-500">🗑️</button></td></tr>`).join('');
         }
         renderProducts();
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = nameInput?.value.trim();
             if (!name) return;
-            await Storage.addProduct({
-                name,
-                category: categoryInput?.value || '',
-                minStock: parseInt(minStockInput?.value) || 10,
-                unit: unitInput?.value || 'kg',
-                brand: brandInput?.value || '',
-                sku: skuInput?.value || ''
-            });
+            await Storage.addProduct({ name, category: categoryInput?.value || '', minStock: parseInt(minStockInput?.value) || 10, unit: unitInput?.value || 'kg', brand: brandInput?.value || '', sku: skuInput?.value || '' });
             showToast('Sukses', 'Produk baru ditambahkan.', 'success');
             form.reset();
             renderProducts();
@@ -469,8 +427,6 @@ window.CFS = window.CFS || {};
         const tracking = document.getElementById('deliveryTracking');
         const status = document.getElementById('deliveryStatus');
         const estimasi = document.getElementById('deliveryEstimate');
-        const tglKirim = document.getElementById('deliveryTglKirim');
-        const notes = document.getElementById('deliveryNotes');
         const tbody = document.getElementById('deliveryTableBody');
 
         function renderDeliveries() {
@@ -483,7 +439,7 @@ window.CFS = window.CFS || {};
         if (saleSelect) saleSelect.innerHTML = '<option value="">Pilih Transaksi</option>' + Storage.getSales().map(s => `<option value="${s.id}">${s.tanggal} - ${s.klien} (${s.produk})</option>`).join('');
         form.addEventListener('submit', async (e) => {
             e.preventDefault(); if (!saleSelect?.value || !courier?.value) return;
-            await Storage.addDelivery({ saleId: saleSelect.value, courier: courier.value, tracking: tracking?.value, status: status?.value, estimasi: estimasi?.value, tglKirim: tglKirim?.value, notes: notes?.value });
+            await Storage.addDelivery({ saleId: saleSelect.value, courier: courier.value, tracking: tracking?.value, status: status?.value, estimasi: estimasi?.value });
             showToast('Sukses', 'Pengiriman dicatat.', 'success'); form.reset(); renderDeliveries(); if (CFS.Dashboard) CFS.Dashboard.refresh();
         });
     }
@@ -595,12 +551,8 @@ window.CFS = window.CFS || {};
         }
     }
 
-        // ===================== GLOBAL ACTIONS =====================
-    // Buat objek CFS.App jika belum ada
-    if (!window.CFS) window.CFS = {};
+    // ===================== GLOBAL ACTIONS =====================
     window.CFS.App = {};
-
-    // Isi properti satu per satu (cara paling aman)
     window.CFS.App.backupData = backupData;
     window.CFS.App.restorePrompt = restorePrompt;
     window.CFS.App.showToast = showToast;
@@ -638,4 +590,4 @@ window.CFS = window.CFS || {};
         }, 200);
     });
 
-})(); // ← INI PENUTUP IIFE, HARUS ADA
+})();
