@@ -1,5 +1,5 @@
 /* ============================================================
-   Cibitung Frozen ERP Ultimate v5.4 — Main Application (FIX)
+   Cibitung Frozen ERP Ultimate v5.4 — Main Application (STABLE)
    ============================================================ */
 window.CFS = window.CFS || {};
 
@@ -9,7 +9,7 @@ window.CFS = window.CFS || {};
     const Storage = CFS.Storage;
     const modulesInitialized = {};
 
-    // --------------- TOAST ---------------
+    // --------------- TOAST NOTIFICATION ---------------
     const toast = document.getElementById('toast');
     const toastIcon = document.getElementById('toastIcon');
     const toastTitle = document.getElementById('toastTitle');
@@ -38,24 +38,28 @@ window.CFS = window.CFS || {};
     }
     window.showToast = showToast;
 
-    // --------------- SWITCH TAB (SATU FUNGSI) ---------------
+    // --------------- SWITCH TAB (MAIN) ---------------
     function switchTab(tabId) {
+        // Hide all tab contents
         document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+        // Remove active from all buttons
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.classList.remove('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
             btn.classList.add('opacity-70');
         });
 
+        // Show target tab
         const target = document.getElementById(tabId);
         if (target) target.classList.add('active');
 
+        // Mark button active
         const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
         if (btn) {
             btn.classList.add('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
             btn.classList.remove('opacity-70');
         }
 
-        // Inisialisasi modul
+        // Initialize/refresh module based on tab
         switch (tabId) {
             case 'tab-dashboard':
                 if (CFS.Dashboard) {
@@ -199,7 +203,7 @@ window.CFS = window.CFS || {};
         input.click();
     }
 
-    // --------------- DARK MODE ---------------
+    // --------------- DARK MODE TOGGLE ---------------
     window.toggleDarkMode = function() {
         document.documentElement.classList.toggle('dark');
         localStorage.setItem('cfs_dark', document.documentElement.classList.contains('dark') ? '1' : '0');
@@ -209,7 +213,7 @@ window.CFS = window.CFS || {};
         if (sidebarMode) sidebarMode.textContent = document.documentElement.classList.contains('dark') ? 'Gelap' : 'Terang';
     };
 
-    // ===================== FALLBACK FUNCTIONS =====================
+    // ===================== FULL FALLBACK FUNCTIONS =====================
 
     function initPurchaseTabFull() {
         const form = document.getElementById('purchaseForm');
@@ -591,19 +595,20 @@ window.CFS = window.CFS || {};
         }
     }
 
-    // --------------- GLOBAL ACTIONS (INITIALIZATION) ---------------
-CFS.App = {};
-CFS.App.backupData = backupData;
-CFS.App.restorePrompt = restorePrompt;
-CFS.App.showToast = showToast;
-CFS.App.switchTab = switchTab;
-CFS.App.acceptPO = function(id) {};
-CFS.App.deleteSupplier = function(id) {};
-CFS.App.deleteProduct = function(id) {};
-CFS.App.deleteCustomer = function(name) {};
-CFS.App.saveProductPricing = function(produk) {};
-CFS.App.deleteSale = function(id) {};
-CFS.App.deleteCustomerDetail = function(name) {};
+    // --------------- GLOBAL ACTIONS ---------------
+    // Inisialisasi dengan fungsi-fungsi dasar
+    CFS.App = {};
+    CFS.App.backupData = backupData;
+    CFS.App.restorePrompt = restorePrompt;
+    CFS.App.showToast = showToast;
+    CFS.App.switchTab = switchTab;
+    CFS.App.acceptPO = function(id) {};
+    CFS.App.deleteSupplier = function(id) {};
+    CFS.App.deleteProduct = function(id) {};
+    CFS.App.deleteCustomer = function(name) {};
+    CFS.App.saveProductPricing = function(produk) {};
+    CFS.App.deleteSale = function(id) {};
+    CFS.App.deleteCustomerDetail = function(name) {};
 
     // --------------- INIT ---------------
     window.addEventListener('DOMContentLoaded', () => {
