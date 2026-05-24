@@ -1,5 +1,5 @@
 /* ============================================================
-   Cibitung Frozen ERP Ultimate v5.4 — Products Module (Upgrade)
+   Cibitung Frozen ERP Ultimate v5.4 — Products Module (FULL)
    ============================================================ */
 window.CFS = window.CFS || {};
 
@@ -7,14 +7,16 @@ window.CFS = window.CFS || {};
     'use strict';
     const Storage = CFS.Storage;
 
+    // State lokal untuk kategori dan varian
     let categories = [];
     let variants = [];
 
+    // Cache elemen
     let elements = {};
 
     function cacheElements() {
         elements = {
-            // Stats
+            // Statistik
             prodTotalProduct: document.getElementById('prodTotalProduct'),
             prodActiveProduct: document.getElementById('prodActiveProduct'),
             prodLowStock: document.getElementById('prodLowStock'),
@@ -54,17 +56,9 @@ window.CFS = window.CFS || {};
         };
     }
 
-    // ===================== INIT =====================
+    // ===================== INISIALISASI =====================
     async function initProductsTab() {
-        await loadCategoriesAndVariants();
-        cacheElements();
-        refreshStats();
-        renderProductTable();
-        populateCategoryFilters();
-        bindEvents();
-    }
-
-    async function loadCategoriesAndVariants() {
+        // Muat kategori dan varian dari localforage
         categories = (await localforage.getItem('cfs_product_categories')) || [];
         variants = (await localforage.getItem('cfs_product_variants')) || [];
         if (!categories.length) {
@@ -75,6 +69,13 @@ window.CFS = window.CFS || {};
             ];
             await localforage.setItem('cfs_product_categories', categories);
         }
+
+        cacheElements();
+        setupSubTabs();
+        refreshStats();
+        renderProductTable();
+        populateCategoryFilters();
+        bindEvents();
     }
 
     async function saveCategories() {
@@ -85,13 +86,35 @@ window.CFS = window.CFS || {};
         await localforage.setItem('cfs_product_variants', variants);
     }
 
-    // ===================== STATS =====================
+    // --------------- SUB‑TAB SWITCHING ---------------
+    function setupSubTabs() {
+        document.querySelectorAll('.products-subtab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.products-subtab-btn').forEach(b => {
+                    b.classList.remove('btn-primary', 'active');
+                    b.classList.add('btn-secondary');
+                });
+                this.classList.add('btn-primary', 'active');
+                this.classList.remove('btn-secondary');
+                const tab = this.dataset.productsTab;
+                document.querySelectorAll('.products-subtab-content').forEach(c => c.classList.add('hidden'));
+                const target = document.getElementById(tab);
+                if (target) target.classList.remove('hidden');
+                if (tab === 'products-category') renderCategoryTable();
+                if (tab === 'products-variants') renderVariantTable();
+                if (tab === 'products-list') renderProductTable();
+            });
+        });
+    }
+
+    // --------------- STATISTIK ---------------
     function refreshStats() {
         const products = Storage.getProducts();
         const total = products.length;
-        const activeCount = products.filter(p => (CFS.Inventory?.getStockPerProduct() || {})[p.name] > 0).length;
+        const stockMap = CFS.Inventory ? CFS.Inventory.getStockPerProduct() : {};
+        const activeCount = products.filter(p => (stockMap[p.name] || 0) > 0).length;
         const lowStockCount = products.filter(p => {
-            const stock = (CFS.Inventory?.getStockPerProduct() || {})[p.name] || 0;
+            const stock = stockMap[p.name] || 0;
             return stock > 0 && stock < (p.minStock || 10);
         }).length;
 
@@ -102,7 +125,7 @@ window.CFS = window.CFS || {};
         if (elements.prodTotalVariants) elements.prodTotalVariants.textContent = variants.length;
     }
 
-    // ===================== PRODUCT TABLE =====================
+    // --------------- DAFTAR PRODUK ---------------
     function renderProductTable(filter = {}) {
         if (!elements.productTableBody) return;
         let products = Storage.getProducts();
@@ -114,7 +137,7 @@ window.CFS = window.CFS || {};
             products = products.filter(p => (p.category || '') === filter.category);
         }
 
-        const stockMap = CFS.Inventory?.getStockPerProduct() || {};
+        const stockMap = CFS.Inventory ? CFS.Inventory.getStockPerProduct() : {};
         if (products.length === 0) {
             elements.productTableBody.innerHTML = '<tr><td colspan="8" class="text-center p-4 opacity-50">Tidak ada produk.</td></tr>';
             return;
@@ -156,12 +179,11 @@ window.CFS = window.CFS || {};
         }
     }
 
-    // ===================== FORM EDIT =====================
+    // --------------- FORM TAMBAH / EDIT ---------------
     function editProduct(id) {
         const product = Storage.getProducts().find(p => p.id === id);
         if (!product) return;
-
-        // Switch to form sub-tab
+        // Pindah ke sub‑tab form
         document.querySelectorAll('.products-subtab-btn').forEach(b => { b.classList.remove('btn-primary','active'); b.classList.add('btn-secondary'); });
         const formBtn = document.querySelector('[data-products-tab="products-form"]');
         if (formBtn) { formBtn.classList.add('btn-primary','active'); formBtn.classList.remove('btn-secondary'); }
@@ -169,7 +191,7 @@ window.CFS = window.CFS || {};
         const formDiv = document.getElementById('products-form');
         if (formDiv) formDiv.classList.remove('hidden');
 
-        // Fill form
+        // Isi form
         elements.prodEditId.value = product.id;
         elements.newProductName.value = product.name;
         elements.newProductCategory.value = product.category || '';
@@ -203,22 +225,29 @@ window.CFS = window.CFS || {};
         const brand = elements.newProductBrand.value.trim();
 
         if (!name) {
-            showToast('Error', 'Nama produk wajib diisi.', 'error');
+            window.showToast?.('Error', 'Nama produk wajib diisi.', 'error');
             return;
         }
 
         if (id) {
+            // Update produk
             const products = Storage.getProducts();
             const product = products.find(p => p.id === id);
             if (product) {
-                Object.assign(product, { name, category, sku, minStock, unit, brand });
+                product.name = name;
+                product.category = category;
+                product.sku = sku;
+                product.minStock = minStock;
+                product.unit = unit;
+                product.brand = brand;
                 await Storage.saveAllData();
-                showToast('Sukses', 'Produk diperbarui.', 'success');
+                window.showToast?.('Sukses', 'Produk diperbarui.', 'success');
             }
         } else {
+            // Tambah baru
             const newProduct = { id: 'prd_' + Date.now(), name, category, sku, minStock, unit, brand };
             await Storage.addProduct(newProduct);
-            showToast('Sukses', 'Produk baru ditambahkan.', 'success');
+            window.showToast?.('Sukses', 'Produk baru ditambahkan.', 'success');
         }
 
         cancelEdit();
@@ -230,26 +259,22 @@ window.CFS = window.CFS || {};
     }
 
     async function deleteProduct(id) {
-        if (!confirm('Hapus produk? Batch terkait tidak akan terhapus.')) return;
+        if (!confirm('Hapus produk? Batch yang terkait tidak akan terhapus.')) return;
         await Storage.deleteProduct(id);
         refreshStats();
         renderProductTable();
         populateCategoryFilters();
         if (CFS.Inventory) CFS.Inventory.populateProductDropdowns();
-        showToast('Sukses', 'Produk dihapus.', 'success');
+        window.showToast?.('Sukses', 'Produk dihapus.', 'success');
     }
 
-    // ===================== KATEGORI =====================
+    // --------------- KATEGORI ---------------
     function renderCategoryTable() {
         if (!elements.categoryTableBody) return;
         const products = Storage.getProducts();
         elements.categoryTableBody.innerHTML = categories.map(c => {
             const count = products.filter(p => (p.category || '') === c.name).length;
-            return `<tr class="border-t">
-                <td class="p-2">${c.name}</td>
-                <td class="p-2 text-right">${count}</td>
-                <td class="p-2 text-center"><button class="btn btn-xs btn-danger" onclick="CFS.Products.deleteCategory('${c.id}')">🗑️</button></td>
-            </tr>`;
+            return `<tr class="border-t"><td class="p-2">${c.name}</td><td class="p-2 text-right">${count}</td><td class="p-2 text-center"><button class="btn btn-xs btn-danger" onclick="CFS.Products.deleteCategory('${c.id}')">🗑️</button></td></tr>`;
         }).join('') || '<tr><td colspan="3" class="text-center p-4 opacity-50">Belum ada kategori.</td></tr>';
     }
 
@@ -262,7 +287,7 @@ window.CFS = window.CFS || {};
         elements.newCategoryName.value = '';
         renderCategoryTable();
         populateCategoryFilters();
-        showToast('Sukses', 'Kategori ditambahkan.', 'success');
+        window.showToast?.('Sukses', 'Kategori ditambahkan.', 'success');
     }
 
     async function deleteCategory(id) {
@@ -276,23 +301,17 @@ window.CFS = window.CFS || {};
             await saveCategories();
             renderCategoryTable();
             populateCategoryFilters();
-            showToast('Sukses', 'Kategori dihapus.', 'success');
+            window.showToast?.('Sukses', 'Kategori dihapus.', 'success');
         }
     }
 
-    // ===================== VARIAN =====================
+    // --------------- VARIAN KEMASAN ---------------
     function renderVariantTable() {
         if (!elements.variantTableBody) return;
         const products = Storage.getProducts();
         elements.variantTableBody.innerHTML = variants.map(v => {
             const product = products.find(p => p.id === v.productId);
-            const productName = product ? product.name : '?';
-            return `<tr class="border-t">
-                <td class="p-2">${productName}</td>
-                <td class="p-2">${v.name}</td>
-                <td class="p-2 text-right">${v.weight} kg</td>
-                <td class="p-2 text-center"><button class="btn btn-xs btn-danger" onclick="CFS.Products.deleteVariant('${v.id}')">🗑️</button></td>
-            </tr>`;
+            return `<tr class="border-t"><td class="p-2">${product ? product.name : '?'}</td><td class="p-2">${v.name}</td><td class="p-2 text-right">${v.weight} kg</td><td class="p-2 text-center"><button class="btn btn-xs btn-danger" onclick="CFS.Products.deleteVariant('${v.id}')">🗑️</button></td></tr>`;
         }).join('') || '<tr><td colspan="4" class="text-center p-4 opacity-50">Belum ada varian.</td></tr>';
     }
 
@@ -301,7 +320,7 @@ window.CFS = window.CFS || {};
         const name = elements.variantName?.value.trim();
         const weight = parseFloat(elements.variantWeight?.value);
         if (!productId || !name || isNaN(weight) || weight <= 0) {
-            showToast('Error', 'Lengkapi data varian dengan benar.', 'error');
+            window.showToast?.('Error', 'Lengkapi data varian dengan benar.', 'error');
             return;
         }
         variants.push({ id: 'var_' + Date.now(), productId, name, weight });
@@ -310,7 +329,7 @@ window.CFS = window.CFS || {};
         elements.variantWeight.value = '';
         renderVariantTable();
         refreshStats();
-        showToast('Sukses', 'Varian kemasan ditambahkan.', 'success');
+        window.showToast?.('Sukses', 'Varian kemasan ditambahkan.', 'success');
     }
 
     async function deleteVariant(id) {
@@ -319,13 +338,13 @@ window.CFS = window.CFS || {};
         await saveVariants();
         renderVariantTable();
         refreshStats();
-        showToast('Sukses', 'Varian dihapus.', 'success');
+        window.showToast?.('Sukses', 'Varian dihapus.', 'success');
     }
 
-    // ===================== IMPORT / EXPORT =====================
+    // --------------- IMPORT / EXPORT ---------------
     async function exportProductsToCSV() {
         const products = Storage.getProducts();
-        const rows = [['Nama', 'Kategori', 'SKU', 'Merek', 'Stok Minimum', 'Satuan']];
+        const rows = [['Nama','Kategori','SKU','Merek','Stok Minimum','Satuan']];
         products.forEach(p => rows.push([p.name, p.category || '', p.sku || '', p.brand || '', p.minStock || 10, p.unit || 'kg']));
         const csvContent = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
         const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -333,7 +352,7 @@ window.CFS = window.CFS || {};
         a.href = URL.createObjectURL(blob);
         a.download = `produk_${new Date().toISOString().slice(0,10)}.csv`;
         a.click();
-        showToast('Sukses', 'Produk diekspor ke CSV.', 'success');
+        window.showToast?.('Sukses', 'Produk diekspor ke CSV.', 'success');
     }
 
     function importProductsFromCSV() {
@@ -365,33 +384,14 @@ window.CFS = window.CFS || {};
             renderProductTable();
             populateCategoryFilters();
             if (CFS.Inventory) CFS.Inventory.populateProductDropdowns();
-            showToast('Sukses', 'Produk diimpor dari CSV.', 'success');
+            window.showToast?.('Sukses', 'Produk diimpor dari CSV.', 'success');
         };
         input.click();
     }
 
-    // ===================== SUB‑TAB SWITCH =====================
+    // --------------- EVENT BINDING ---------------
     function bindEvents() {
-        // Sub‑tab switching
-        document.querySelectorAll('.products-subtab-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.products-subtab-btn').forEach(b => {
-                    b.classList.remove('btn-primary', 'active');
-                    b.classList.add('btn-secondary');
-                });
-                this.classList.add('btn-primary', 'active');
-                this.classList.remove('btn-secondary');
-                const tab = this.dataset.productsTab;
-                document.querySelectorAll('.products-subtab-content').forEach(c => c.classList.add('hidden'));
-                const target = document.getElementById(tab);
-                if (target) target.classList.remove('hidden');
-                if (tab === 'products-category') renderCategoryTable();
-                if (tab === 'products-variants') renderVariantTable();
-                if (tab === 'products-list') renderProductTable();
-            });
-        });
-
-        // Filter
+        // Filter daftar produk
         if (elements.applyProdFilter) {
             elements.applyProdFilter.addEventListener('click', () => {
                 renderProductTable({
@@ -401,7 +401,7 @@ window.CFS = window.CFS || {};
             });
         }
 
-        // Form
+        // Form submit
         if (elements.productCustomForm) {
             elements.productCustomForm.addEventListener('submit', handleProductSubmit);
             elements.productCustomForm.dataset.listener = 'true';
@@ -437,9 +437,9 @@ window.CFS = window.CFS || {};
     // Expose API
     CFS.Products = {
         init: initProductsTab,
-        editProduct,
-        deleteProduct,
-        deleteCategory,
-        deleteVariant
+        editProduct: editProduct,
+        deleteProduct: deleteProduct,
+        deleteCategory: deleteCategory,
+        deleteVariant: deleteVariant
     };
 })();
