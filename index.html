@@ -2318,7 +2318,7 @@
     </div>
 </div>
 
-        <!-- ==================== TAB NOTIFIKASI (LENGKAP) ==================== -->
+       <!-- ==================== TAB NOTIFIKASI (DINAMIS) ==================== -->
 <div id="tab-notifications" class="tab-content space-y-6">
     <div class="card p-6">
         <h2 class="text-xl font-bold mb-4"><i class="ph ph-bell text-red-600"></i> Pusat Notifikasi & Alert</h2>
@@ -2337,7 +2337,7 @@
         </div>
 
         <!-- Filter Jenis Notifikasi -->
-        <div class="flex flex-wrap gap-2 mb-6">
+        <div class="flex flex-wrap gap-2 mb-4">
             <button class="btn btn-sm btn-primary notif-filter-btn" data-filter="all">Semua</button>
             <button class="btn btn-sm btn-secondary notif-filter-btn" data-filter="stock">📦 Stok</button>
             <button class="btn btn-sm btn-secondary notif-filter-btn" data-filter="expired">⚠️ Kadaluarsa</button>
@@ -2347,141 +2347,15 @@
             <button class="btn btn-sm btn-secondary notif-filter-btn" data-filter="retur">↩️ Retur</button>
         </div>
 
-        <!-- Daftar Notifikasi -->
-        <div class="space-y-3" id="notificationList">
-            <!-- Notifikasi Stok Menipis -->
-            <div class="card p-4 flex items-start gap-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 animate-fadeIn notif-item" data-type="stock">
-                <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-800 flex items-center justify-center flex-shrink-0">
-                    <i class="ph ph-package text-red-600 text-xl"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="flex justify-between items-start">
-                        <h4 class="font-semibold text-red-700 dark:text-red-400">Stok Menipis!</h4>
-                        <span class="text-xs opacity-50">Hari ini, 08:30</span>
-                    </div>
-                    <p class="text-sm opacity-80 mt-1">
-                        <strong>Ikan Salmon</strong> tersisa <strong>5 kg</strong> di Gudang Utama. 
-                        Stok minimum yang disarankan adalah 10 kg. Segera lakukan pemesanan ke supplier untuk menghindari kekosongan.
-                    </p>
-                    <div class="flex gap-2 mt-2">
-                        <button onclick="switchTab('tab-stock')" class="btn btn-xs btn-primary">Lihat Stok</button>
-                        <button onclick="switchTab('tab-purchase')" class="btn btn-xs btn-secondary">Buat PO</button>
-                    </div>
-                </div>
-            </div>
+        <!-- Info Ringkas -->
+        <div class="flex justify-between text-xs opacity-70 mb-2">
+            <span>Total: <strong id="notifTotalCount">0</strong> notifikasi</span>
+            <span>Terbaru: <strong id="notifLatestTime">-</strong></span>
+        </div>
 
-            <!-- Notifikasi Batch Kadaluarsa -->
-            <div class="card p-4 flex items-start gap-4 bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 animate-fadeIn notif-item" data-type="expired">
-                <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-800 flex items-center justify-center flex-shrink-0">
-                    <i class="ph ph-clock-countdown text-amber-600 text-xl"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="flex justify-between items-start">
-                        <h4 class="font-semibold text-amber-700 dark:text-amber-400">Batch Hampir Kadaluarsa</h4>
-                        <span class="text-xs opacity-50">Hari ini, 07:15</span>
-                    </div>
-                    <p class="text-sm opacity-80 mt-1">
-                        <strong>Udang Vaname</strong> (Batch #b123) akan kadaluarsa pada <strong>3 hari lagi</strong>. 
-                        Sisa stok: 12 kg. Prioritaskan penjualan produk ini atau pertimbangkan untuk memberikan diskon khusus.
-                    </p>
-                    <div class="flex gap-2 mt-2">
-                        <button onclick="switchTab('tab-sales')" class="btn btn-xs btn-warning">Jual Sekarang</button>
-                        <button onclick="switchTab('tab-pricing')" class="btn btn-xs btn-secondary">Atur Diskon</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Notifikasi Target Penjualan -->
-            <div class="card p-4 flex items-start gap-4 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 animate-fadeIn notif-item" data-type="sales">
-                <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-800 flex items-center justify-center flex-shrink-0">
-                    <i class="ph ph-target text-green-600 text-xl"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="flex justify-between items-start">
-                        <h4 class="font-semibold text-green-700 dark:text-green-400">Target Penjualan Tercapai 80%!</h4>
-                        <span class="text-xs opacity-50">Kemarin, 22:00</span>
-                    </div>
-                    <p class="text-sm opacity-80 mt-1">
-                        Penjualan bulan ini telah mencapai <strong>Rp 40.000.000</strong> dari target Rp 50.000.000. 
-                        Tersisa 20% lagi. Pertahankan momentum penjualan hingga akhir bulan!
-                    </p>
-                    <div class="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                        <div class="bg-green-500 h-2.5 rounded-full" style="width: 80%"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Notifikasi Backup -->
-            <div class="card p-4 flex items-start gap-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 animate-fadeIn notif-item" data-type="system">
-                <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-800 flex items-center justify-center flex-shrink-0">
-                    <i class="ph ph-cloud-arrow-up text-blue-600 text-xl"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="flex justify-between items-start">
-                        <h4 class="font-semibold text-blue-700 dark:text-blue-400">Backup Data Mingguan Disarankan</h4>
-                        <span class="text-xs opacity-50">2 hari yang lalu</span>
-                    </div>
-                    <p class="text-sm opacity-80 mt-1">
-                        Anda belum melakukan backup data selama <strong>7 hari</strong>. 
-                        Backup rutin melindungi data dari kehilangan akibat kerusakan browser atau kesalahan teknis.
-                    </p>
-                    <button onclick="CFS.App.backupData()" class="btn btn-xs btn-primary mt-2">Backup Sekarang</button>
-                </div>
-            </div>
-
-            <!-- Notifikasi Opname -->
-            <div class="card p-4 flex items-start gap-4 bg-purple-50 dark:bg-purple-900/20 border-l-4 border-purple-500 animate-fadeIn notif-item" data-type="opname">
-                <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-800 flex items-center justify-center flex-shrink-0">
-                    <i class="ph ph-clipboard-text text-purple-600 text-xl"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="flex justify-between items-start">
-                        <h4 class="font-semibold text-purple-700 dark:text-purple-400">Stock Opname Terjadwal</h4>
-                        <span class="text-xs opacity-50">3 hari yang lalu</span>
-                    </div>
-                    <p class="text-sm opacity-80 mt-1">
-                        Sudah <strong>2 minggu</strong> sejak stock opname terakhir. 
-                        Disarankan untuk melakukan opname rutin setiap minggu untuk menjaga akurasi stok.
-                    </p>
-                    <button onclick="switchTab('tab-opname')" class="btn btn-xs btn-primary mt-2">Mulai Opname</button>
-                </div>
-            </div>
-
-            <!-- Notifikasi Retur -->
-            <div class="card p-4 flex items-start gap-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 animate-fadeIn notif-item" data-type="retur">
-                <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-800 flex items-center justify-center flex-shrink-0">
-                    <i class="ph ph-arrow-u-up-left text-red-600 text-xl"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="flex justify-between items-start">
-                        <h4 class="font-semibold text-red-700 dark:text-red-400">Retur Penjualan Baru</h4>
-                        <span class="text-xs opacity-50">5 hari yang lalu</span>
-                    </div>
-                    <p class="text-sm opacity-80 mt-1">
-                        <strong>Budi Santoso</strong> mengembalikan <strong>2 kg Ikan Kakap</strong> dengan alasan: 
-                        <em>"Kualitas tidak sesuai"</em>. Stok telah dikembalikan ke sistem. Tindak lanjuti dengan evaluasi supplier.
-                    </p>
-                    <button onclick="switchTab('tab-return')" class="btn btn-xs btn-primary mt-2">Lihat Detail</button>
-                </div>
-            </div>
-
-            <!-- Notifikasi Stok Kosong -->
-            <div class="card p-4 flex items-start gap-4 bg-gray-100 dark:bg-gray-800 border-l-4 border-gray-500 animate-fadeIn notif-item" data-type="stock">
-                <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                    <i class="ph ph-x-circle text-gray-600 text-xl"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="flex justify-between items-start">
-                        <h4 class="font-semibold text-gray-700 dark:text-gray-400">Stok Habis!</h4>
-                        <span class="text-xs opacity-50">1 minggu yang lalu</span>
-                    </div>
-                    <p class="text-sm opacity-80 mt-1">
-                        <strong>Kepiting</strong> saat ini kosong di semua gudang. Produk ini sudah tidak tersedia untuk dijual. 
-                        Jika permintaan tinggi, segera lakukan pembelian ke supplier.
-                    </p>
-                    <button onclick="switchTab('tab-purchase')" class="btn btn-xs btn-primary mt-2">Pesan Sekarang</button>
-                </div>
-            </div>
+        <!-- Daftar Notifikasi (diisi oleh JS) -->
+        <div class="space-y-3 max-h-[500px] overflow-y-auto" id="notificationList">
+            <!-- Konten akan diisi oleh notifications.js -->
         </div>
 
         <!-- Tombol Aksi -->
@@ -2491,7 +2365,7 @@
         </div>
     </div>
 </div>
-
+        
         <!-- ==================== TAB PENGATURAN (UPGRADE KOMPLEKS) ==================== -->
 <div id="tab-settings" class="tab-content space-y-6">
     <div class="card p-6">
