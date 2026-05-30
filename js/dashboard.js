@@ -428,6 +428,13 @@ window.CFS = window.CFS || {};
         if (elements.storedCustomersCount) elements.storedCustomersCount.textContent = Object.keys(Storage.getCustomers()).length;
         if (elements.storedSuppliersCount) elements.storedSuppliersCount.textContent = Storage.getSuppliers().length;
         if (elements.storedDeliveriesCount) elements.storedDeliveriesCount.textContent = Storage.getDeliveries().length;
+       // Di dalam refreshSidebarStatus() atau refreshDashboard()
+      var notifBadge = document.getElementById('notifBadge');
+      if (notifBadge) {
+       var trail = Storage.getAuditTrail();
+       var totalNotif = trail.length;
+       notifBadge.textContent = totalNotif;
+       notifBadge.classList.toggle('hidden', totalNotif === 0);
     }
 
     // Expose API
