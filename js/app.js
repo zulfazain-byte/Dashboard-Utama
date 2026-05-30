@@ -448,11 +448,18 @@ window.CFS = window.CFS || {};
             }
             window.switchTab('tab-dashboard');
             setInterval(function() {
-                var el = document.getElementById('lastUpdate');
-                if (el) el.textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                var sysEl = document.getElementById('systemDateTime');
-                if (sysEl) sysEl.textContent = new Date().toLocaleString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
-            }, 1000);
+    var el = document.getElementById('lastUpdate');
+    if (el) el.textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    var sysEl = document.getElementById('systemDateTime');
+    if (sysEl) sysEl.textContent = new Date().toLocaleString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
+}, 1000);
+
+// Auto‑refresh dashboard setiap 30 detik
+setInterval(function() {
+    if (CFS.Dashboard && typeof CFS.Dashboard.refresh === 'function') {
+        CFS.Dashboard.refresh();
+    }
+}, 30000);
             document.addEventListener('keydown', function(e) {
                 if (e.ctrlKey && e.key === 'd') { e.preventDefault(); window.switchTab('tab-dashboard'); }
                 if (e.ctrlKey && e.key === 's') { e.preventDefault(); window.switchTab('tab-stock'); }
