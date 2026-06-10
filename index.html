@@ -3204,6 +3204,49 @@
 <script src="js/audit.js"></script>
 <script src="js/app.js"></script>
 
+<script>
+(function() {
+    function initSidebarCollapse() {
+        document.querySelectorAll('.sidebar-group-title').forEach(function(title) {
+            title.removeEventListener('click', handleGroupClick);
+            title.addEventListener('click', handleGroupClick);
+        });
+        applySavedState();
+    }
+
+    function handleGroupClick(e) {
+        var group = this.closest('.sidebar-group');
+        if (!group) return;
+        group.classList.toggle('open');
+        saveState();
+    }
+
+    function saveState() {
+        var closedIndexes = [];
+        document.querySelectorAll('.sidebar-group').forEach(function(group, index) {
+            if (!group.classList.contains('open')) closedIndexes.push(index);
+        });
+        localStorage.setItem('cfs_sidebar_groups', JSON.stringify(closedIndexes));
+    }
+
+    function applySavedState() {
+        var closedIndexes = JSON.parse(localStorage.getItem('cfs_sidebar_groups') || '[]');
+        document.querySelectorAll('.sidebar-group').forEach(function(group, index) {
+            if (closedIndexes.indexOf(index) !== -1) {
+                group.classList.remove('open');
+            } else {
+                group.classList.add('open');
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSidebarCollapse);
+    } else {
+        initSidebarCollapse();
+    }
+})();
+    
 <!-- ==================== INLINE SCRIPTS ==================== -->
 <script>
     function toggleDarkMode() {
