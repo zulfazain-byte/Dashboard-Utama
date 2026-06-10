@@ -450,8 +450,8 @@ window.CFS = window.CFS || {};
            // Daftarkan Service Worker untuk PWA
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/Dashboard-Utama/sw.js', { scope: '/Dashboard-Utama/' })
-    .then(reg => console.log('✅ SW registered:', reg.scope))
-    .catch(err => console.log('❌ SW error:', err));
+        .then(reg => console.log('✅ Service Worker registered:', reg.scope))
+        .catch(err => console.log('❌ Service Worker error:', err));
 }
             setInterval(function() {
     var el = document.getElementById('lastUpdate');
