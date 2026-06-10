@@ -93,7 +93,88 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ---- Sidebar Accordion ---- */
+.sidebar-group-title {
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    text-align: left;
+    color: var(--text);
+}
+.sidebar-group-title:hover {
+    color: var(--accent);
+}
+.sidebar-group-title .group-arrow {
+    transition: transform 0.2s ease;
+}
+.sidebar-group.open .group-arrow {
+    transform: rotate(180deg);
+}
+.sidebar-group-items {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    max-height: 500px; /* buka default */
+}
+.sidebar-group:not(.open) .sidebar-group-items {
+    max-height: 0;
+}
+        .sidebar-group:not(.open) .sidebar-group-items {
+    max-height: 0;
+    overflow: hidden;
+}
+.sidebar-group.open .sidebar-group-items {
+    max-height: 600px; /* cukup besar untuk menampung semua item */
+}
+<script>
+(function() {
+    function initSidebarCollapse() {
+        // Pasang event listener untuk setiap judul grup
+        document.querySelectorAll('.sidebar-group-title').forEach(function(title) {
+            // Hapus listener lama agar tidak duplikat (opsional)
+            title.removeEventListener('click', handleGroupClick);
+            title.addEventListener('click', handleGroupClick);
+        });
 
+        // Terapkan state yang tersimpan
+        applySavedState();
+    }
+
+    function handleGroupClick(e) {
+        var group = this.closest('.sidebar-group');
+        if (!group) return;
+        group.classList.toggle('open');
+        saveState();
+    }
+
+    function saveState() {
+        var closedIndexes = [];
+        document.querySelectorAll('.sidebar-group').forEach(function(group, index) {
+            if (!group.classList.contains('open')) {
+                closedIndexes.push(index);
+            }
+        });
+        localStorage.setItem('cfs_sidebar_groups', JSON.stringify(closedIndexes));
+    }
+
+    function applySavedState() {
+        var closedIndexes = JSON.parse(localStorage.getItem('cfs_sidebar_groups') || '[]');
+        document.querySelectorAll('.sidebar-group').forEach(function(group, index) {
+            if (closedIndexes.indexOf(index) !== -1) {
+                group.classList.remove('open');
+            } else {
+                group.classList.add('open');
+            }
+        });
+    }
+
+    // Inisialisasi setelah DOM siap
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSidebarCollapse);
+    } else {
+        initSidebarCollapse();
+    }
+})();
+</script>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg);
@@ -156,61 +237,6 @@
             .container-main { padding: 0 0.75rem; }
             .card { border-radius: 0.75rem; }
         }
-        /* ---- Sidebar Accordion ---- */
-.sidebar-group-title {
-    cursor: pointer;
-    background: transparent;
-    border: none;
-    text-align: left;
-    color: var(--text);
-}
-.sidebar-group-title:hover {
-    color: var(--accent);
-}
-.sidebar-group-title .group-arrow {
-    transition: transform 0.2s ease;
-}
-.sidebar-group.open .group-arrow {
-    transform: rotate(180deg);
-}
-.sidebar-group-items {
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-    max-height: 500px; /* buka default */
-}
-.sidebar-group:not(.open) .sidebar-group-items {
-    max-height: 0;
-}
-        <script>
-(function() {
-    // Collapse sidebar groups
-    document.querySelectorAll('.sidebar-group-title').forEach(function(title) {
-        title.addEventListener('click', function() {
-            var group = this.parentElement;
-            group.classList.toggle('open');
-            // Simpan state ke localStorage
-            var groupIndex = Array.from(document.querySelectorAll('.sidebar-group')).indexOf(group);
-            var stored = JSON.parse(localStorage.getItem('cfs_sidebar_groups') || '[]');
-            if (group.classList.contains('open')) {
-                stored = stored.filter(function(i) { return i !== groupIndex; });
-            } else {
-                stored.push(groupIndex);
-            }
-            localStorage.setItem('cfs_sidebar_groups', JSON.stringify(stored));
-        });
-    });
-
-    // Load state from localStorage
-    var closedGroups = JSON.parse(localStorage.getItem('cfs_sidebar_groups') || '[]');
-    document.querySelectorAll('.sidebar-group').forEach(function(group, index) {
-        if (closedGroups.indexOf(index) !== -1) {
-            group.classList.remove('open');
-        } else {
-            group.classList.add('open');
-        }
-    });
-})();
-</script>
     </style>
 </head>
 <body class="antialiased">
