@@ -1,8 +1,8 @@
 {
     "name": "Cibitung Frozen ERP",
-    "short_name": "CFS ERP",
+    "short_name": "CibitungFrozen",
     "description": "Sistem ERP manajemen inventori, penjualan, dan akuntansi Cibitung Frozen.",
-    "start_url": "/",
+    "start_url": "/Dashboard-Utama/",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#2563eb",
