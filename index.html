@@ -10,7 +10,6 @@
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐟</text></svg>">
     <link rel="manifest" href="manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="CibitungFrozen">
@@ -93,88 +92,33 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         /* ---- Sidebar Accordion ---- */
-.sidebar-group-title {
-    cursor: pointer;
-    background: transparent;
-    border: none;
-    text-align: left;
-    color: var(--text);
-}
-.sidebar-group-title:hover {
-    color: var(--accent);
-}
-.sidebar-group-title .group-arrow {
-    transition: transform 0.2s ease;
-}
-.sidebar-group.open .group-arrow {
-    transform: rotate(180deg);
-}
-.sidebar-group-items {
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-    max-height: 500px; /* buka default */
-}
-.sidebar-group:not(.open) .sidebar-group-items {
-    max-height: 0;
-}
+        .sidebar-group-title {
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            text-align: left;
+            color: var(--text);
+        }
+        .sidebar-group-title:hover {
+            color: var(--accent);
+        }
+        .sidebar-group-title .group-arrow {
+            transition: transform 0.2s ease;
+        }
+        .sidebar-group.open .group-arrow {
+            transform: rotate(180deg);
+        }
+        .sidebar-group-items {
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            max-height: 600px;
+        }
         .sidebar-group:not(.open) .sidebar-group-items {
-    max-height: 0;
-    overflow: hidden;
-}
-.sidebar-group.open .sidebar-group-items {
-    max-height: 600px; /* cukup besar untuk menampung semua item */
-}
-<script>
-(function() {
-    function initSidebarCollapse() {
-        // Pasang event listener untuk setiap judul grup
-        document.querySelectorAll('.sidebar-group-title').forEach(function(title) {
-            // Hapus listener lama agar tidak duplikat (opsional)
-            title.removeEventListener('click', handleGroupClick);
-            title.addEventListener('click', handleGroupClick);
-        });
+            max-height: 0;
+        }
 
-        // Terapkan state yang tersimpan
-        applySavedState();
-    }
-
-    function handleGroupClick(e) {
-        var group = this.closest('.sidebar-group');
-        if (!group) return;
-        group.classList.toggle('open');
-        saveState();
-    }
-
-    function saveState() {
-        var closedIndexes = [];
-        document.querySelectorAll('.sidebar-group').forEach(function(group, index) {
-            if (!group.classList.contains('open')) {
-                closedIndexes.push(index);
-            }
-        });
-        localStorage.setItem('cfs_sidebar_groups', JSON.stringify(closedIndexes));
-    }
-
-    function applySavedState() {
-        var closedIndexes = JSON.parse(localStorage.getItem('cfs_sidebar_groups') || '[]');
-        document.querySelectorAll('.sidebar-group').forEach(function(group, index) {
-            if (closedIndexes.indexOf(index) !== -1) {
-                group.classList.remove('open');
-            } else {
-                group.classList.add('open');
-            }
-        });
-    }
-
-    // Inisialisasi setelah DOM siap
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initSidebarCollapse);
-    } else {
-        initSidebarCollapse();
-    }
-})();
-</script>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg);
@@ -290,127 +234,141 @@
 
 <!-- ==================== MAIN LAYOUT ==================== -->
 <div class="container-main py-6 flex-1 flex flex-col lg:flex-row gap-6" id="main-content">
-    <!-- ==================== SIDEBAR NAVIGATION ==================== -->
     <aside class="lg:w-72 flex-shrink-0">
-    <div class="card sticky top-24 overflow-hidden">
-        <div class="p-5 border-b" style="border-color: var(--border);">
-            <h3 class="font-bold text-sm uppercase tracking-wider opacity-70">📋 Modul Operasional</h3>
+        <div class="card sticky top-24 overflow-hidden">
+            <div class="p-5 border-b" style="border-color: var(--border);">
+                <h3 class="font-bold text-sm uppercase tracking-wider opacity-70">📋 Modul Operasional</h3>
+            </div>
+            <nav class="p-2 space-y-1" id="tabs">
+                <!-- Grup 1: Operasional -->
+                <div class="sidebar-group">
+                    <button class="sidebar-group-title w-full flex items-center justify-between px-3 py-2 text-xs font-bold uppercase tracking-wider opacity-60 hover:opacity-100 transition">
+                        <span>🚀 Operasional</span>
+                        <i class="ph ph-caret-down text-sm transition-transform duration-200 group-arrow"></i>
+                    </button>
+                    <div class="sidebar-group-items space-y-1 pl-2 mt-1">
+                        <button onclick="switchTab('tab-dashboard')" data-tab="tab-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition active bg-primary-50 text-primary-700 font-semibold">
+                            <i class="ph ph-chart-bar text-lg"></i> Dashboard
+                        </button>
+                        <button onclick="switchTab('tab-stock')" data-tab="tab-stock" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                            <i class="ph ph-package text-lg"></i> Stok & Batch
+                        </button>
+                        <button onclick="switchTab('tab-sales')" data-tab="tab-sales" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                            <i class="ph ph-shopping-cart text-lg"></i> Penjualan
+                        </button>
+                        <button onclick="switchTab('tab-purchase')" data-tab="tab-purchase" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                            <i class="ph ph-truck text-lg"></i> Pembelian
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grup 2: Manajemen Data -->
+                <div class="sidebar-group">
+                    <button class="sidebar-group-title w-full flex items-center justify-between px-3 py-2 text-xs font-bold uppercase tracking-wider opacity-60 hover:opacity-100 transition">
+                        <span>🗂️ Manajemen</span>
+                        <i class="ph ph-caret-down text-sm transition-transform duration-200 group-arrow"></i>
+                    </button>
+                    <div class="sidebar-group-items space-y-1 pl-2 mt-1">
+                        <button onclick="switchTab('tab-supplier')" data-tab="tab-supplier" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                            <i class="ph ph-buildings text-lg"></i> Supplier
+                        </button>
+                        <button onclick="switchTab('tab-products')" data-tab="tab-products" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                            <i class="ph ph-list-checks text-lg"></i> Kustomisasi Produk
+                        </button>
+                        <button onclick="switchTab('tab-crm')" data-tab="tab-crm" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                            <i class="ph ph-users text-lg"></i> CRM Pelanggan
+                        </button>
+                        <button onclick="switchTab('tab-crm-detail')" data-tab="tab-crm-detail" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                            <i class="ph ph-address-book text-lg"></i> Detail Pelanggan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grup 3: Keuangan & Harga -->
+                <div class="sidebar-group">
+                    <button class="sidebar-group-title w-full flex items-center justify-between px-3 py-2 text-xs font-bold uppercase tracking-wider opacity-60 hover:opacity-100 transition">
+                        <span>💰 Keuangan</span>
+                        <i class="ph ph-caret-down text-sm transition-transform duration-200 group-arrow"></i>
+                    </button>
+                    <div class="sidebar-group-items space-y-1 pl-2 mt-1">
+                        <button onclick="switchTab('tab-pricing')" data-tab="tab-pricing" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                            <i class="ph ph-currency-circle-dollar text-lg"></i> Harga Jual
+                        </button>
+                        <button onclick="switchTab('tab-finance')" data-tab="tab-finance" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                            <i class="ph ph-wallet text-lg"></i> Keuangan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grup 4: Logistik -->
+                <div class="sidebar-group">
+                    <button class="sidebar-group-title w-full flex items-center justify-between px-3 py-2 text-xs font-bold uppercase tracking-wider opacity-60 hover:opacity-100 transition">
+                        <span>🚚 Logistik</span>
+                        <i class="ph ph-caret-down text-sm transition-transform duration-200 group-arrow"></i>
+                    </button>
+                    <div class="sidebar-group-items space-y-1 pl-2 mt-1">
+                        <button onclick="switchTab('tab-delivery')" data-tab="tab-delivery" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                            <i class="ph ph-truck-trailer text-lg"></i> Pengiriman
+                        </button>
+                        <button onclick="switchTab('tab-opname')" data-tab="tab-opname" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                            <i class="ph ph-clipboard-text text-lg"></i> Stock Opname
+                        </button>
+                        <button onclick="switchTab('tab-return')" data-tab="tab-return" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                            <i class="ph ph-arrow-u-up-left text-lg"></i> Retur
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grup 5: Laporan & Riwayat -->
+                <div class="sidebar-group">
+                    <button class="sidebar-group-title w-full flex items-center justify-between px-3 py-2 text-xs font-bold uppercase tracking-wider opacity-60 hover:opacity-100 transition">
+                        <span>📊 Laporan</span>
+                        <i class="ph ph-caret-down text-sm transition-transform duration-200 group-arrow"></i>
+                    </button>
+                    <div class="sidebar-group-items space-y-1 pl-2 mt-1">
+                        <button onclick="switchTab('tab-history')" data-tab="tab-history" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                            <i class="ph ph-clock-counter-clockwise text-lg"></i> Riwayat
+                        </button>
+                        <button onclick="switchTab('tab-audit')" data-tab="tab-audit" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                            <i class="ph ph-files text-lg"></i> Audit Trail
+                        </button>
+                        <button onclick="switchTab('tab-reports')" data-tab="tab-reports" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                            <i class="ph ph-file-text text-lg"></i> Laporan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Menu tanpa grup -->
+                <button onclick="switchTab('tab-notifications')" data-tab="tab-notifications" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-bell text-lg"></i> Notifikasi
+                </button>
+                <button onclick="switchTab('tab-settings')" data-tab="tab-settings" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-gear text-lg"></i> Pengaturan
+                </button>
+                <button onclick="switchTab('tab-help')" data-tab="tab-help" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
+                    <i class="ph ph-question text-lg"></i> Bantuan
+                </button>
+            </nav>
+            <!-- Tips & Status Data tetap di sini -->
+            <div class="p-4 border-t mt-2" style="border-color: var(--border);">
+                <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">💡 Tips Cepat</h4>
+                <p class="text-xs opacity-60 leading-relaxed">Gunakan <strong>FEFO</strong> untuk produk frozen agar batch terdekat expired terjual lebih dulu. Backup data setiap minggu untuk keamanan.</p>
+            </div>
+            <div class="p-4 border-t mt-2" style="border-color: var(--border);">
+                <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">📌 Status Data</h4>
+                <p class="text-xs opacity-50">Batch: <span id="storedBatchesCount">-</span></p>
+                <p class="text-xs opacity-50">Transaksi: <span id="storedTransactionsCount">-</span></p>
+                <p class="text-xs opacity-50">Pelanggan: <span id="storedCustomersCount">-</span></p>
+                <p class="text-xs opacity-50">Supplier: <span id="storedSuppliersCount">-</span></p>
+                <p class="text-xs opacity-50">Pengiriman: <span id="storedDeliveriesCount">-</span></p>
+                <p class="text-xs opacity-50">Mode: <span id="sidebar-mode">Terang</span></p>
+            </div>
+            <div class="p-4 border-t mt-2" style="border-color: var(--border);">
+                <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">⌨️ Shortcut</h4>
+                <p class="text-xs opacity-40 leading-relaxed"><kbd>Ctrl+D</kbd> Dashboard · <kbd>Ctrl+S</kbd> Stok · <kbd>Ctrl+B</kbd> Backup</p>
+            </div>
         </div>
-        <nav class="p-2 space-y-1" id="tabs">
-            <!-- Grup 1: Operasional Harian -->
-            <div class="sidebar-group">
-                <button class="sidebar-group-title w-full flex items-center justify-between px-3 py-2 text-xs font-bold uppercase tracking-wider opacity-60 hover:opacity-100 transition">
-                    <span>🚀 Operasional</span>
-                    <i class="ph ph-caret-down text-sm transition-transform duration-200 group-arrow"></i>
-                </button>
-                <div class="sidebar-group-items space-y-1 pl-2 mt-1">
-                    <button onclick="switchTab('tab-dashboard')" data-tab="tab-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition active bg-primary-50 text-primary-700 font-semibold">
-                        <i class="ph ph-chart-bar text-lg"></i> Dashboard
-                    </button>
-                    <button onclick="switchTab('tab-stock')" data-tab="tab-stock" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-package text-lg"></i> Stok & Batch
-                    </button>
-                    <button onclick="switchTab('tab-sales')" data-tab="tab-sales" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-shopping-cart text-lg"></i> Penjualan
-                    </button>
-                    <button onclick="switchTab('tab-purchase')" data-tab="tab-purchase" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-truck text-lg"></i> Pembelian
-                    </button>
-                </div>
-            </div>
-
-            <!-- Grup 2: Manajemen Data -->
-            <div class="sidebar-group">
-                <button class="sidebar-group-title w-full flex items-center justify-between px-3 py-2 text-xs font-bold uppercase tracking-wider opacity-60 hover:opacity-100 transition">
-                    <span>🗂️ Manajemen</span>
-                    <i class="ph ph-caret-down text-sm transition-transform duration-200 group-arrow"></i>
-                </button>
-                <div class="sidebar-group-items space-y-1 pl-2 mt-1">
-                    <button onclick="switchTab('tab-supplier')" data-tab="tab-supplier" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-buildings text-lg"></i> Supplier
-                    </button>
-                    <button onclick="switchTab('tab-products')" data-tab="tab-products" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-list-checks text-lg"></i> Kustomisasi Produk
-                    </button>
-                    <button onclick="switchTab('tab-crm')" data-tab="tab-crm" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-users text-lg"></i> CRM Pelanggan
-                    </button>
-                    <button onclick="switchTab('tab-crm-detail')" data-tab="tab-crm-detail" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-address-book text-lg"></i> Detail Pelanggan
-                    </button>
-                </div>
-            </div>
-
-            <!-- Grup 3: Keuangan & Harga -->
-            <div class="sidebar-group">
-                <button class="sidebar-group-title w-full flex items-center justify-between px-3 py-2 text-xs font-bold uppercase tracking-wider opacity-60 hover:opacity-100 transition">
-                    <span>💰 Keuangan</span>
-                    <i class="ph ph-caret-down text-sm transition-transform duration-200 group-arrow"></i>
-                </button>
-                <div class="sidebar-group-items space-y-1 pl-2 mt-1">
-                    <button onclick="switchTab('tab-pricing')" data-tab="tab-pricing" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-currency-circle-dollar text-lg"></i> Harga Jual
-                    </button>
-                    <button onclick="switchTab('tab-finance')" data-tab="tab-finance" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-wallet text-lg"></i> Keuangan
-                    </button>
-                </div>
-            </div>
-
-            <!-- Grup 4: Logistik -->
-            <div class="sidebar-group">
-                <button class="sidebar-group-title w-full flex items-center justify-between px-3 py-2 text-xs font-bold uppercase tracking-wider opacity-60 hover:opacity-100 transition">
-                    <span>🚚 Logistik</span>
-                    <i class="ph ph-caret-down text-sm transition-transform duration-200 group-arrow"></i>
-                </button>
-                <div class="sidebar-group-items space-y-1 pl-2 mt-1">
-                    <button onclick="switchTab('tab-delivery')" data-tab="tab-delivery" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-truck-trailer text-lg"></i> Pengiriman
-                    </button>
-                    <button onclick="switchTab('tab-opname')" data-tab="tab-opname" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-clipboard-text text-lg"></i> Stock Opname
-                    </button>
-                    <button onclick="switchTab('tab-return')" data-tab="tab-return" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-arrow-u-up-left text-lg"></i> Retur
-                    </button>
-                </div>
-            </div>
-
-            <!-- Grup 5: Laporan & Riwayat -->
-            <div class="sidebar-group">
-                <button class="sidebar-group-title w-full flex items-center justify-between px-3 py-2 text-xs font-bold uppercase tracking-wider opacity-60 hover:opacity-100 transition">
-                    <span>📊 Laporan</span>
-                    <i class="ph ph-caret-down text-sm transition-transform duration-200 group-arrow"></i>
-                </button>
-                <div class="sidebar-group-items space-y-1 pl-2 mt-1">
-                    <button onclick="switchTab('tab-history')" data-tab="tab-history" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-clock-counter-clockwise text-lg"></i> Riwayat
-                    </button>
-                    <button onclick="switchTab('tab-audit')" data-tab="tab-audit" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-files text-lg"></i> Audit Trail
-                    </button>
-                    <button onclick="switchTab('tab-reports')" data-tab="tab-reports" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                        <i class="ph ph-file-text text-lg"></i> Laporan
-                    </button>
-                </div>
-            </div>
-
-            <!-- Menu tanpa grup (selalu terlihat) -->
-            <button onclick="switchTab('tab-notifications')" data-tab="tab-notifications" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                <i class="ph ph-bell text-lg"></i> Notifikasi
-            </button>
-            <button onclick="switchTab('tab-settings')" data-tab="tab-settings" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                <i class="ph ph-gear text-lg"></i> Pengaturan
-            </button>
-            <button onclick="switchTab('tab-help')" data-tab="tab-help" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100">
-                <i class="ph ph-question text-lg"></i> Bantuan
-            </button>
-        </nav>
-
-        <!-- Tips & Shortcut tetap -->
-        <!-- ... (sama seperti sebelumnya) ... -->
-    </div>
-</aside>
+    </aside>
 
     <!-- ==================== MAIN CONTENT AREA ==================== -->
     <main class="flex-1 min-w-0">
