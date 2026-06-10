@@ -447,6 +447,14 @@ window.CFS = window.CFS || {};
                 if (sidebarMode) sidebarMode.textContent = 'Gelap';
             }
             window.switchTab('tab-dashboard');
+           // Daftarkan Service Worker untuk PWA
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').then(function(registration) {
+        console.log('✅ Service Worker terdaftar:', registration.scope);
+    }).catch(function(error) {
+        console.log('❌ Service Worker gagal:', error);
+    });
+}
             setInterval(function() {
     var el = document.getElementById('lastUpdate');
     if (el) el.textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
