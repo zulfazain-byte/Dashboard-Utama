@@ -35,8 +35,8 @@ let products = [];
 
 // Produk bawaan
 const defaultProducts = [
-    'Ikan Salmon', 'Ikan Tuna', 'Ikan Kakap', 'Ikan Bandeng', 'Ikan Lele',
-    'Udang Vaname', 'Cumi-Cumi', 'Kepiting', 'Ikan Dori'
+    'Ikan Kembung Banjar', 'Ikan Kembung Layang', 'Ikan Kembung Belo', 'Ikan Tongkol', 'Ikan Salem',
+    'Ikan Tenggiri', 'Bawal Laut', 'Cumi-Cumi', 'Ikan Dori Fillet'
 ];
 
 // Pengaturan default
@@ -126,7 +126,7 @@ function seedSampleData() {
     const fmt = (d) => d.toISOString().split('T')[0];
 
     // Batch sampel
-    const produkSample = ['Ikan Salmon', 'Ikan Tuna', 'Udang Vaname', 'Ikan Kakap', 'Ikan Lele'];
+    const produkSample = ['Ikan Kembung Banjar', 'Ikan Kembung Layang', 'Ikan Kembung Belo', 'Ikan Tongkol', 'Ikan Salem'];
     produkSample.forEach((produk, i) => {
         batches.push({
             id: 'b' + (Date.now() + i),
