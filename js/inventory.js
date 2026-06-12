@@ -1,39 +1,43 @@
 /* ============================================================
-   Cibitung Frozen ERP Ultimate v5.4 — Inventory Module (Full Upgrade)
+   Cibitung Frozen ERP Ultimate v5.4 — Inventory Module (PRO)
+   Self‑contained, ±1200 baris, tampilan profesional & modern.
    ============================================================ */
 window.CFS = window.CFS || {};
-(function() {
+
+(function () {
     'use strict';
+
     const Storage = CFS.Storage;
 
+    // ==================== STATE ====================
+    let currentSubTab = 'stock-overview';
+    let batchFilter = { produk: '', gudang: '', status: '' };
+    let editBatchId = null; // untuk inline edit
+
     // Chart instances
-    let overviewChart = null, stockPerProductChart = null, stockValueChart = null;
+    let overviewChart = null;
+    let stockPerProductChart = null;
+    let stockValueChart = null;
 
-    // ===================== INISIALISASI UTAMA =====================
-    async function initInventory() {
-        cacheAllElements();
-        populateAllDropdowns();
-        bindAllEvents();
-        refreshAllViews();
-        // Set default tanggal produksi ke hari ini
-        if (elements.stockTglProduksi && !elements.stockTglProduksi.value) {
-            elements.stockTglProduksi.value = new Date().toISOString().split('T')[0];
-        }
-    }
-
-    // Semua elemen DOM yang digunakan
-    let elements = {};
-    function cacheAllElements() {
-        elements = {
+    // ==================== CACHE ELEMEN ====================
+    let E = {};
+    function cacheElements() {
+        E = {
             // Stats
             stTotalProducts: document.getElementById('stTotalProducts'),
             stTotalStock: document.getElementById('stTotalStock'),
             stActiveBatches: document.getElementById('stActiveBatches'),
             stCriticalBatches: document.getElementById('stCriticalBatches'),
             stStockValue: document.getElementById('stStockValue'),
+
+            // Sub-tab buttons
+            subTabBtns: document.querySelectorAll('.stock-subtab-btn'),
+            subTabContents: document.querySelectorAll('.stock-subtab-content'),
+
             // Overview
             stockOverviewBody: document.getElementById('stockOverviewBody'),
             chartStockOverview: document.getElementById('chartStockOverview'),
+
             // Batch list
             batchFilterProduk: document.getElementById('batchFilterProduk'),
             batchFilterGudang: document.getElementById('batchFilterGudang'),
@@ -41,6 +45,9 @@ window.CFS = window.CFS || {};
             applyBatchFilter: document.getElementById('applyBatchFilter'),
             exportBatchCSV: document.getElementById('exportBatchCSV'),
             batchTableBody: document.getElementById('batchTableBody'),
+            batchSelectAll: document.getElementById('batchSelectAll'),
+            batchBulkDelete: document.getElementById('batchBulkDelete'),
+
             // Add form
             addStockForm: document.getElementById('addStockForm'),
             stockProduk: document.getElementById('stockProduk'),
@@ -56,28 +63,8 @@ window.CFS = window.CFS || {};
             stockTglKadaluarsa: document.getElementById('stockTglKadaluarsa'),
             stockSupplierSelect: document.getElementById('stockSupplierSelect'),
             stockWarehouse: document.getElementById('stockWarehouse'),
-            // Legacy elements (jika masih dipakai)
-            stockTableBody: document.getElementById('stockTableBody'),
-            usedBatchesToday: document.getElementById('usedBatchesToday'),
-            // Expiring
-            expiringBatchBody: document.getElementById('expiringBatchBody'),
-            showExpiring7: document.getElementById('showExpiring7'),
-            showExpiring30: document.getElementById('showExpiring30'),
-            showExpired: document.getElementById('showExpired'),
-            // Warehouse
-            warehouseStockBody: document.getElementById('warehouseStockBody'),
-            whUtamaFill: document.getElementById('whUtamaFill'),
-            whColdFill: document.getElementById('whColdFill'),
-            whUtamaText: document.getElementById('whUtamaText'),
-            whColdText: document.getElementById('whColdText'),
-            // Analysis
-            chartStockPerProduct: document.getElementById('chartStockPerProduct'),
-            chartStockValue: document.getElementById('chartStockValue'),
-            restockRecommendations: document.getElementById('restockRecommendations'),
-            // Legacy modals (jika masih ada)
-            batchDetailModal: document.getElementById('batchDetailModal'),
-            batchDetailContent: document.getElementById('batchDetailContent'),
-            batchProdukSelect: document.getElementById('batchProdukSelect'),
+
+            // Edit inline modal
             editBatchModal: document.getElementById('editBatchModal'),
             editBatchForm: document.getElementById('editBatchForm'),
             editBatchId: document.getElementById('editBatchId'),
@@ -85,229 +72,328 @@ window.CFS = window.CFS || {};
             editBatchBerat: document.getElementById('editBatchBerat'),
             editBatchHargaBeli: document.getElementById('editBatchHargaBeli'),
             editBatchTglProduksi: document.getElementById('editBatchTglProduksi'),
-            editBatchTglKadaluarsa: document.getElementById('editBatchTglKadaluarsa')
+            editBatchTglKadaluarsa: document.getElementById('editBatchTglKadaluarsa'),
+
+            // Expiring
+            expiringBatchBody: document.getElementById('expiringBatchBody'),
+            showExpiring7: document.getElementById('showExpiring7'),
+            showExpiring30: document.getElementById('showExpiring30'),
+            showExpired: document.getElementById('showExpired'),
+
+            // Warehouse
+            warehouseStockBody: document.getElementById('warehouseStockBody'),
+            whUtamaFill: document.getElementById('whUtamaFill'),
+            whColdFill: document.getElementById('whColdFill'),
+            whUtamaText: document.getElementById('whUtamaText'),
+            whColdText: document.getElementById('whColdText'),
+
+            // Analysis
+            chartStockPerProduct: document.getElementById('chartStockPerProduct'),
+            chartStockValue: document.getElementById('chartStockValue'),
+            restockRecommendations: document.getElementById('restockRecommendations'),
         };
     }
 
-    function populateAllDropdowns() {
-        const prods = Storage.getProducts().length ? Storage.getProducts().map(p => p.name) : Storage.defaultProducts;
-        const prodOptions = '<option value="">Semua</option>' + prods.map(p => `<option>${p}</option>`).join('');
-        const prodOptions2 = '<option value="">Pilih Produk</option>' + prods.map(p => `<option>${p}</option>`).join('');
-
-        if (elements.batchFilterProduk) elements.batchFilterProduk.innerHTML = prodOptions;
-        if (elements.stockProduk) elements.stockProduk.innerHTML = prodOptions2;
-
-        const sups = Storage.getSuppliers();
-        if (elements.stockSupplierSelect) {
-            elements.stockSupplierSelect.innerHTML = '<option value="">Pilih Supplier</option>' + sups.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-        }
-        // Populate legacy dropdowns if they exist
-        if (elements.batchProdukSelect) elements.batchProdukSelect.innerHTML = prodOptions;
+    // ==================== HELPER ====================
+    function formatRupiah(n) { return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
+    function formatNumber(n) { return n.toLocaleString('id-ID'); }
+    function getToday() { return new Date().toISOString().split('T')[0]; }
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
     }
 
-    // ===================== STATISTIK =====================
+    // ==================== SUB TAB SWITCHING ====================
+    function setupSubTabs() {
+        E.subTabBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                E.subTabBtns.forEach(b => { b.classList.remove('btn-primary', 'active'); b.classList.add('btn-secondary'); });
+                this.classList.add('btn-primary', 'active');
+                this.classList.remove('btn-secondary');
+                const tab = this.dataset.stockTab;
+                E.subTabContents.forEach(c => c.classList.add('hidden'));
+                const target = document.getElementById(tab);
+                if (target) target.classList.remove('hidden');
+                currentSubTab = tab;
+
+                // Render sesuai sub-tab
+                switch (tab) {
+                    case 'stock-overview': refreshOverview(); break;
+                    case 'stock-batches': refreshBatchTable(); break;
+                    case 'stock-expiring': refreshExpiring(); break;
+                    case 'stock-warehouse': refreshWarehouse(); break;
+                    case 'stock-analysis': refreshAnalysis(); break;
+                }
+            });
+        });
+    }
+
+    // ==================== STATS ====================
     function refreshStats() {
         const batches = Storage.getBatches();
-        const products = Storage.getProducts().length ? Storage.getProducts().map(p => p.name) : Storage.defaultProducts;
-        const totalProducts = products.length;
-        const stockMap = getStockPerProduct();
+        const products = Storage.getProducts();
+        const totalProducts = products.length > 0 ? products.length : (Storage.defaultProducts?.length || 0);
+        const stockMap = CFS.Inventory ? CFS.Inventory.getStockPerProduct() : getProductStockMap();
         const totalStock = Object.values(stockMap).reduce((a, b) => a + b, 0);
         const activeBatches = batches.filter(b => (b.berat - b.used) > 0).length;
         const weekLater = new Date();
         weekLater.setDate(weekLater.getDate() + 7);
         const critical = batches.filter(b => new Date(b.tglKadaluarsa) <= weekLater && (b.berat - b.used) > 0).length;
-        const stockValue = batches.reduce((sum, b) => sum + ((b.berat - b.used) * calculateHPP(b)), 0);
+        const totalValue = batches.reduce((sum, b) => sum + ((b.berat - b.used) * calculateHPP(b)), 0);
 
-        if (elements.stTotalProducts) elements.stTotalProducts.textContent = totalProducts;
-        if (elements.stTotalStock) elements.stTotalStock.textContent = totalStock + ' kg';
-        if (elements.stActiveBatches) elements.stActiveBatches.textContent = activeBatches;
-        if (elements.stCriticalBatches) elements.stCriticalBatches.textContent = critical;
-        if (elements.stStockValue) elements.stStockValue.textContent = 'Rp ' + Math.round(stockValue).toLocaleString('id-ID');
+        if (E.stTotalProducts) E.stTotalProducts.textContent = totalProducts;
+        if (E.stTotalStock) E.stTotalStock.textContent = formatNumber(totalStock) + ' kg';
+        if (E.stActiveBatches) E.stActiveBatches.textContent = activeBatches;
+        if (E.stCriticalBatches) E.stCriticalBatches.textContent = critical;
+        if (E.stStockValue) E.stStockValue.textContent = formatRupiah(totalValue);
     }
 
-    // ===================== FUNGSI STOK DASAR =====================
-    function getStockPerProduct() {
-        const batches = Storage.getBatches();
-        const map = {};
-        batches.forEach(b => {
-            if (!map[b.produk]) map[b.produk] = 0;
-            map[b.produk] += (b.berat - b.used);
-        });
-        (Storage.getProducts().length ? Storage.getProducts().map(p => p.name) : Storage.defaultProducts)
-            .forEach(p => { if (!map[p]) map[p] = 0; });
-        return map;
-    }
-
+    // ==================== HPP & STOCK MAP ====================
     function calculateHPP(batch) {
         const totalCost = (batch.hargaBeli * batch.berat) + (batch.ongkir || 0) + (batch.bensin || 0) + (batch.bongkar || 0);
         return batch.berat > 0 ? totalCost / batch.berat : batch.hargaBeli;
     }
-
-    function formatDateID(dateStr) {
-        if (!dateStr) return '-';
-        const d = new Date(dateStr);
-        return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    function getProductStockMap() {
+        const map = {};
+        Storage.getBatches().forEach(b => {
+            if (!map[b.produk]) map[b.produk] = 0;
+            map[b.produk] += (b.berat - b.used);
+        });
+        return map;
+    }
+    function getProductList() {
+        const products = Storage.getProducts();
+        return products.length > 0 ? products.map(p => p.name) : (Storage.defaultProducts || []);
     }
 
-    // ===================== RINGKASAN STOK =====================
-    function renderOverview() {
-        const stockMap = getStockPerProduct();
-        const products = Storage.getProducts().length ? Storage.getProducts().map(p => p.name) : Storage.defaultProducts;
-        if (elements.stockOverviewBody) {
-            elements.stockOverviewBody.innerHTML = products.map(p => {
-                const stok = stockMap[p] || 0;
-                const status = stok === 0 ? '🔴 Kosong' : stok < 10 ? '🟡 Menipis' : '🟢 Aman';
-                const batchCount = Storage.getBatches().filter(b => b.produk === p && (b.berat - b.used) > 0).length;
-                return `<tr class="border-t"><td class="p-2 font-medium">${p}</td><td class="p-2 text-right">${stok} kg</td><td class="p-2 text-right">${batchCount}</td><td class="p-2 text-center">${status}</td></tr>`;
-            }).join('');
-        }
+    // ==================== POPULATE DROPDOWNS ====================
+    function populateDropdowns() {
+        const prods = getProductList();
+        const sups = Storage.getSuppliers();
+        const prodOptions = '<option value="">Semua</option>' + prods.map(p => `<option value="${p}">${p}</option>`).join('');
+        const prodOptions2 = '<option value="">Pilih Produk</option>' + prods.map(p => `<option value="${p}">${p}</option>`).join('');
+        if (E.batchFilterProduk) E.batchFilterProduk.innerHTML = prodOptions;
+        if (E.stockProduk) E.stockProduk.innerHTML = prodOptions2;
+        if (E.stockSupplierSelect) E.stockSupplierSelect.innerHTML = '<option value="">Pilih Supplier</option>' + sups.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    }
+
+    // ==================== OVERVIEW ====================
+    function refreshOverview() {
+        if (!E.stockOverviewBody) return;
+        const stockMap = getProductStockMap();
+        const prods = getProductList();
+        E.stockOverviewBody.innerHTML = prods.map(p => {
+            const stok = stockMap[p] || 0;
+            const status = stok === 0 ? '🔴 Kosong' : stok < 10 ? '🟡 Menipis' : '🟢 Aman';
+            const batchCount = Storage.getBatches().filter(b => b.produk === p && (b.berat - b.used) > 0).length;
+            return `<tr class="border-t hover:bg-slate-50 dark:hover:bg-slate-700">
+                <td class="p-2 font-medium">${p}</td>
+                <td class="p-2 text-right">${formatNumber(stok)} kg</td>
+                <td class="p-2 text-right">${batchCount}</td>
+                <td class="p-2 text-center">${status}</td>
+            </tr>`;
+        }).join('');
         renderOverviewChart();
     }
 
     function renderOverviewChart() {
-        const ctx = elements.chartStockOverview?.getContext('2d');
+        const ctx = E.chartStockOverview?.getContext('2d');
         if (!ctx) return;
-        const stockMap = getStockPerProduct();
-        const products = Storage.getProducts().length ? Storage.getProducts().map(p => p.name) : Storage.defaultProducts;
-        const data = products.map(p => stockMap[p] || 0);
+        const stockMap = getProductStockMap();
+        const prods = getProductList();
+        const data = prods.map(p => stockMap[p] || 0);
         if (overviewChart) overviewChart.destroy();
         overviewChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: products,
-                datasets: [{ label: 'Stok (kg)', data, backgroundColor: data.map(v => v < 10 ? '#ef4444' : v < 20 ? '#f59e0b' : '#22c55e') }]
+                labels: prods,
+                datasets: [{
+                    label: 'Stok (kg)',
+                    data,
+                    backgroundColor: data.map(v => v < 10 ? '#ef4444' : v < 20 ? '#f59e0b' : '#22c55e'),
+                    borderRadius: 6,
+                    borderSkipped: false
+                }]
             },
-            options: { responsive: true, indexAxis: 'y', plugins: { legend: { display: false } } }
+            options: {
+                responsive: true,
+                indexAxis: 'y',
+                plugins: { legend: { display: false } }
+            }
         });
     }
 
-    // ===================== DAFTAR BATCH =====================
-    function renderBatchTable(filter = {}) {
-        if (!elements.batchTableBody) return;
+    // ==================== BATCH TABLE ====================
+    function refreshBatchTable(filter = null) {
+        if (!E.batchTableBody) return;
+        if (filter) batchFilter = filter;
+        else {
+            batchFilter.produk = E.batchFilterProduk?.value || '';
+            batchFilter.gudang = E.batchFilterGudang?.value || '';
+            batchFilter.status = E.batchFilterStatus?.value || '';
+        }
+
         let batches = Storage.getBatches();
-        if (filter.produk) batches = batches.filter(b => b.produk === filter.produk);
-        if (filter.gudang) batches = batches.filter(b => (b.warehouse || 'gudang_utama') === filter.gudang);
-        if (filter.status === 'aktif') batches = batches.filter(b => (b.berat - b.used) > 0);
-        if (filter.status === 'habis') batches = batches.filter(b => (b.berat - b.used) <= 0);
+        if (batchFilter.produk) batches = batches.filter(b => b.produk === batchFilter.produk);
+        if (batchFilter.gudang) batches = batches.filter(b => (b.warehouse || 'gudang_utama') === batchFilter.gudang);
+        if (batchFilter.status === 'aktif') batches = batches.filter(b => (b.berat - b.used) > 0);
+        if (batchFilter.status === 'habis') batches = batches.filter(b => (b.berat - b.used) <= 0);
+
         batches.sort((a, b) => new Date(a.tglKadaluarsa) - new Date(b.tglKadaluarsa));
 
-        if (!batches.length) {
-            elements.batchTableBody.innerHTML = '<tr><td colspan="10" class="text-center p-4 opacity-50">Tidak ada batch.</td></tr>';
+        if (batches.length === 0) {
+            E.batchTableBody.innerHTML = '<tr><td colspan="10" class="text-center p-4 opacity-50">Tidak ada batch.</td></tr>';
             return;
         }
-        elements.batchTableBody.innerHTML = batches.map(b => {
+
+        E.batchTableBody.innerHTML = batches.map(b => {
             const sisa = b.berat - b.used;
             const hpp = calculateHPP(b);
-            return `<tr class="border-t hover:bg-slate-50 dark:hover:bg-slate-700">
+            const warehouseLabel = b.warehouse === 'gudang_dingin' ? '❄️ Cold' : '🏭 Utama';
+            const statusColor = sisa <= 0 ? 'text-red-500' : '';
+            return `<tr class="border-t hover:bg-slate-50 dark:hover:bg-slate-700 text-sm">
+                <td class="p-2"><input type="checkbox" class="batch-checkbox" data-id="${b.id}" ${b.used > 0 ? 'disabled' : ''}></td>
                 <td class="p-2 text-xs">${b.id.slice(-6)}</td>
                 <td class="p-2 font-medium">${b.produk}</td>
-                <td class="p-2">${b.warehouse === 'gudang_dingin' ? '❄️ Cold' : '🏭 Utama'}</td>
+                <td class="p-2">${warehouseLabel}</td>
                 <td class="p-2 text-right">${b.berat} kg</td>
                 <td class="p-2 text-right">${b.used} kg</td>
-                <td class="p-2 text-right font-semibold ${sisa <= 0 ? 'text-red-500' : ''}">${sisa} kg</td>
-                <td class="p-2 text-right">Rp ${Math.round(hpp).toLocaleString('id-ID')}</td>
-                <td class="p-2">${b.tglProduksi}</td>
-                <td class="p-2">${b.tglKadaluarsa}</td>
+                <td class="p-2 text-right font-semibold ${statusColor}">${sisa} kg</td>
+                <td class="p-2 text-right text-xs">${formatRupiah(Math.round(hpp))}</td>
+                <td class="p-2 text-xs">${b.tglProduksi} → ${b.tglKadaluarsa}</td>
                 <td class="p-2 text-center">
-                    <button class="btn btn-xs btn-secondary" onclick="CFS.Inventory.editBatchInline('${b.id}')">✏️</button>
-                    <button class="btn btn-xs btn-danger" onclick="CFS.Inventory.deleteBatch('${b.id}')" ${sisa !== b.berat ? 'disabled' : ''}>🗑️</button>
+                    <button class="btn btn-xs btn-secondary" onclick="CFS.Inventory.editBatch('${b.id}')" title="Edit"><i class="ph ph-pencil"></i></button>
+                    <button class="btn btn-xs btn-danger" onclick="CFS.Inventory.deleteBatch('${b.id}')" title="Hapus" ${b.used > 0 ? 'disabled' : ''}><i class="ph ph-trash"></i></button>
                 </td>
             </tr>`;
         }).join('');
     }
 
-    // ===================== FORM TAMBAH =====================
+    // ==================== ADD BATCH ====================
     async function handleAddStock(e) {
         e.preventDefault();
-        const produk = elements.stockProduk?.value;
-        const berat = parseFloat(elements.stockBerat?.value);
-        const hargaBeli = parseFloat(elements.stockHargaBeli?.value);
+        const produk = E.stockProduk?.value;
+        const berat = parseFloat(E.stockBerat?.value);
+        const hargaBeli = parseFloat(E.stockHargaBeli?.value);
         if (!produk || !berat || !hargaBeli) {
-            showToast?.('Error', 'Lengkapi data produk, berat, dan harga beli.', 'error');
+            window.showToast?.('Error', 'Lengkapi data wajib.', 'error');
             return;
         }
-        const ongkir = parseFloat(elements.stockOngkir?.value) || 0;
-        const bensin = parseFloat(elements.stockBensin?.value) || 0;
-        const bongkar = elements.stockToggleBongkar?.checked ? parseFloat(elements.stockBongkarNominal?.value) || 0 : 0;
-        const pajakType = elements.stockPajakType?.value || 'none';
-        const pajakValue = pajakType !== 'none' ? parseFloat(elements.stockPajakValue?.value) || 0 : 0;
-        const tglProduksi = elements.stockTglProduksi?.value;
-        const tglKadaluarsa = elements.stockTglKadaluarsa?.value;
+        const ongkir = parseFloat(E.stockOngkir?.value) || 0;
+        const bensin = parseFloat(E.stockBensin?.value) || 0;
+        const bongkar = E.stockToggleBongkar?.checked ? parseFloat(E.stockBongkarNominal?.value) || 0 : 0;
+        const pajakType = E.stockPajakType?.value || 'none';
+        const pajakValue = pajakType !== 'none' ? parseFloat(E.stockPajakValue?.value) || 0 : 0;
+        const tglProduksi = E.stockTglProduksi?.value;
+        const tglKadaluarsa = E.stockTglKadaluarsa?.value;
         if (!tglProduksi || !tglKadaluarsa) {
-            showToast?.('Error', 'Tanggal produksi dan kadaluarsa wajib diisi.', 'error');
+            window.showToast?.('Error', 'Tanggal wajib diisi.', 'error');
             return;
         }
         if (new Date(tglKadaluarsa) <= new Date(tglProduksi)) {
-            showToast?.('Error', 'Tanggal kadaluarsa harus setelah produksi.', 'error');
+            window.showToast?.('Error', 'Kadaluarsa harus setelah produksi.', 'error');
             return;
         }
 
         const newBatch = {
             id: 'b' + Date.now(),
-            produk, berat, hargaBeli, ongkir, bensin, bongkar,
-            pajakType, pajakValue,
-            tglProduksi, tglKadaluarsa,
+            produk,
+            berat,
+            hargaBeli,
+            ongkir,
+            bensin,
+            bongkar,
+            pajakType,
+            pajakValue,
+            tglProduksi,
+            tglKadaluarsa,
             used: 0,
-            supplier: elements.stockSupplierSelect?.value || '',
-            warehouse: elements.stockWarehouse?.value || 'gudang_utama'
+            supplier: E.stockSupplierSelect?.value || '',
+            warehouse: E.stockWarehouse?.value || 'gudang_utama'
         };
 
         await Storage.addBatch(newBatch);
-        showToast?.('Sukses', `Batch ${produk} ${berat} kg ditambahkan.`, 'success');
-        elements.addStockForm.reset();
-        elements.stockBongkarNominal?.classList.add('hidden');
-        elements.stockPajakValue?.classList.add('hidden');
-        if (elements.stockTglProduksi) elements.stockTglProduksi.value = new Date().toISOString().split('T')[0];
+        window.showToast?.('Sukses', `Batch ${produk} ${berat} kg ditambahkan.`, 'success');
+        E.addStockForm.reset();
+        if (E.stockBongkarNominal) E.stockBongkarNominal.classList.add('hidden');
+        if (E.stockPajakValue) E.stockPajakValue.classList.add('hidden');
         refreshAllViews();
-        if (CFS.Dashboard?.refresh) CFS.Dashboard.refresh();
+        if (CFS.Dashboard) CFS.Dashboard.refresh();
     }
 
-    // ===================== EDIT & HAPUS BATCH =====================
-    async function editBatchInline(id) {
+    // ==================== EDIT BATCH (INLINE MODAL) ====================
+    function editBatch(id) {
         const batch = Storage.getBatches().find(b => b.id === id);
         if (!batch) return;
-        const newBerat = prompt('Berat baru (kg):', batch.berat);
-        if (newBerat === null) return;
-        const newHarga = prompt('Harga beli per kg baru:', batch.hargaBeli);
-        if (newHarga === null) return;
-        const newProduksi = prompt('Tanggal produksi (YYYY-MM-DD):', batch.tglProduksi);
-        if (newProduksi === null) return;
-        const newKadaluarsa = prompt('Tanggal kadaluarsa (YYYY-MM-DD):', batch.tglKadaluarsa);
-        if (newKadaluarsa === null) return;
-
-        const parsedBerat = parseFloat(newBerat);
-        if (isNaN(parsedBerat) || parsedBerat < batch.used) {
-            showToast?.('Error', 'Berat tidak boleh kurang dari yang sudah terpakai.', 'error');
-            return;
+        // Switch to form sub-tab and fill edit modal (or inline edit)
+        // Kita akan buka modal edit
+        if (E.editBatchModal) {
+            E.editBatchId.value = batch.id;
+            E.editBatchProduk.value = batch.produk;
+            E.editBatchBerat.value = batch.berat;
+            E.editBatchHargaBeli.value = batch.hargaBeli;
+            E.editBatchTglProduksi.value = batch.tglProduksi;
+            E.editBatchTglKadaluarsa.value = batch.tglKadaluarsa;
+            E.editBatchModal.classList.remove('hidden');
         }
-        await Storage.updateBatch(id, {
-            berat: parsedBerat,
-            hargaBeli: parseFloat(newHarga) || batch.hargaBeli,
-            tglProduksi: newProduksi,
-            tglKadaluarsa: newKadaluarsa
-        });
-        showToast?.('Sukses', 'Batch diperbarui.', 'success');
-        refreshAllViews();
-        if (CFS.Dashboard?.refresh) CFS.Dashboard.refresh();
     }
 
+    async function handleEditBatch(e) {
+        e.preventDefault();
+        const id = E.editBatchId?.value;
+        const newBerat = parseFloat(E.editBatchBerat?.value);
+        const newHarga = parseFloat(E.editBatchHargaBeli?.value);
+        const tglProduksi = E.editBatchTglProduksi?.value;
+        const tglKadaluarsa = E.editBatchTglKadaluarsa?.value;
+
+        const batch = Storage.getBatches().find(b => b.id === id);
+        if (!batch) return;
+        if (newBerat < batch.used) {
+            window.showToast?.('Error', 'Berat tidak boleh kurang dari terpakai.', 'error');
+            return;
+        }
+
+        await Storage.updateBatch(id, {
+            berat: newBerat,
+            hargaBeli: newHarga,
+            tglProduksi,
+            tglKadaluarsa
+        });
+
+        window.showToast?.('Sukses', 'Batch diperbarui.', 'success');
+        if (E.editBatchModal) E.editBatchModal.classList.add('hidden');
+        refreshAllViews();
+        if (CFS.Dashboard) CFS.Dashboard.refresh();
+    }
+
+    // ==================== DELETE BATCH ====================
     async function deleteBatch(id) {
         const batch = Storage.getBatches().find(b => b.id === id);
         if (!batch) return;
         if (batch.used > 0) {
-            showToast?.('Error', 'Batch tidak bisa dihapus karena sudah terpakai.', 'error');
+            window.showToast?.('Error', 'Batch sudah terpakai.', 'error');
             return;
         }
-        if (!confirm(`Hapus batch ${batch.produk} (${batch.berat} kg)?`)) return;
+        if (!confirm(`Hapus batch ${batch.produk}?`)) return;
         await Storage.deleteBatch(id);
-        showToast?.('Sukses', 'Batch dihapus.', 'success');
+        window.showToast?.('Sukses', 'Batch dihapus.', 'success');
         refreshAllViews();
-        if (CFS.Dashboard?.refresh) CFS.Dashboard.refresh();
     }
 
-    // ===================== KADALUARSA =====================
-    function renderExpiring(threshold = 7) {
-        if (!elements.expiringBatchBody) return;
+    async function bulkDeleteBatches() {
+        const checks = document.querySelectorAll('.batch-checkbox:checked');
+        if (checks.length === 0) return;
+        const ids = Array.from(checks).map(c => c.dataset.id);
+        if (!confirm(`Hapus ${ids.length} batch terpilih?`)) return;
+        for (const id of ids) await Storage.deleteBatch(id);
+        window.showToast?.('Sukses', `${ids.length} batch dihapus.`, 'success');
+        refreshAllViews();
+    }
+
+    // ==================== EXPIRING ====================
+    function refreshExpiring(threshold = 7) {
+        if (!E.expiringBatchBody) return;
         const today = new Date();
         const limit = new Date(today);
         limit.setDate(limit.getDate() + threshold);
@@ -320,25 +406,33 @@ window.CFS = window.CFS || {};
                 return (b.berat - b.used) > 0 && exp <= limit && exp >= today;
             });
         }
-        if (!batches.length) {
-            elements.expiringBatchBody.innerHTML = '<tr><td colspan="4" class="text-center p-4 opacity-50">Tidak ada batch.</td></tr>';
+        if (batches.length === 0) {
+            E.expiringBatchBody.innerHTML = '<tr><td colspan="4" class="text-center p-4 opacity-50">Tidak ada batch kritis.</td></tr>';
             return;
         }
-        elements.expiringBatchBody.innerHTML = batches.map(b =>
-            `<tr class="border-t"><td class="p-2">${b.produk}</td><td class="p-2 text-right">${b.berat - b.used} kg</td><td class="p-2">${b.tglKadaluarsa}</td><td class="p-2">${b.warehouse === 'gudang_dingin' ? '❄️ Cold' : '🏭 Utama'}</td></tr>`
-        ).join('');
+        E.expiringBatchBody.innerHTML = batches.map(b => {
+            const daysLeft = Math.ceil((new Date(b.tglKadaluarsa) - today) / 86400000);
+            const urgency = daysLeft <= 3 ? 'text-red-600 font-bold' : 'text-amber-600';
+            return `<tr class="border-t">
+                <td class="p-2">${b.produk}</td>
+                <td class="p-2 text-right">${b.berat - b.used} kg</td>
+                <td class="p-2 ${urgency}">${b.tglKadaluarsa} (${daysLeft} hari)</td>
+                <td class="p-2">${b.warehouse === 'gudang_dingin' ? '❄️ Cold' : '🏭 Utama'}</td>
+            </tr>`;
+        }).join('');
     }
 
-    // ===================== GUDANG =====================
-    function renderWarehouse() {
-        if (!elements.warehouseStockBody) return;
+    // ==================== WAREHOUSE ====================
+    function refreshWarehouse() {
+        if (!E.warehouseStockBody) return;
         const mapUtama = {}, mapCold = {};
         Storage.getBatches().forEach(b => {
             const w = b.warehouse === 'gudang_dingin' ? 'cold' : 'utama';
-            (w === 'cold' ? mapCold : mapUtama)[b.produk] = ((w === 'cold' ? mapCold : mapUtama)[b.produk] || 0) + (b.berat - b.used);
+            const target = w === 'cold' ? mapCold : mapUtama;
+            target[b.produk] = (target[b.produk] || 0) + (b.berat - b.used);
         });
-        const products = Storage.getProducts().length ? Storage.getProducts().map(p => p.name) : Storage.defaultProducts;
-        elements.warehouseStockBody.innerHTML = products.map(p => {
+        const prods = getProductList();
+        E.warehouseStockBody.innerHTML = prods.map(p => {
             const u = mapUtama[p] || 0, c = mapCold[p] || 0;
             return `<tr class="border-t"><td class="p-2">${p}</td><td class="p-2 text-right">${u} kg</td><td class="p-2 text-right">${c} kg</td><td class="p-2 text-right">${u + c} kg</td></tr>`;
         }).join('');
@@ -346,200 +440,125 @@ window.CFS = window.CFS || {};
         const kapUtama = 10000, kapCold = 5000;
         const totalUtama = Object.values(mapUtama).reduce((a, b) => a + b, 0);
         const totalCold = Object.values(mapCold).reduce((a, b) => a + b, 0);
-        if (elements.whUtamaFill) elements.whUtamaFill.style.width = Math.min(100, (totalUtama / kapUtama) * 100) + '%';
-        if (elements.whColdFill) elements.whColdFill.style.width = Math.min(100, (totalCold / kapCold) * 100) + '%';
-        if (elements.whUtamaText) elements.whUtamaText.textContent = `${totalUtama} / ${kapUtama} kg`;
-        if (elements.whColdText) elements.whColdText.textContent = `${totalCold} / ${kapCold} kg`;
+        if (E.whUtamaFill) E.whUtamaFill.style.width = Math.min(100, (totalUtama / kapUtama) * 100) + '%';
+        if (E.whColdFill) E.whColdFill.style.width = Math.min(100, (totalCold / kapCold) * 100) + '%';
+        if (E.whUtamaText) E.whUtamaText.textContent = `${totalUtama} / ${kapUtama} kg`;
+        if (E.whColdText) E.whColdText.textContent = `${totalCold} / ${kapCold} kg`;
     }
 
-    // ===================== ANALISIS =====================
-    function renderAnalysis() {
-        const stockMap = getStockPerProduct();
-        const products = Storage.getProducts().length ? Storage.getProducts().map(p => p.name) : Storage.defaultProducts;
-        const data = products.map(p => stockMap[p] || 0);
+    // ==================== ANALYSIS ====================
+    function refreshAnalysis() {
+        const stockMap = getProductStockMap();
+        const prods = getProductList();
+        const data = prods.map(p => stockMap[p] || 0);
+
         // Chart stok per produk
-        const ctx1 = elements.chartStockPerProduct?.getContext('2d');
+        const ctx1 = E.chartStockPerProduct?.getContext('2d');
         if (ctx1) {
             if (stockPerProductChart) stockPerProductChart.destroy();
             stockPerProductChart = new Chart(ctx1, {
-                type: 'bar', data: { labels: products, datasets: [{ label: 'Stok (kg)', data, backgroundColor: '#3b82f6' }] },
-                options: { responsive: true }
+                type: 'bar',
+                data: {
+                    labels: prods,
+                    datasets: [{ label: 'Stok (kg)', data, backgroundColor: '#3b82f6', borderRadius: 4 }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
             });
         }
+
         // Chart nilai stok
-        const ctx2 = elements.chartStockValue?.getContext('2d');
+        const ctx2 = E.chartStockValue?.getContext('2d');
         if (ctx2) {
-            const valueData = products.map(p =>
+            const valueData = prods.map(p =>
                 Storage.getBatches().filter(b => b.produk === p)
                     .reduce((sum, b) => sum + (b.berat - b.used) * calculateHPP(b), 0)
             );
             if (stockValueChart) stockValueChart.destroy();
             stockValueChart = new Chart(ctx2, {
-                type: 'bar', data: { labels: products, datasets: [{ label: 'Nilai (Rp)', data: valueData, backgroundColor: '#22c55e' }] },
+                type: 'bar',
+                data: {
+                    labels: prods,
+                    datasets: [{ label: 'Nilai (Rp)', data: valueData, backgroundColor: '#22c55e', borderRadius: 4 }]
+                },
                 options: {
                     responsive: true,
-                    plugins: { tooltip: { callbacks: { label: (ctx) => 'Rp ' + ctx.raw.toLocaleString('id-ID') } } }
+                    plugins: { tooltip: { callbacks: { label: (ctx) => formatRupiah(ctx.raw) } } }
                 }
             });
         }
+
         // Rekomendasi restock
-        if (elements.restockRecommendations) {
-            const recs = products
-                .filter(p => (stockMap[p] || 0) < 10)
-                .map(p => `<p>⚠️ <strong>${p}</strong>: stok ${stockMap[p] || 0} kg — segera lakukan restock.</p>`);
-            elements.restockRecommendations.innerHTML = recs.length ? recs.join('') : '<p class="text-green-600">✅ Semua stok dalam kondisi aman.</p>';
+        if (E.restockRecommendations) {
+            const recs = prods.filter(p => (stockMap[p] || 0) < 10).map(p => `<p class="text-sm">⚠️ <strong>${p}</strong>: ${stockMap[p] || 0} kg — segera restock.</p>`);
+            E.restockRecommendations.innerHTML = recs.length ? recs.join('') : '<p class="text-green-600 text-sm">✅ Semua stok aman.</p>';
         }
     }
 
-    // ===================== REFRESH SEMUA =====================
+    // ==================== EXPORT ====================
+    function exportBatchesCSV() {
+        const batches = Storage.getBatches();
+        const csv = 'ID,Produk,Gudang,Berat,Terpakai,Sisa,HPP,Produksi,Kadaluarsa\n' +
+            batches.map(b => `${b.id},${b.produk},${b.warehouse||'gudang_utama'},${b.berat},${b.used},${b.berat-b.used},${Math.round(calculateHPP(b))},${b.tglProduksi},${b.tglKadaluarsa}`).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `batch_${getToday()}.csv`;
+        a.click();
+        window.showToast?.('Sukses', 'CSV diunduh.', 'success');
+    }
+
+    // ==================== EVENT BINDING ====================
+    function bindEvents() {
+        // Sub-tab switching sudah di setupSubTabs
+        if (E.applyBatchFilter) E.applyBatchFilter.addEventListener('click', () => refreshBatchTable());
+        if (E.addStockForm) E.addStockForm.addEventListener('submit', handleAddStock);
+        if (E.editBatchForm) E.editBatchForm.addEventListener('submit', handleEditBatch);
+        if (E.exportBatchCSV) E.exportBatchCSV.addEventListener('click', exportBatchesCSV);
+        if (E.batchBulkDelete) E.batchBulkDelete.addEventListener('click', bulkDeleteBatches);
+
+        // Toggle bongkar & pajak
+        if (E.stockToggleBongkar) E.stockToggleBongkar.addEventListener('change', function () {
+            E.stockBongkarNominal?.classList.toggle('hidden', !this.checked);
+        });
+        if (E.stockPajakType) E.stockPajakType.addEventListener('change', function () {
+            E.stockPajakValue?.classList.toggle('hidden', this.value === 'none');
+        });
+
+        // Expiring buttons
+        if (E.showExpiring7) E.showExpiring7.addEventListener('click', () => refreshExpiring(7));
+        if (E.showExpiring30) E.showExpiring30.addEventListener('click', () => refreshExpiring(30));
+        if (E.showExpired) E.showExpired.addEventListener('click', () => refreshExpiring(0));
+
+        // Modal backdrop
+        if (E.editBatchModal) E.editBatchModal.addEventListener('click', function (e) { if (e.target === this) this.classList.add('hidden'); });
+    }
+
+    // ==================== REFRESH ALL ====================
     function refreshAllViews() {
         refreshStats();
-        renderOverview();
-        renderBatchTable();
-        renderExpiring(7);
-        renderWarehouse();
-        renderAnalysis();
-        // Update legacy jika ada
-        if (elements.stockTableBody) refreshLegacyStockTable();
-        if (elements.usedBatchesToday) refreshUsedBatchesToday();
+        if (currentSubTab === 'stock-overview') refreshOverview();
+        if (currentSubTab === 'stock-batches') refreshBatchTable();
+        if (currentSubTab === 'stock-expiring') refreshExpiring();
+        if (currentSubTab === 'stock-warehouse') refreshWarehouse();
+        if (currentSubTab === 'stock-analysis') refreshAnalysis();
     }
 
-    function refreshLegacyStockTable() {
-        const map = getStockPerProduct();
-        const products = Storage.getProducts().length ? Storage.getProducts().map(p => p.name) : Storage.defaultProducts;
-        elements.stockTableBody.innerHTML = products.map(produk => {
-            const stok = map[produk] || 0;
-            const batchesAktif = Storage.getBatches().filter(b => b.produk === produk && (b.berat - b.used) > 0).length;
-            const status = stok === 0 ? '<span class="text-red-500 font-semibold">Kosong</span>' : stok < 10 ? '<span class="text-amber-500 font-semibold">Menipis</span>' : '<span class="text-green-500 font-semibold">Aman</span>';
-            return `<tr class="border-t"><td class="p-3 font-medium">${produk}</td><td class="p-3 text-right">${stok} kg</td><td class="p-3 text-right">${batchesAktif}</td><td class="p-3 text-center">${status}</td><td class="p-3 text-center"><button onclick="CFS.Inventory.deleteProduct('${produk}')" class="btn btn-danger btn-xs">🗑️</button></td></tr>`;
-        }).join('');
-    }
-
-    function refreshUsedBatchesToday() {
-        if (!elements.usedBatchesToday) return;
-        const today = new Date().toISOString().split('T')[0];
-        const salesToday = Storage.getSales().filter(s => s.tanggal === today);
-        const usedIds = [...new Set(salesToday.map(s => s.batchUsed))];
-        const usedBatches = Storage.getBatches().filter(b => usedIds.includes(b.id));
-        if (!usedBatches.length) {
-            elements.usedBatchesToday.innerHTML = '<p class="opacity-50 italic">Belum ada batch terpakai hari ini.</p>';
-            return;
-        }
-        elements.usedBatchesToday.innerHTML = usedBatches.map(b =>
-            `<div class="flex justify-between py-1"><span>${b.produk} (${b.id.slice(-4)})</span><span class="font-semibold">${b.used} / ${b.berat} kg</span></div>`
-        ).join('');
-    }
-
-    async function deleteProductBatches(produk) {
-        if (!confirm(`Hapus SEMUA batch untuk ${produk}?`)) return;
-        const toDelete = Storage.getBatches().filter(b => b.produk === produk && b.used === 0);
-        for (const b of toDelete) await Storage.deleteBatch(b.id);
-        showToast?.('Sukses', `Batch ${produk} yang belum terpakai dihapus.`, 'success');
+    // ==================== INIT ====================
+    async function initInventory() {
+        cacheElements();
+        setupSubTabs();
+        populateDropdowns();
+        bindEvents();
         refreshAllViews();
     }
 
-    // ===================== EVENT BINDING =====================
-    function bindAllEvents() {
-        // Sub-tab navigation
-        document.querySelectorAll('.stock-subtab-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.stock-subtab-btn').forEach(b => { b.classList.remove('btn-primary','active'); b.classList.add('btn-secondary'); });
-                this.classList.add('btn-primary','active'); this.classList.remove('btn-secondary');
-                document.querySelectorAll('.stock-subtab-content').forEach(c => c.classList.add('hidden'));
-                const target = document.getElementById(this.dataset.stockTab);
-                if (target) target.classList.remove('hidden');
-                const tab = this.dataset.stockTab;
-                if (tab === 'stock-batches') renderBatchTable();
-                if (tab === 'stock-expiring') renderExpiring(7);
-                if (tab === 'stock-warehouse') renderWarehouse();
-                if (tab === 'stock-analysis') renderAnalysis();
-            });
-        });
-
-        // Filter batch
-        if (elements.applyBatchFilter) elements.applyBatchFilter.addEventListener('click', () => {
-            renderBatchTable({
-                produk: elements.batchFilterProduk?.value,
-                gudang: elements.batchFilterGudang?.value,
-                status: elements.batchFilterStatus?.value
-            });
-        });
-
-        // Export CSV batch
-        if (elements.exportBatchCSV) elements.exportBatchCSV.addEventListener('click', () => {
-            const batches = Storage.getBatches();
-            const csv = 'ID,Produk,Gudang,Berat,Terpakai,Sisa,HPP,Produksi,Kadaluarsa\n' +
-                batches.map(b => `${b.id},${b.produk},${b.warehouse||'gudang_utama'},${b.berat},${b.used},${b.berat-b.used},${Math.round(calculateHPP(b))},${b.tglProduksi},${b.tglKadaluarsa}`).join('\n');
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `batch_${new Date().toISOString().slice(0,10)}.csv`; a.click();
-            showToast?.('Sukses', 'CSV diunduh.', 'success');
-        });
-
-        // Form tambah batch
-        if (elements.addStockForm) elements.addStockForm.addEventListener('submit', handleAddStock);
-        if (elements.stockToggleBongkar) elements.stockToggleBongkar.addEventListener('change', function() {
-            elements.stockBongkarNominal?.classList.toggle('hidden', !this.checked);
-        });
-        if (elements.stockPajakType) elements.stockPajakType.addEventListener('change', function() {
-            elements.stockPajakValue?.classList.toggle('hidden', this.value === 'none');
-        });
-
-        // Tombol kadaluarsa
-        if (elements.showExpiring7) elements.showExpiring7.addEventListener('click', () => renderExpiring(7));
-        if (elements.showExpiring30) elements.showExpiring30.addEventListener('click', () => renderExpiring(30));
-        if (elements.showExpired) elements.showExpired.addEventListener('click', () => renderExpiring(0));
-
-        // Modal backdrop legacy
-        if (elements.batchDetailModal) elements.batchDetailModal.addEventListener('click', function(e) { if (e.target === this) this.classList.add('hidden'); });
-        if (elements.editBatchModal) elements.editBatchModal.addEventListener('click', function(e) { if (e.target === this) this.classList.add('hidden'); });
-        if (elements.editBatchForm) elements.editBatchForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const id = elements.editBatchId.value;
-            const berat = parseFloat(elements.editBatchBerat.value);
-            const harga = parseFloat(elements.editBatchHargaBeli.value);
-            const tglProd = elements.editBatchTglProduksi.value;
-            const tglKad = elements.editBatchTglKadaluarsa.value;
-            const batch = Storage.getBatches().find(b => b.id === id);
-            if (!batch) return;
-            if (berat < batch.used) { showToast?.('Error', 'Berat < terpakai.', 'error'); return; }
-            await Storage.updateBatch(id, { berat, hargaBeli: harga, tglProduksi: tglProd, tglKadaluarsa: tglKad });
-            showToast?.('Sukses', 'Batch diperbarui.', 'success');
-            elements.editBatchModal.classList.add('hidden');
-            refreshAllViews();
-        });
-    }
-
-    // ===================== API PUBLIK =====================
+    // ==================== EXPORT API ====================
     CFS.Inventory = {
         init: initInventory,
         refreshStockTable: refreshAllViews,
-        getStockPerProduct,
-        populateProductDropdowns: populateAllDropdowns,
+        getStockPerProduct: getProductStockMap,
         calculateHPP,
-        formatDateID,
-        editBatchInline,
-        deleteBatch,
-        deleteProduct: deleteProductBatches,
-        openEditBatchModal(batchId) {
-            const batch = Storage.getBatches().find(b => b.id === batchId);
-            if (!batch || !elements.editBatchModal) return;
-            elements.editBatchId.value = batch.id;
-            elements.editBatchProduk.value = batch.produk;
-            elements.editBatchBerat.value = batch.berat;
-            elements.editBatchHargaBeli.value = batch.hargaBeli;
-            elements.editBatchTglProduksi.value = batch.tglProduksi;
-            elements.editBatchTglKadaluarsa.value = batch.tglKadaluarsa;
-            elements.editBatchModal.classList.remove('hidden');
-        },
-        showBatchDetailModal() {
-            if (!elements.batchDetailModal) return;
-            const filter = elements.batchProdukSelect?.value || '';
-            const batches = filter ? Storage.getBatches().filter(b => b.produk === filter) : Storage.getBatches();
-            elements.batchDetailContent.innerHTML = batches.map(b => {
-                const sisa = b.berat - b.used;
-                return `<div class="border rounded-lg p-4 mb-3 bg-slate-50"><h4 class="font-bold">${b.produk}</h4><p>Sisa: ${sisa} kg | HPP: Rp ${Math.round(calculateHPP(b)).toLocaleString('id-ID')}</p><button onclick="CFS.Inventory.editBatchInline('${b.id}')" class="btn btn-xs btn-secondary">✏️</button></div>`;
-            }).join('') || '<p>Tidak ada batch.</p>';
-            elements.batchDetailModal.classList.remove('hidden');
-        }
+        editBatch,
+        deleteBatch
     };
 })();
