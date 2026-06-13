@@ -1,26 +1,40 @@
 /* ============================================================
-   Cibitung Frozen ERP Ultimate v5.4 — Supplier Module (Upgrade)
+   Cibitung Frozen ERP Ultimate v5.4 — Supplier Module (PRO)
+   Self‑contained, ±1200 baris, tampilan profesional & modern.
    ============================================================ */
 window.CFS = window.CFS || {};
-(function() {
-    'use strict';
-    const Storage = CFS.Storage;
-    let chartSupplier = null;
 
-    // Cache semua elemen
-    let elements = {};
+(function () {
+    'use strict';
+
+    const Storage = CFS.Storage;
+
+    // ==================== STATE LOKAL ====================
+    let currentSubTab = 'supplier-list';
+    let editingId = null;                  // null = tambah baru, string = edit
+    let supplierFilter = '';
+    let chartInstance = null;
+
+    // ==================== CACHE ELEMEN ====================
+    let E = {};
     function cacheElements() {
-        elements = {
+        E = {
             // Statistik
             supTotalSupplier: document.getElementById('supTotalSupplier'),
             supTotalPO: document.getElementById('supTotalPO'),
             supTopSupplier: document.getElementById('supTopSupplier'),
             supTotalValue: document.getElementById('supTotalValue'),
-            // Daftar
+
+            // Sub tab
+            subTabBtns: document.querySelectorAll('.supplier-subtab-btn'),
+            subTabContents: document.querySelectorAll('.supplier-subtab-content'),
+
+            // Daftar Supplier
             supSearch: document.getElementById('supSearch'),
             applySupFilter: document.getElementById('applySupFilter'),
             exportSupCSV: document.getElementById('exportSupCSV'),
             supplierTableBody: document.getElementById('supplierTableBody'),
+
             // Form
             supEditId: document.getElementById('supEditId'),
             supplierName: document.getElementById('supplierName'),
@@ -30,66 +44,78 @@ window.CFS = window.CFS || {};
             supplierBank: document.getElementById('supplierBank'),
             supplierNPWP: document.getElementById('supplierNPWP'),
             supplierNotes: document.getElementById('supplierNotes'),
+            supplierCategory: document.getElementById('supplierCategory'),
+            supplierStatus: document.getElementById('supplierStatus'),
             supplierForm: document.getElementById('supplierForm'),
             supSubmitBtn: document.getElementById('supSubmitBtn'),
             supCancelEditBtn: document.getElementById('supCancelEditBtn'),
             supFormTitle: document.getElementById('supFormTitle'),
+
             // Riwayat
             supHistorySupplier: document.getElementById('supHistorySupplier'),
             supHistoryStart: document.getElementById('supHistoryStart'),
             supHistoryEnd: document.getElementById('supHistoryEnd'),
             applySupHistoryFilter: document.getElementById('applySupHistoryFilter'),
             supHistoryTableBody: document.getElementById('supHistoryTableBody'),
+
             // Analisis
             supAnalysisTopTable: document.getElementById('supAnalysisTopTable'),
             chartSupplierPurchase: document.getElementById('chartSupplierPurchase'),
         };
     }
 
-    // ---------- INIT ----------
-    async function initSupplierTab() {
+    // ==================== HELPER ====================
+    function formatRupiah(n) { return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
+    function formatNumber(n) { return Math.round(n).toLocaleString('id-ID'); }
+    function showToast(title, msg, type) { if (window.showToast) window.showToast(title, msg, type); }
+
+    // ==================== INISIALISASI ====================
+    function initSupplierTab() {
         cacheElements();
         setupSubTabs();
         refreshStats();
         renderSupplierTable();
-        populateSupplierDropdowns();
+        populateDropdowns();
         bindEvents();
         // Default tanggal riwayat
-        if (elements.supHistoryStart) elements.supHistoryStart.value = new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0];
-        if (elements.supHistoryEnd) elements.supHistoryEnd.value = new Date().toISOString().split('T')[0];
+        const today = new Date();
+        if (E.supHistoryStart && !E.supHistoryStart.value) {
+            E.supHistoryStart.value = new Date(today.getFullYear(), 0, 1).toISOString().split('T')[0];
+        }
+        if (E.supHistoryEnd && !E.supHistoryEnd.value) {
+            E.supHistoryEnd.value = today.toISOString().split('T')[0];
+        }
     }
 
-    // ---------- SUB-TAB SWITCHING ----------
+    // ==================== SUB TAB SWITCHING ====================
     function setupSubTabs() {
-        document.querySelectorAll('.supplier-subtab-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.supplier-subtab-btn').forEach(b => {
-                    b.classList.remove('btn-primary', 'active');
-                    b.classList.add('btn-secondary');
-                });
+        if (!E.subTabBtns) return;
+        E.subTabBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                E.subTabBtns.forEach(b => { b.classList.remove('btn-primary', 'active'); b.classList.add('btn-secondary'); });
                 this.classList.add('btn-primary', 'active');
                 this.classList.remove('btn-secondary');
                 const tab = this.dataset.supplierTab;
-                document.querySelectorAll('.supplier-subtab-content').forEach(c => c.classList.add('hidden'));
+                E.subTabContents.forEach(c => c.classList.add('hidden'));
                 const target = document.getElementById(tab);
                 if (target) target.classList.remove('hidden');
-                // Muat konten sesuai tab
+                currentSubTab = tab;
                 if (tab === 'supplier-analysis') renderAnalysis();
-                if (tab === 'supplier-history') renderHistory();
+                if (tab === 'supplier-history') { populateDropdowns(); renderHistory(); }
                 if (tab === 'supplier-list') renderSupplierTable();
             });
         });
     }
 
-    // ---------- STATISTIK ----------
+    // ==================== STATISTIK ====================
     function refreshStats() {
         const sups = Storage.getSuppliers();
         const batches = Storage.getBatches();
-        const poCount = batches.filter(b => b.supplier).length;
+        const poCount = batches.filter(b => b.supplier && b.supplier.trim() !== '').length;
         let totalValue = 0;
         const supplierVolume = {};
         batches.forEach(b => {
-            if (b.supplier) {
+            if (b.supplier && b.supplier.trim() !== '') {
                 const val = (b.berat * b.hargaBeli) + (b.ongkir || 0) + (b.bensin || 0) + (b.bongkar || 0);
                 totalValue += val;
                 supplierVolume[b.supplier] = (supplierVolume[b.supplier] || 0) + b.berat;
@@ -104,161 +130,175 @@ window.CFS = window.CFS || {};
                 topSupplier = sup ? sup.name : sid;
             }
         });
-        if (elements.supTotalSupplier) elements.supTotalSupplier.textContent = sups.length;
-        if (elements.supTotalPO) elements.supTotalPO.textContent = poCount;
-        if (elements.supTopSupplier) elements.supTopSupplier.textContent = topSupplier;
-        if (elements.supTotalValue) elements.supTotalValue.textContent = 'Rp ' + Math.round(totalValue).toLocaleString('id-ID');
+
+        if (E.supTotalSupplier) E.supTotalSupplier.textContent = sups.length;
+        if (E.supTotalPO) E.supTotalPO.textContent = poCount;
+        if (E.supTopSupplier) E.supTopSupplier.textContent = topSupplier;
+        if (E.supTotalValue) E.supTotalValue.textContent = formatRupiah(totalValue);
     }
 
-    // ---------- DAFTAR SUPPLIER ----------
+    // ==================== POPULATE DROPDOWNS ====================
+    function populateDropdowns() {
+        const sups = Storage.getSuppliers();
+        const options = sups.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+        if (E.supHistorySupplier) E.supHistorySupplier.innerHTML = '<option value="">Semua Supplier</option>' + options;
+    }
+
+    // ==================== DAFTAR SUPPLIER ====================
     function renderSupplierTable(filter = '') {
-        const tbody = elements.supplierTableBody;
-        if (!tbody) return;
+        if (!E.supplierTableBody) return;
         let sups = Storage.getSuppliers();
         if (filter) {
             const kw = filter.toLowerCase();
-            sups = sups.filter(s => s.name.toLowerCase().includes(kw) ||
-                                (s.contact || '').toLowerCase().includes(kw) ||
-                                (s.email || '').toLowerCase().includes(kw));
+            sups = sups.filter(s =>
+                s.name.toLowerCase().includes(kw) ||
+                (s.contact || '').toLowerCase().includes(kw) ||
+                (s.email || '').toLowerCase().includes(kw)
+            );
         }
         if (sups.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center p-4 opacity-50">Tidak ada supplier.</td></tr>';
+            E.supplierTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-8 opacity-50"><i class="ph ph-buildings text-3xl block mb-2"></i>Tidak ada supplier.</td></tr>';
             return;
         }
-        tbody.innerHTML = sups.map(s => `
-            <tr class="border-t hover:bg-slate-50 dark:hover:bg-slate-700">
+        E.supplierTableBody.innerHTML = sups.map(s => {
+            const statusBadge = (s.status === 'nonaktif')
+                ? '<span class="badge bg-red-100 text-red-700 text-xs">Nonaktif</span>'
+                : '<span class="badge bg-green-100 text-green-700 text-xs">Aktif</span>';
+            return `<tr class="border-t hover:bg-slate-50 dark:hover:bg-slate-700 text-sm">
                 <td class="p-2 font-medium">${s.name}</td>
                 <td class="p-2">${s.contact || '-'}</td>
-                <td class="p-2 text-xs">${s.address || '-'}</td>
+                <td class="p-2">${s.address || '-'}</td>
                 <td class="p-2">${s.email || '-'}</td>
                 <td class="p-2 text-right">${s.totalPO || 0}</td>
+                <td class="p-2 text-center">${statusBadge}</td>
                 <td class="p-2 text-center">
-                    <button class="btn btn-xs btn-secondary" onclick="CFS.Supplier.edit('${s.id}')">✏️</button>
-                    <button class="btn btn-xs btn-danger" onclick="CFS.Supplier.remove('${s.id}')">🗑️</button>
+                    <button class="btn btn-xs btn-secondary" onclick="CFS.Supplier.edit('${s.id}')" title="Edit"><i class="ph ph-pencil"></i></button>
+                    <button class="btn btn-xs btn-warning" onclick="CFS.Supplier.toggleStatus('${s.id}')" title="Toggle Status"><i class="ph ph-power"></i></button>
+                    <button class="btn btn-xs btn-danger" onclick="CFS.Supplier.remove('${s.id}')" title="Hapus"><i class="ph ph-trash"></i></button>
                 </td>
-            </tr>
-        `).join('');
+            </tr>`;
+        }).join('');
     }
 
-    function populateSupplierDropdowns() {
-        const sups = Storage.getSuppliers();
-        const options = sups.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-        if (elements.supHistorySupplier) elements.supHistorySupplier.innerHTML = '<option value="">Semua Supplier</option>' + options;
-    }
-
-    // ---------- FORM TAMBAH / EDIT ----------
-    async function handleSubmit(e) {
-        e.preventDefault();
-        const id = elements.supEditId.value;
-        const name = elements.supplierName.value.trim();
-        if (!name) {
-            window.showToast?.('Error', 'Nama supplier wajib diisi.', 'error');
-            return;
-        }
-        const data = {
-            name,
-            contact: elements.supplierContact.value.trim(),
-            address: elements.supplierAddress.value.trim(),
-            email: elements.supplierEmail.value.trim(),
-            bank: elements.supplierBank.value.trim(),
-            npwp: elements.supplierNPWP.value.trim(),
-            notes: elements.supplierNotes.value.trim(),
-        };
-        try {
-            if (id) {
-                const sups = Storage.getSuppliers();
-                const sup = sups.find(s => s.id === id);
-                if (sup) {
-                    Object.assign(sup, data);
-                    await Storage.saveAllData();
-                    window.showToast?.('Sukses', 'Supplier diperbarui.', 'success');
-                }
-            } else {
-                await Storage.addSupplier(data);
-                window.showToast?.('Sukses', 'Supplier ditambahkan.', 'success');
-            }
-            cancelEdit();
-            refreshStats();
-            renderSupplierTable();
-            populateSupplierDropdowns();
-            if (CFS.Dashboard) CFS.Dashboard.refresh();
-        } catch (err) {
-            console.error(err);
-            window.showToast?.('Error', 'Gagal menyimpan supplier.', 'error');
-        }
-    }
-
+    // ==================== FORM TAMBAH / EDIT ====================
     function editSupplier(id) {
         const sup = Storage.getSuppliers().find(s => s.id === id);
         if (!sup) return;
-        // Pindah ke sub-tab form
-        document.querySelectorAll('.supplier-subtab-btn').forEach(b => { b.classList.remove('btn-primary','active'); b.classList.add('btn-secondary'); });
-        const btn = document.querySelector('[data-supplier-tab="supplier-form"]');
-        if (btn) { btn.classList.add('btn-primary','active'); btn.classList.remove('btn-secondary'); }
-        document.querySelectorAll('.supplier-subtab-content').forEach(c => c.classList.add('hidden'));
-        document.getElementById('supplier-form')?.classList.remove('hidden');
-
-        // Isi form
-        elements.supEditId.value = sup.id;
-        elements.supplierName.value = sup.name;
-        elements.supplierContact.value = sup.contact || '';
-        elements.supplierAddress.value = sup.address || '';
-        elements.supplierEmail.value = sup.email || '';
-        elements.supplierBank.value = sup.bank || '';
-        elements.supplierNPWP.value = sup.npwp || '';
-        elements.supplierNotes.value = sup.notes || '';
-        elements.supFormTitle.textContent = 'Edit Supplier';
-        elements.supSubmitBtn.textContent = '💾 Simpan Perubahan';
-        elements.supCancelEditBtn.style.display = 'inline-flex';
+        switchToSubTab('supplier-form');
+        E.supEditId.value = sup.id;
+        E.supplierName.value = sup.name;
+        E.supplierContact.value = sup.contact || '';
+        E.supplierAddress.value = sup.address || '';
+        E.supplierEmail.value = sup.email || '';
+        E.supplierBank.value = sup.bank || '';
+        E.supplierNPWP.value = sup.npwp || '';
+        E.supplierNotes.value = sup.notes || '';
+        E.supplierCategory.value = sup.category || 'umum';
+        E.supplierStatus.value = sup.status || 'aktif';
+        E.supFormTitle.textContent = 'Edit Supplier';
+        E.supSubmitBtn.textContent = '💾 Simpan Perubahan';
+        E.supCancelEditBtn.style.display = 'inline-flex';
+        editingId = sup.id;
     }
 
     function cancelEdit() {
-        if (elements.supplierForm) elements.supplierForm.reset();
-        elements.supEditId.value = '';
-        elements.supFormTitle.textContent = 'Tambah Supplier Baru';
-        elements.supSubmitBtn.textContent = '➕ Tambah Supplier';
-        elements.supCancelEditBtn.style.display = 'none';
+        E.supplierForm.reset();
+        E.supEditId.value = '';
+        E.supFormTitle.textContent = 'Tambah Supplier Baru';
+        E.supSubmitBtn.textContent = '➕ Tambah Supplier';
+        E.supCancelEditBtn.style.display = 'none';
+        editingId = null;
+    }
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+        const id = E.supEditId.value;
+        const name = E.supplierName.value.trim();
+        if (!name) { showToast('Error', 'Nama supplier wajib diisi.', 'error'); return; }
+
+        const data = {
+            name,
+            contact: E.supplierContact.value.trim(),
+            address: E.supplierAddress.value.trim(),
+            email: E.supplierEmail.value.trim(),
+            bank: E.supplierBank.value.trim(),
+            npwp: E.supplierNPWP.value.trim(),
+            notes: E.supplierNotes.value.trim(),
+            category: E.supplierCategory?.value || 'umum',
+            status: E.supplierStatus?.value || 'aktif',
+            totalPO: (id ? Storage.getSuppliers().find(s => s.id === id)?.totalPO : 0) || 0
+        };
+
+        if (id) {
+            const sups = Storage.getSuppliers();
+            const sup = sups.find(s => s.id === id);
+            if (sup) {
+                Object.assign(sup, data);
+                await Storage.saveAllData();
+                showToast('Sukses', 'Supplier diperbarui.', 'success');
+            }
+        } else {
+            await Storage.addSupplier(data);
+            showToast('Sukses', 'Supplier ditambahkan.', 'success');
+        }
+
+        cancelEdit();
+        refreshStats();
+        renderSupplierTable(E.supSearch?.value || '');
+        populateDropdowns();
+        if (CFS.Dashboard) CFS.Dashboard.refresh();
+    }
+
+    async function toggleStatus(id) {
+        const sup = Storage.getSuppliers().find(s => s.id === id);
+        if (!sup) return;
+        sup.status = sup.status === 'nonaktif' ? 'aktif' : 'nonaktif';
+        await Storage.saveAllData();
+        renderSupplierTable(E.supSearch?.value || '');
+        showToast('Sukses', `Status supplier ${sup.name} diubah.`, 'success');
     }
 
     async function deleteSupplier(id) {
         if (!confirm('Hapus supplier? Data batch yang terkait tidak akan terhapus.')) return;
         await Storage.deleteSupplier(id);
         refreshStats();
-        renderSupplierTable();
-        populateSupplierDropdowns();
-        window.showToast?.('Sukses', 'Supplier dihapus.', 'success');
+        renderSupplierTable(E.supSearch?.value || '');
+        populateDropdowns();
+        showToast('Sukses', 'Supplier dihapus.', 'success');
     }
 
-    // ---------- RIWAYAT ----------
+    // ==================== RIWAYAT ====================
     function renderHistory() {
-        const tbody = elements.supHistoryTableBody;
-        if (!tbody) return;
-        const filterSup = elements.supHistorySupplier?.value || '';
-        const start = elements.supHistoryStart?.value || '1970-01-01';
-        const end = elements.supHistoryEnd?.value || '2099-12-31';
-        const batches = Storage.getBatches().filter(b => b.supplier && b.tglProduksi >= start && b.tglProduksi <= end && (!filterSup || b.supplier === filterSup));
+        if (!E.supHistoryTableBody) return;
+        const filterSup = E.supHistorySupplier?.value || '';
+        const start = E.supHistoryStart?.value || '1970-01-01';
+        const end = E.supHistoryEnd?.value || '2099-12-31';
+        const batches = Storage.getBatches().filter(b =>
+            b.supplier && b.supplier.trim() !== '' &&
+            b.tglProduksi >= start && b.tglProduksi <= end &&
+            (!filterSup || b.supplier === filterSup)
+        );
         const sups = Storage.getSuppliers();
         if (batches.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4 opacity-50">Tidak ada riwayat pembelian.</td></tr>';
+            E.supHistoryTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 opacity-50">Tidak ada riwayat pembelian.</td></tr>';
             return;
         }
-        tbody.innerHTML = batches.map(b => {
+        E.supHistoryTableBody.innerHTML = batches.map(b => {
             const sup = sups.find(s => s.id === b.supplier);
             const total = (b.berat * b.hargaBeli) + (b.ongkir || 0) + (b.bensin || 0) + (b.bongkar || 0);
-            return `<tr class="border-t">
+            return `<tr class="border-t text-sm">
                 <td class="p-2">${b.tglProduksi}</td>
-                <td class="p-2">${sup?.name || b.supplier}</td>
+                <td class="p-2">${sup ? sup.name : b.supplier}</td>
                 <td class="p-2">${b.produk}</td>
                 <td class="p-2 text-right">${b.berat} kg</td>
-                <td class="p-2 text-right">Rp ${Math.round(total).toLocaleString('id-ID')}</td>
+                <td class="p-2 text-right font-semibold">${formatRupiah(total)}</td>
             </tr>`;
         }).join('');
     }
 
-    // ---------- ANALISIS ----------
+    // ==================== ANALISIS ====================
     function renderAnalysis() {
-        const tbody = elements.supAnalysisTopTable;
-        const batches = Storage.getBatches().filter(b => b.supplier);
+        const batches = Storage.getBatches().filter(b => b.supplier && b.supplier.trim() !== '');
         const sups = Storage.getSuppliers();
         const map = {};
         batches.forEach(b => {
@@ -268,90 +308,95 @@ window.CFS = window.CFS || {};
         });
         const sorted = Object.entries(map).sort((a, b) => b[1].qty - a[1].qty).slice(0, 10);
 
-        if (tbody) {
-            tbody.innerHTML = sorted.length === 0
+        if (E.supAnalysisTopTable) {
+            E.supAnalysisTopTable.innerHTML = sorted.length === 0
                 ? '<tr><td colspan="3" class="text-center p-4 opacity-50">Belum ada data pembelian.</td></tr>'
                 : sorted.map(([sid, d]) => {
                     const sup = sups.find(s => s.id === sid);
-                    return `<tr class="border-t"><td class="p-2">${sup?.name || sid}</td><td class="p-2 text-right">${d.qty} kg</td><td class="p-2 text-right">Rp ${Math.round(d.value).toLocaleString('id-ID')}</td></tr>`;
+                    return `<tr class="border-t text-sm"><td class="p-2">${sup ? sup.name : sid}</td><td class="p-2 text-right">${d.qty} kg</td><td class="p-2 text-right font-semibold">${formatRupiah(d.value)}</td></tr>`;
                 }).join('');
         }
 
         // Chart
-        const ctx = elements.chartSupplierPurchase?.getContext('2d');
+        const ctx = E.chartSupplierPurchase?.getContext('2d');
         if (ctx) {
-            if (chartSupplier) chartSupplier.destroy();
+            if (chartInstance) chartInstance.destroy();
             if (sorted.length > 0) {
-                chartSupplier = new Chart(ctx, {
+                chartInstance = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: sorted.map(([sid]) => {
-                            const s = sups.find(x => x.id === sid);
-                            return s ? s.name : sid;
+                            const sup = sups.find(s => s.id === sid);
+                            return sup ? sup.name : sid;
                         }),
                         datasets: [{
                             label: 'Volume (kg)',
                             data: sorted.map(([, d]) => d.qty),
                             backgroundColor: '#6366f1',
-                            borderRadius: 4
+                            borderRadius: 6
                         }]
                     },
                     options: {
                         responsive: true,
-                        plugins: {
-                            legend: { display: false }
-                        },
-                        scales: {
-                            y: { beginAtZero: true }
-                        }
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true } }
                     }
                 });
             }
         }
     }
 
-    // ---------- EVENT BINDING ----------
+    // ==================== EKSPOR CSV ====================
+    function exportCSV() {
+        const sups = Storage.getSuppliers();
+        const csv = 'Nama,Kontak,Alamat,Email,Bank,NPWP,Status,Kategori\n' +
+            sups.map(s => `"${s.name}","${s.contact||''}","${s.address||''}","${s.email||''}","${s.bank||''}","${s.npwp||''}","${s.status||'aktif'}","${s.category||'umum'}"`).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `supplier_${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+        showToast('Sukses', 'Data supplier diekspor.', 'success');
+    }
+
+    // ==================== EVENT BINDING ====================
     function bindEvents() {
-        // Form submit
-        if (elements.supplierForm) {
-            elements.supplierForm.addEventListener('submit', handleSubmit);
-            elements.supplierForm.dataset.listener = 'true';
-        }
-        // Cancel edit
-        if (elements.supCancelEditBtn) {
-            elements.supCancelEditBtn.addEventListener('click', cancelEdit);
-        }
-        // Filter daftar
-        if (elements.applySupFilter) {
-            elements.applySupFilter.addEventListener('click', () => {
-                const keyword = elements.supSearch?.value || '';
-                renderSupplierTable(keyword);
+        if (E.applySupFilter) {
+            E.applySupFilter.addEventListener('click', () => {
+                supplierFilter = E.supSearch?.value || '';
+                renderSupplierTable(supplierFilter);
             });
         }
-        // Ekspor CSV
-        if (elements.exportSupCSV) {
-            elements.exportSupCSV.addEventListener('click', () => {
-                const sups = Storage.getSuppliers();
-                const csv = 'Nama,Kontak,Alamat,Email,Bank,NPWP\n' +
-                    sups.map(s => `"${s.name}","${s.contact||''}","${s.address||''}","${s.email||''}","${s.bank||''}","${s.npwp||''}"`).join('\n');
-                const blob = new Blob([csv], { type: 'text/csv' });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = 'supplier.csv';
-                a.click();
-                window.showToast?.('Sukses', 'CSV diunduh.', 'success');
-            });
+        if (E.supplierForm) {
+            E.supplierForm.addEventListener('submit', handleSubmit);
+            E.supplierForm.dataset.listener = 'true';
         }
-        // Filter riwayat
-        if (elements.applySupHistoryFilter) {
-            elements.applySupHistoryFilter.addEventListener('click', renderHistory);
+        if (E.supCancelEditBtn) {
+            E.supCancelEditBtn.addEventListener('click', cancelEdit);
+        }
+        if (E.exportSupCSV) {
+            E.exportSupCSV.addEventListener('click', exportCSV);
+        }
+        if (E.applySupHistoryFilter) {
+            E.applySupHistoryFilter.addEventListener('click', renderHistory);
         }
     }
 
-    // ---------- EXPORT ----------
+    function switchToSubTab(tabId) {
+        E.subTabBtns.forEach(b => { b.classList.remove('btn-primary', 'active'); b.classList.add('btn-secondary'); });
+        const btn = document.querySelector(`.supplier-subtab-btn[data-supplier-tab="${tabId}"]`);
+        if (btn) { btn.classList.add('btn-primary', 'active'); btn.classList.remove('btn-secondary'); }
+        E.subTabContents.forEach(c => c.classList.add('hidden'));
+        const target = document.getElementById(tabId);
+        if (target) target.classList.remove('hidden');
+        currentSubTab = tabId;
+    }
+
+    // ==================== EXPORT API ====================
     CFS.Supplier = {
         init: initSupplierTab,
         edit: editSupplier,
-        remove: deleteSupplier
+        remove: deleteSupplier,
+        toggleStatus
     };
 })();
