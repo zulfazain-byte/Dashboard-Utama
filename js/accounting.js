@@ -1,167 +1,160 @@
 /* ============================================================
-   Cibitung Frozen ERP Ultimate v5.4 — Accounting Module (ULTIMATE)
-   Self-contained, 1200+ lines, semua fitur keuangan
+   Cibitung Frozen ERP Ultimate v5.4 — Accounting Module (ULTRA)
+   Self‑contained, ±1200 baris, fitur keuangan kelas enterprise.
    ============================================================ */
 window.CFS = window.CFS || {};
 
-(function() {
+(function () {
     'use strict';
+
     const Storage = CFS.Storage;
 
-    // ==================== STATE INTERNAL ====================
-    // Budget / Anggaran (disimpan di storage)
-    let budgets = [];               // { id, tahun, bulan, akun, jumlah }
-    let bankReconciliations = [];   // { id, tanggal, bank, saldoBuku, saldoBank, selisih, catatan }
-
-    // Chart instances
+    // ==================== STATE LOKAL ====================
+    let currentSubTab = 'finance-overview';
+    let journalPage = 1;
+    const JOURNAL_PER_PAGE = 50;
     let monthlyPLChart = null;
     let expenseCompositionChart = null;
     let marginPerProductChart = null;
     let cashflowChart = null;
-    let budgetVsActualChart = null;
 
-    // ==================== STORAGE KEYS ====================
-    const KEYS = {
-        budgets: 'cfs_budgets',
-        bankReconciliations: 'cfs_bank_reconciliations'
-    };
-
-    // ==================== INIT ====================
-    async function initAccounting() {
-        await loadInternalData();
-        cacheElements();
-        setupFinanceSubTabs();
-        setupEventListeners();
-        
-        // Set default dates
-        const today = new Date();
-        if (elements.journalStartDate) elements.journalStartDate.value = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
-        if (elements.journalEndDate) elements.journalEndDate.value = today.toISOString().split('T')[0];
-        if (elements.expenseTanggal) elements.expenseTanggal.value = today.toISOString().split('T')[0];
-        if (elements.cashflowMonth) elements.cashflowMonth.value = today.getMonth();
-        if (elements.cashflowYear) elements.cashflowYear.value = today.getFullYear();
-
-        refreshFinanceOverview();
-        renderRecentExpenses();
-        renderJournal();
-        refreshCashflow();
-        refreshAnalysis();
-        refreshBudgetVsActual();
-        renderBankReconciliations();
-    }
-
-    async function loadInternalData() {
-        budgets = (await localforage.getItem(KEYS.budgets)) || [];
-        bankReconciliations = (await localforage.getItem(KEYS.bankReconciliations)) || [];
-    }
-
-    async function saveBudgets() { await localforage.setItem(KEYS.budgets, budgets); }
-    async function saveBankReconciliations() { await localforage.setItem(KEYS.bankReconciliations, bankReconciliations); }
-
-    // ==================== CACHE ELEMENTS ====================
-    let elements = {};
+    // ==================== CACHE ELEMEN ====================
+    let E = {};
     function cacheElements() {
-        elements = {
-            // Overview
+        E = {
+            // Sub tab
+            subTabBtns: document.querySelectorAll('.finance-subtab-btn'),
+            subTabContents: document.querySelectorAll('.finance-subtab-content'),
+
+            // Ringkasan
             finPendapatan: document.getElementById('finPendapatan'),
             finHPP: document.getElementById('finHPP'),
             finLabaKotor: document.getElementById('finLabaKotor'),
             finBeban: document.getElementById('finBeban'),
             finLabaBersih: document.getElementById('finLabaBersih'),
-            // Expense form
+            chartFinanceMonthlyPL: document.getElementById('chartFinanceMonthlyPL'),
+            chartExpenseComposition: document.getElementById('chartExpenseComposition'),
+            chartMarginPerProduct: document.getElementById('chartMarginPerProduct'),
+
+            // Beban
             expenseForm: document.getElementById('expenseForm'),
             expenseAkun: document.getElementById('expenseAkun'),
             expenseJumlah: document.getElementById('expenseJumlah'),
             expenseTanggal: document.getElementById('expenseTanggal'),
             expenseDeskripsi: document.getElementById('expenseDeskripsi'),
             recentExpensesList: document.getElementById('recentExpensesList'),
-            // Journal
+            expenseSearch: document.getElementById('expenseSearch'),
+            expenseFilterAkun: document.getElementById('expenseFilterAkun'),
+
+            // Buku Besar
             journalStartDate: document.getElementById('journalStartDate'),
             journalEndDate: document.getElementById('journalEndDate'),
             journalFilterAkun: document.getElementById('journalFilterAkun'),
             applyJournalFilter: document.getElementById('applyJournalFilter'),
             exportJournalExcel: document.getElementById('exportJournalExcel'),
-            exportJournalPDF: document.getElementById('exportJournalPDF'),
             journalTableBody: document.getElementById('journalTableBody'),
             journalShowingInfo: document.getElementById('journalShowingInfo'),
             loadMoreJournal: document.getElementById('loadMoreJournal'),
-            // Cashflow
+
+            // Arus Kas
             cashflowMonth: document.getElementById('cashflowMonth'),
             cashflowYear: document.getElementById('cashflowYear'),
             applyCashflowFilter: document.getElementById('applyCashflowFilter'),
             cfKasMasuk: document.getElementById('cfKasMasuk'),
             cfKasKeluar: document.getElementById('cfKasKeluar'),
             cfSaldoBersih: document.getElementById('cfSaldoBersih'),
-            // Analysis
+            chartCashflow: document.getElementById('chartCashflow'),
+
+            // Analisis
             anaMarginKotor: document.getElementById('anaMarginKotor'),
             anaMarginBersih: document.getElementById('anaMarginBersih'),
             anaRasioBeban: document.getElementById('anaRasioBeban'),
+            anaROA: document.getElementById('anaROA'),
+            anaROE: document.getElementById('anaROE'),
             analysisRecommendations: document.getElementById('analysisRecommendations'),
-            // Export buttons
+
+            // Pajak
+            taxPeriodStart: document.getElementById('taxPeriodStart'),
+            taxPeriodEnd: document.getElementById('taxPeriodEnd'),
+            applyTaxFilter: document.getElementById('applyTaxFilter'),
+            taxDPP: document.getElementById('taxDPP'),
+            taxPPN: document.getElementById('taxPPN'),
+            taxPPH25: document.getElementById('taxPPH25'),
+            taxPPH21: document.getElementById('taxPPH21'),
+            taxTotalPajak: document.getElementById('taxTotalPajak'),
+            exportTaxPDF: document.getElementById('exportTaxPDF'),
+            taxBreakdownTable: document.getElementById('taxBreakdownTable'),
+
+            // Ekspor
             exportFinanceExcelBtn: document.getElementById('exportFinanceExcelBtn'),
             exportFinanceFullExcelBtn: document.getElementById('exportFinanceFullExcelBtn'),
             exportFinancePDFBtn: document.getElementById('exportFinancePDFBtn'),
             exportFinanceNeracaPDFBtn: document.getElementById('exportFinanceNeracaPDFBtn'),
-            // Budget
-            budgetForm: document.getElementById('budgetForm'),
-            budgetTahun: document.getElementById('budgetTahun'),
-            budgetBulan: document.getElementById('budgetBulan'),
-            budgetAkun: document.getElementById('budgetAkun'),
-            budgetJumlah: document.getElementById('budgetJumlah'),
-            budgetTableBody: document.getElementById('budgetTableBody'),
-            // Bank Reconciliation
-            bankRecForm: document.getElementById('bankRecForm'),
-            bankRecTanggal: document.getElementById('bankRecTanggal'),
-            bankRecBank: document.getElementById('bankRecBank'),
-            bankRecSaldoBuku: document.getElementById('bankRecSaldoBuku'),
-            bankRecSaldoBank: document.getElementById('bankRecSaldoBank'),
-            bankRecCatatan: document.getElementById('bankRecCatatan'),
-            bankRecTableBody: document.getElementById('bankRecTableBody'),
-            // Charts
-            chartFinanceMonthlyPL: document.getElementById('chartFinanceMonthlyPL'),
-            chartExpenseComposition: document.getElementById('chartExpenseComposition'),
-            chartMarginPerProduct: document.getElementById('chartMarginPerProduct'),
-            chartCashflow: document.getElementById('chartCashflow'),
-            chartBudgetVsActual: document.getElementById('chartBudgetVsActual'),
         };
     }
 
-    // ==================== SUB-TAB SWITCHING ====================
-    function setupFinanceSubTabs() {
-        document.querySelectorAll('.finance-subtab-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.finance-subtab-btn').forEach(b => {
-                    b.classList.remove('btn-primary', 'active');
-                    b.classList.add('btn-secondary');
-                });
+    // ==================== HELPER ====================
+    function formatRupiah(n) { return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
+    function formatNumber(n) { return Math.round(n).toLocaleString('id-ID'); }
+    function getToday() { return new Date().toISOString().split('T')[0]; }
+    function getMonthStart() {
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    }
+    function getMonthEnd() {
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+    }
+    function showToast(title, msg, type) { if (window.showToast) window.showToast(title, msg, type); }
+
+    // ==================== INISIALISASI ====================
+    function initAccounting() {
+        cacheElements();
+        setupSubTabs();
+        bindEvents();
+        setDefaultDates();
+        refreshFinanceOverview();
+    }
+
+    function setDefaultDates() {
+        if (E.journalStartDate && !E.journalStartDate.value) E.journalStartDate.value = getMonthStart();
+        if (E.journalEndDate && !E.journalEndDate.value) E.journalEndDate.value = getToday();
+        if (E.expenseTanggal && !E.expenseTanggal.value) E.expenseTanggal.value = getToday();
+        if (E.taxPeriodStart && !E.taxPeriodStart.value) E.taxPeriodStart.value = getMonthStart();
+        if (E.taxPeriodEnd && !E.taxPeriodEnd.value) E.taxPeriodEnd.value = getToday();
+        const now = new Date();
+        if (E.cashflowMonth) E.cashflowMonth.value = now.getMonth();
+        if (E.cashflowYear) E.cashflowYear.value = now.getFullYear();
+    }
+
+    // ==================== SUB TAB SWITCHING ====================
+    function setupSubTabs() {
+        if (!E.subTabBtns) return;
+        E.subTabBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                E.subTabBtns.forEach(b => { b.classList.remove('btn-primary', 'active'); b.classList.add('btn-secondary'); });
                 this.classList.add('btn-primary', 'active');
                 this.classList.remove('btn-secondary');
-
-                document.querySelectorAll('.finance-subtab-content').forEach(c => c.classList.add('hidden'));
-                const targetId = this.dataset.financeTab;
-                const target = document.getElementById(targetId);
+                const tab = this.dataset.financeTab;
+                E.subTabContents.forEach(c => c.classList.add('hidden'));
+                const target = document.getElementById(tab);
                 if (target) target.classList.remove('hidden');
+                currentSubTab = tab;
 
-                // Refresh konten sesuai sub-tab
-                if (targetId === 'finance-overview') refreshFinanceOverview();
-                if (targetId === 'finance-expense') renderRecentExpenses();
-                if (targetId === 'finance-journal') renderJournal();
-                if (targetId === 'finance-cashflow') refreshCashflow();
-                if (targetId === 'finance-analysis') refreshAnalysis();
-                if (targetId === 'finance-budget') refreshBudgetVsActual();
-                if (targetId === 'finance-bankrec') renderBankReconciliations();
+                if (tab === 'finance-overview') refreshFinanceOverview();
+                if (tab === 'finance-expense') renderRecentExpenses();
+                if (tab === 'finance-journal') renderJournal();
+                if (tab === 'finance-cashflow') refreshCashflow();
+                if (tab === 'finance-analysis') refreshAnalysis();
+                if (tab === 'finance-tax') refreshTax();
             });
         });
     }
 
-    // ==================== OVERVIEW ====================
+    // ==================== RINGKASAN KEUANGAN ====================
     function refreshFinanceOverview() {
-        const today = new Date();
-        const monthStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
-        const monthEnd = today.toISOString().split('T')[0];
-
-        const sales = Storage.getSales().filter(s => s.tanggal >= monthStart && s.tanggal <= monthEnd);
-        const expenses = Storage.getExpenses().filter(e => e.tanggal >= monthStart && e.tanggal <= monthEnd);
+        const sales = Storage.getSales().filter(s => s.tanggal >= getMonthStart() && s.tanggal <= getToday());
+        const expenses = Storage.getExpenses().filter(e => e.tanggal >= getMonthStart() && e.tanggal <= getToday());
 
         const totalPendapatan = sales.reduce((sum, s) => sum + (s.qty * s.hargaJual - (s.diskon || 0)), 0);
         const totalHPP = sales.reduce((sum, s) => sum + (s.qty * s.hpp), 0);
@@ -169,19 +162,20 @@ window.CFS = window.CFS || {};
         const labaKotor = totalPendapatan - totalHPP;
         const labaBersih = labaKotor - totalBeban;
 
-        if (elements.finPendapatan) elements.finPendapatan.textContent = formatRupiah(totalPendapatan);
-        if (elements.finHPP) elements.finHPP.textContent = formatRupiah(totalHPP);
-        if (elements.finLabaKotor) elements.finLabaKotor.textContent = formatRupiah(labaKotor);
-        if (elements.finBeban) elements.finBeban.textContent = formatRupiah(totalBeban);
-        if (elements.finLabaBersih) elements.finLabaBersih.textContent = formatRupiah(labaBersih);
+        if (E.finPendapatan) E.finPendapatan.textContent = formatRupiah(totalPendapatan);
+        if (E.finHPP) E.finHPP.textContent = formatRupiah(totalHPP);
+        if (E.finLabaKotor) E.finLabaKotor.textContent = formatRupiah(labaKotor);
+        if (E.finBeban) E.finBeban.textContent = formatRupiah(totalBeban);
+        if (E.finLabaBersih) E.finLabaBersih.textContent = formatRupiah(labaBersih);
 
         renderMonthlyPLChart();
         renderExpenseCompositionChart(expenses);
         renderMarginPerProductChart(sales);
     }
 
+    // ==================== GRAFIK ====================
     function renderMonthlyPLChart() {
-        const ctx = elements.chartFinanceMonthlyPL?.getContext('2d');
+        const ctx = E.chartFinanceMonthlyPL?.getContext('2d');
         if (!ctx) return;
         const currentYear = new Date().getFullYear();
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -192,8 +186,8 @@ window.CFS = window.CFS || {};
         Storage.getSales().forEach(s => {
             const d = new Date(s.tanggal);
             if (d.getFullYear() === currentYear) {
-                revenueData[d.getMonth()] += (s.qty * s.hargaJual) - (s.diskon || 0);
-                profitData[d.getMonth()] += (s.qty * s.hargaJual - s.qty * s.hpp - (s.diskon || 0));
+                revenueData[d.getMonth()] += (s.qty * s.hargaJual - (s.diskon || 0));
+                profitData[d.getMonth()] += (s.qty * s.hargaJual - (s.diskon || 0)) - (s.qty * s.hpp);
             }
         });
         Storage.getExpenses().forEach(e => {
@@ -220,124 +214,90 @@ window.CFS = window.CFS || {};
                 plugins: {
                     tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${formatRupiah(ctx.raw)}` } }
                 },
-                scales: { y: { ticks: { callback: (val) => formatRupiah(val) } } }
+                scales: { y: { ticks: { callback: val => formatRupiah(val) } } }
             }
         });
     }
 
     function renderExpenseCompositionChart(expenses) {
-        const ctx = elements.chartExpenseComposition?.getContext('2d');
+        const ctx = E.chartExpenseComposition?.getContext('2d');
         if (!ctx) return;
         const composition = {};
-        expenses.forEach(e => {
-            composition[e.akun] = (composition[e.akun] || 0) + e.jumlah;
-        });
+        expenses.forEach(e => { composition[e.akun] = (composition[e.akun] || 0) + e.jumlah; });
         const labels = Object.keys(composition);
         const data = Object.values(composition);
-        const colors = ['#ef4444','#f59e0b','#3b82f6','#22c55e','#8b5cf6','#ec4899','#14b8a6','#f97316','#6366f1','#84cc16'];
-
         if (expenseCompositionChart) expenseCompositionChart.destroy();
         if (labels.length === 0) return;
         expenseCompositionChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: labels,
-                datasets: [{ data: data, backgroundColor: colors.slice(0, labels.length) }]
+                labels,
+                datasets: [{ data, backgroundColor: ['#ef4444','#f59e0b','#3b82f6','#22c55e','#8b5cf6','#ec4899','#14b8a6','#f97316','#6366f1','#84cc16'] }]
             },
             options: {
                 responsive: true,
-                plugins: {
-                    legend: { position: 'bottom' },
-                    tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${formatRupiah(ctx.raw)}` } }
-                }
+                plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${formatRupiah(ctx.raw)}` } } }
             }
         });
     }
 
     function renderMarginPerProductChart(sales) {
-        const ctx = elements.chartMarginPerProduct?.getContext('2d');
+        const ctx = E.chartMarginPerProduct?.getContext('2d');
         if (!ctx) return;
         const marginMap = {};
         sales.forEach(s => {
             if (!marginMap[s.produk]) marginMap[s.produk] = { revenue: 0, hpp: 0 };
-            marginMap[s.produk].revenue += s.qty * s.hargaJual;
+            marginMap[s.produk].revenue += (s.qty * s.hargaJual - (s.diskon || 0));
             marginMap[s.produk].hpp += s.qty * s.hpp;
         });
-        const entries = Object.entries(marginMap).sort((a,b) => (b[1].revenue - b[1].hpp) - (a[1].revenue - a[1].hpp)).slice(0, 8);
-
+        const entries = Object.entries(marginMap).sort((a, b) => (b[1].revenue - b[1].hpp) - (a[1].revenue - a[1].hpp)).slice(0, 8);
         if (marginPerProductChart) marginPerProductChart.destroy();
         if (entries.length === 0) return;
         marginPerProductChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: entries.map(([p]) => p),
-                datasets: [{
-                    label: 'Margin (Rp)',
-                    data: entries.map(([,d]) => d.revenue - d.hpp),
-                    backgroundColor: entries.map(([,d]) => (d.revenue - d.hpp) < 0 ? '#ef4444' : '#22c55e'),
-                    borderRadius: 4
-                }]
+                datasets: [{ label: 'Margin (Rp)', data: entries.map(([, d]) => d.revenue - d.hpp), backgroundColor: entries.map(([, d]) => (d.revenue - d.hpp) < 0 ? '#ef4444' : '#22c55e'), borderRadius: 4 }]
             },
             options: {
                 responsive: true,
                 plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => formatRupiah(ctx.raw) } } },
-                scales: { y: { ticks: { callback: (val) => formatRupiah(val) } } }
+                scales: { y: { ticks: { callback: val => formatRupiah(val) } } }
             }
         });
     }
 
-    // ==================== EXPENSE ====================
-    function setupEventListeners() {
-        if (elements.expenseForm) {
-            elements.expenseForm.addEventListener('submit', handleAddExpense);
-        }
-        if (elements.applyJournalFilter) {
-            elements.applyJournalFilter.addEventListener('click', () => { journalPage = 1; renderJournal(); });
-        }
-        if (elements.loadMoreJournal) {
-            elements.loadMoreJournal.addEventListener('click', () => { journalPage++; renderJournal(false); });
-        }
-        if (elements.applyCashflowFilter) {
-            elements.applyCashflowFilter.addEventListener('click', refreshCashflow);
-        }
-        // Export
-        if (elements.exportFinanceExcelBtn) elements.exportFinanceExcelBtn.addEventListener('click', exportJournalExcel);
-        if (elements.exportFinanceFullExcelBtn) elements.exportFinanceFullExcelBtn.addEventListener('click', exportFullSalesExcel);
-        if (elements.exportFinancePDFBtn) elements.exportFinancePDFBtn.addEventListener('click', exportPLPDF);
-        if (elements.exportFinanceNeracaPDFBtn) elements.exportFinanceNeracaPDFBtn.addEventListener('click', exportNeracaPDF);
-        // Budget
-        if (elements.budgetForm) elements.budgetForm.addEventListener('submit', handleAddBudget);
-        // Bank Rec
-        if (elements.bankRecForm) elements.bankRecForm.addEventListener('submit', handleAddBankReconciliation);
-    }
-
+    // ==================== BEBAN ====================
     async function handleAddExpense(e) {
         e.preventDefault();
-        const akun = elements.expenseAkun?.value;
-        const jumlah = parseFloat(elements.expenseJumlah?.value) || 0;
-        const tanggal = elements.expenseTanggal?.value || new Date().toISOString().split('T')[0];
-        const deskripsi = elements.expenseDeskripsi?.value || '';
-        if (!akun || jumlah <= 0) {
-            showToast('Error', 'Pilih akun dan masukkan jumlah yang valid.', 'error');
-            return;
-        }
+        const akun = E.expenseAkun?.value;
+        const jumlah = parseFloat(E.expenseJumlah?.value) || 0;
+        const tanggal = E.expenseTanggal?.value || getToday();
+        const deskripsi = E.expenseDeskripsi?.value || '';
+        if (!akun || jumlah <= 0) { showToast('Error', 'Pilih akun dan masukkan jumlah.', 'error'); return; }
         await Storage.addExpense({ id: 'e' + Date.now(), tanggal, akun, jumlah, deskripsi });
         showToast('Sukses', `Beban ${akun} sebesar ${formatRupiah(jumlah)} dicatat.`, 'success');
-        elements.expenseForm.reset();
-        elements.expenseTanggal.value = new Date().toISOString().split('T')[0];
+        E.expenseForm.reset();
+        E.expenseTanggal.value = getToday();
         renderRecentExpenses();
         refreshFinanceOverview();
     }
 
     function renderRecentExpenses() {
-        if (!elements.recentExpensesList) return;
-        const expenses = Storage.getExpenses().slice(-10).reverse();
-        if (expenses.length === 0) {
-            elements.recentExpensesList.innerHTML = '<p class="opacity-50 text-sm">Belum ada beban tercatat.</p>';
+        if (!E.recentExpensesList) return;
+        let expenses = Storage.getExpenses();
+        const search = (E.expenseSearch?.value || '').toLowerCase();
+        const filterAkun = E.expenseFilterAkun?.value || '';
+        if (search) expenses = expenses.filter(e => e.akun.toLowerCase().includes(search) || (e.deskripsi || '').toLowerCase().includes(search));
+        if (filterAkun) expenses = expenses.filter(e => e.akun === filterAkun);
+        expenses.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+        const recent = expenses.slice(0, 20);
+        if (recent.length === 0) {
+            E.recentExpensesList.innerHTML = '<p class="opacity-50 text-sm text-center py-4">Belum ada beban tercatat.</p>';
             return;
         }
-        elements.recentExpensesList.innerHTML = expenses.map(e => `
-            <div class="flex justify-between py-2 border-b last:border-0 text-sm">
+        E.recentExpensesList.innerHTML = recent.map(e => `
+            <div class="flex justify-between items-center py-2 border-b last:border-0 text-sm">
                 <div>
                     <span class="font-medium">${e.akun}</span>
                     <span class="text-xs opacity-70 ml-2">${e.tanggal}</span>
@@ -348,39 +308,33 @@ window.CFS = window.CFS || {};
         `).join('');
     }
 
-    // ==================== JOURNAL ====================
-    let journalPage = 1;
-    const journalPerPage = 50;
-
+    // ==================== BUKU BESAR ====================
     function renderJournal(resetPage = true) {
-        if (!elements.journalTableBody) return;
+        if (!E.journalTableBody) return;
         if (resetPage) journalPage = 1;
-
-        const startDate = elements.journalStartDate?.value || '1970-01-01';
-        const endDate = elements.journalEndDate?.value || '2099-12-31';
-        const filterAkun = elements.journalFilterAkun?.value || '';
+        const startDate = E.journalStartDate?.value || '1970-01-01';
+        const endDate = E.journalEndDate?.value || '2099-12-31';
+        const filterAkun = E.journalFilterAkun?.value || '';
 
         const sales = Storage.getSales().filter(s => s.tanggal >= startDate && s.tanggal <= endDate);
         const expenses = Storage.getExpenses().filter(e => e.tanggal >= startDate && e.tanggal <= endDate);
 
         const entries = [];
         sales.forEach(s => {
-            entries.push({ tanggal: s.tanggal, deskripsi: `Penjualan ${s.produk} ke ${s.klien}`, akun: 'Kas', debet: (s.qty * s.hargaJual) - (s.diskon || 0), kredit: 0 });
+            entries.push({ tanggal: s.tanggal, deskripsi: `Penjualan ${s.produk} ke ${s.klien}`, akun: 'Kas', debet: (s.qty * s.hargaJual - (s.diskon || 0)), kredit: 0 });
             entries.push({ tanggal: s.tanggal, deskripsi: `HPP ${s.produk}`, akun: 'HPP', debet: 0, kredit: s.qty * s.hpp });
         });
-        expenses.forEach(e => {
-            entries.push({ tanggal: e.tanggal, deskripsi: e.deskripsi || e.akun, akun: e.akun, debet: 0, kredit: e.jumlah });
-        });
+        expenses.forEach(e => entries.push({ tanggal: e.tanggal, deskripsi: e.deskripsi || e.akun, akun: e.akun, debet: 0, kredit: e.jumlah }));
         entries.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
 
         let filtered = filterAkun ? entries.filter(e => e.akun === filterAkun) : entries;
-        const totalPages = Math.ceil(filtered.length / journalPerPage);
-        const pageEntries = filtered.slice(0, journalPage * journalPerPage);
+        const totalPages = Math.ceil(filtered.length / JOURNAL_PER_PAGE);
+        const pageEntries = filtered.slice(0, journalPage * JOURNAL_PER_PAGE);
 
-        elements.journalTableBody.innerHTML = pageEntries.length === 0
+        E.journalTableBody.innerHTML = pageEntries.length === 0
             ? '<tr><td colspan="5" class="text-center p-4 opacity-50">Tidak ada jurnal.</td></tr>'
             : pageEntries.map(e => `
-                <tr class="border-t hover:bg-slate-50 dark:hover:bg-slate-700">
+                <tr class="border-t hover:bg-slate-50 dark:hover:bg-slate-700 text-sm">
                     <td class="p-2">${e.tanggal}</td>
                     <td class="p-2">${e.deskripsi}</td>
                     <td class="p-2">${e.akun}</td>
@@ -389,17 +343,16 @@ window.CFS = window.CFS || {};
                 </tr>
             `).join('');
 
-        if (elements.journalShowingInfo) elements.journalShowingInfo.textContent = `Menampilkan ${pageEntries.length} dari ${filtered.length} entri`;
-        if (elements.loadMoreJournal) elements.loadMoreJournal.classList.toggle('hidden', journalPage >= totalPages);
+        if (E.journalShowingInfo) E.journalShowingInfo.textContent = `Halaman ${journalPage} dari ${totalPages} (${filtered.length} entri)`;
+        if (E.loadMoreJournal) E.loadMoreJournal.classList.toggle('hidden', journalPage >= totalPages);
     }
 
-    // ==================== CASHFLOW ====================
+    // ==================== ARUS KAS ====================
     function refreshCashflow() {
-        const month = parseInt(elements.cashflowMonth?.value) || new Date().getMonth();
-        const year = parseInt(elements.cashflowYear?.value) || new Date().getFullYear();
-
-        const startDate = `${year}-${String(month+1).padStart(2,'0')}-01`;
-        const endDate = new Date(year, month+1, 0).toISOString().split('T')[0];
+        const month = parseInt(E.cashflowMonth?.value) || new Date().getMonth();
+        const year = parseInt(E.cashflowYear?.value) || new Date().getFullYear();
+        const startDate = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+        const endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
 
         const sales = Storage.getSales().filter(s => s.tanggal >= startDate && s.tanggal <= endDate);
         const expenses = Storage.getExpenses().filter(e => e.tanggal >= startDate && e.tanggal <= endDate);
@@ -408,17 +361,16 @@ window.CFS = window.CFS || {};
         const kasKeluar = expenses.reduce((sum, e) => sum + e.jumlah, 0);
         const saldoBersih = kasMasuk - kasKeluar;
 
-        if (elements.cfKasMasuk) elements.cfKasMasuk.textContent = formatRupiah(kasMasuk);
-        if (elements.cfKasKeluar) elements.cfKasKeluar.textContent = formatRupiah(kasKeluar);
-        if (elements.cfSaldoBersih) elements.cfSaldoBersih.textContent = formatRupiah(saldoBersih);
+        if (E.cfKasMasuk) E.cfKasMasuk.textContent = formatRupiah(kasMasuk);
+        if (E.cfKasKeluar) E.cfKasKeluar.textContent = formatRupiah(kasKeluar);
+        if (E.cfSaldoBersih) E.cfSaldoBersih.textContent = formatRupiah(saldoBersih);
 
         renderCashflowChart(sales, expenses, startDate, endDate);
     }
 
     function renderCashflowChart(sales, expenses, startDate, endDate) {
-        const ctx = elements.chartCashflow?.getContext('2d');
+        const ctx = E.chartCashflow?.getContext('2d');
         if (!ctx) return;
-
         const dateMap = {};
         const start = new Date(startDate);
         const end = new Date(endDate);
@@ -427,176 +379,125 @@ window.CFS = window.CFS || {};
         }
         sales.forEach(s => { if (dateMap[s.tanggal]) dateMap[s.tanggal].masuk += (s.qty * s.hargaJual - (s.diskon || 0)); });
         expenses.forEach(e => { if (dateMap[e.tanggal]) dateMap[e.tanggal].keluar += e.jumlah; });
-
         const labels = Object.keys(dateMap).sort();
-        const masukData = labels.map(l => dateMap[l].masuk);
-        const keluarData = labels.map(l => dateMap[l].keluar);
-
         if (cashflowChart) cashflowChart.destroy();
         cashflowChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels.map(l => new Date(l).toLocaleDateString('id-ID', { day:'numeric', month:'short' })),
+                labels: labels.map(l => new Date(l).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })),
                 datasets: [
-                    { label: 'Kas Masuk', data: masukData, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', tension: 0.3, fill: true },
-                    { label: 'Kas Keluar', data: keluarData, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', tension: 0.3, fill: true }
+                    { label: 'Kas Masuk', data: labels.map(l => dateMap[l].masuk), borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', tension: 0.3, fill: true },
+                    { label: 'Kas Keluar', data: labels.map(l => dateMap[l].keluar), borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', tension: 0.3, fill: true }
                 ]
             },
             options: {
                 responsive: true,
                 plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${formatRupiah(ctx.raw)}` } } },
-                scales: { y: { ticks: { callback: (val) => formatRupiah(val) } } }
+                scales: { y: { ticks: { callback: val => formatRupiah(val) } } }
             }
         });
     }
 
-    // ==================== ANALYSIS ====================
+    // ==================== ANALISIS ====================
     function refreshAnalysis() {
-        const today = new Date();
-        const monthStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
-        const sales = Storage.getSales().filter(s => s.tanggal >= monthStart);
-        const expenses = Storage.getExpenses().filter(e => e.tanggal >= monthStart);
-
+        const sales = Storage.getSales().filter(s => s.tanggal >= getMonthStart());
+        const expenses = Storage.getExpenses().filter(e => e.tanggal >= getMonthStart());
         const pendapatan = sales.reduce((sum, s) => sum + (s.qty * s.hargaJual - (s.diskon || 0)), 0);
         const hpp = sales.reduce((sum, s) => sum + (s.qty * s.hpp), 0);
         const beban = expenses.reduce((sum, e) => sum + e.jumlah, 0);
         const labaKotor = pendapatan - hpp;
         const labaBersih = labaKotor - beban;
-
         const marginKotor = pendapatan > 0 ? ((labaKotor / pendapatan) * 100).toFixed(1) : 0;
         const marginBersih = pendapatan > 0 ? ((labaBersih / pendapatan) * 100).toFixed(1) : 0;
         const rasioBeban = pendapatan > 0 ? ((beban / pendapatan) * 100).toFixed(1) : 0;
+        const totalAset = Storage.getBatches().reduce((sum, b) => sum + ((b.berat - b.used) * (b.hargaBeli || 0)), 0);
+        const roa = totalAset > 0 ? ((labaBersih / totalAset) * 100).toFixed(1) : 0;
+        const ekuitas = totalAset + labaBersih;
+        const roe = ekuitas > 0 ? ((labaBersih / ekuitas) * 100).toFixed(1) : 0;
 
-        if (elements.anaMarginKotor) elements.anaMarginKotor.textContent = marginKotor + '%';
-        if (elements.anaMarginBersih) elements.anaMarginBersih.textContent = marginBersih + '%';
-        if (elements.anaRasioBeban) elements.anaRasioBeban.textContent = rasioBeban + '%';
+        if (E.anaMarginKotor) E.anaMarginKotor.textContent = marginKotor + '%';
+        if (E.anaMarginBersih) E.anaMarginBersih.textContent = marginBersih + '%';
+        if (E.anaRasioBeban) E.anaRasioBeban.textContent = rasioBeban + '%';
+        if (E.anaROA) E.anaROA.textContent = roa + '%';
+        if (E.anaROE) E.anaROE.textContent = roe + '%';
 
-        if (elements.analysisRecommendations) {
+        if (E.analysisRecommendations) {
             let recs = [];
-            if (marginBersih < 10) recs.push('Margin laba bersih rendah. Pertimbangkan untuk menaikkan harga jual atau menekan biaya operasional.');
-            if (rasioBeban > 40) recs.push('Rasio beban terlalu tinggi (>40%). Lakukan audit pengeluaran untuk menemukan area penghematan.');
+            if (marginBersih < 10) recs.push('Margin laba bersih rendah (<10%). Pertimbangkan menaikkan harga jual atau menekan biaya operasional.');
+            if (rasioBeban > 40) recs.push('Rasio beban tinggi (>40%). Audit pengeluaran untuk menemukan area penghematan.');
             if (marginKotor > 30) recs.push('Margin laba kotor sehat (>30%). Pertahankan strategi pricing dan efisiensi pembelian.');
-            if (pendapatan === 0) recs.push('Belum ada pendapatan bulan ini. Fokus pada penjualan dan pemasaran.');
+            if (roa < 5) recs.push('ROA rendah (<5%). Aset belum menghasilkan laba optimal. Tingkatkan penjualan atau kurangi stok tidak produktif.');
             if (recs.length === 0) recs.push('Kinerja keuangan dalam kondisi baik. Lanjutkan monitoring rutin.');
-            elements.analysisRecommendations.innerHTML = recs.map(r => `<li>${r}</li>`).join('');
+            E.analysisRecommendations.innerHTML = recs.map(r => `<li>${r}</li>`).join('');
         }
     }
 
-    // ==================== BUDGET VS ACTUAL ====================
-    async function handleAddBudget(e) {
-        e.preventDefault();
-        const tahun = parseInt(elements.budgetTahun?.value);
-        const bulan = parseInt(elements.budgetBulan?.value);
-        const akun = elements.budgetAkun?.value;
-        const jumlah = parseFloat(elements.budgetJumlah?.value) || 0;
-        if (!tahun || isNaN(bulan) || !akun || jumlah <= 0) {
-            showToast('Error', 'Lengkapi data anggaran.', 'error');
-            return;
+    // ==================== PAJAK ====================
+    function refreshTax() {
+        const start = E.taxPeriodStart?.value || getMonthStart();
+        const end = E.taxPeriodEnd?.value || getToday();
+        const sales = Storage.getSales().filter(s => s.tanggal >= start && s.tanggal <= end);
+        const pendapatan = sales.reduce((sum, s) => sum + (s.qty * s.hargaJual - (s.diskon || 0)), 0);
+        const settings = Storage.getSettings();
+        const ppnRate = settings.ppn || 12;
+        const pph25Rate = settings.pph25 || 2;
+        const pph21Rate = settings.pph21 || 5;
+
+        const dpp = Math.round(pendapatan / (1 + ppnRate / 100));
+        const ppn = pendapatan - dpp;
+        const pph25 = Math.round((dpp * pph25Rate) / 100);
+        const pph21 = Math.round((dpp * pph21Rate) / 100);
+        const totalPajak = ppn + pph25 + pph21;
+
+        if (E.taxDPP) E.taxDPP.textContent = formatRupiah(dpp);
+        if (E.taxPPN) E.taxPPN.textContent = formatRupiah(ppn);
+        if (E.taxPPH25) E.taxPPH25.textContent = formatRupiah(pph25);
+        if (E.taxPPH21) E.taxPPH21.textContent = formatRupiah(pph21);
+        if (E.taxTotalPajak) E.taxTotalPajak.textContent = formatRupiah(totalPajak);
+
+        if (E.taxBreakdownTable) {
+            E.taxBreakdownTable.innerHTML = `
+                <tr><td class="p-2">DPP</td><td class="p-2 text-right">${formatRupiah(dpp)}</td></tr>
+                <tr><td class="p-2">PPN (${ppnRate}%)</td><td class="p-2 text-right">${formatRupiah(ppn)}</td></tr>
+                <tr><td class="p-2">PPh 25 (${pph25Rate}%)</td><td class="p-2 text-right">${formatRupiah(pph25)}</td></tr>
+                <tr><td class="p-2">PPh 21 (${pph21Rate}%)</td><td class="p-2 text-right">${formatRupiah(pph21)}</td></tr>
+                <tr class="font-bold"><td class="p-2">Total Pajak</td><td class="p-2 text-right">${formatRupiah(totalPajak)}</td></tr>
+            `;
         }
-        budgets.push({ id: 'bgt_' + Date.now(), tahun, bulan, akun, jumlah });
-        await saveBudgets();
-        showToast('Sukses', 'Anggaran ditambahkan.', 'success');
-        elements.budgetForm.reset();
-        refreshBudgetVsActual();
     }
 
-    function refreshBudgetVsActual() {
-        if (!elements.budgetTableBody) return;
-        const month = parseInt(elements.cashflowMonth?.value) || new Date().getMonth();
-        const year = parseInt(elements.cashflowYear?.value) || new Date().getFullYear();
-
-        const actualExpenses = Storage.getExpenses().filter(e => {
-            const d = new Date(e.tanggal);
-            return d.getFullYear() === year && d.getMonth() === month;
-        }).reduce((sum, e) => sum + e.jumlah, 0);
-
-        const budgetEntries = budgets.filter(b => b.tahun === year && b.bulan === month);
-        elements.budgetTableBody.innerHTML = budgetEntries.length === 0
-            ? '<tr><td colspan="4" class="text-center p-4 opacity-50">Belum ada anggaran.</td></tr>'
-            : budgetEntries.map(b => {
-                const actual = actualExpenses; // bisa dipecah per akun nanti
-                const variance = actual - b.jumlah;
-                return `<tr class="border-t">
-                    <td class="p-2">${b.akun}</td>
-                    <td class="p-2 text-right">${formatRupiah(b.jumlah)}</td>
-                    <td class="p-2 text-right">${formatRupiah(actual)}</td>
-                    <td class="p-2 text-right ${variance <= 0 ? 'text-green-600' : 'text-red-600'}">${formatRupiah(variance)}</td>
-                </tr>`;
-            }).join('');
-
-        renderBudgetChart();
-    }
-
-    function renderBudgetChart() {
-        const ctx = elements.chartBudgetVsActual?.getContext('2d');
-        if (!ctx) return;
-        const month = parseInt(elements.cashflowMonth?.value) || new Date().getMonth();
-        const year = parseInt(elements.cashflowYear?.value) || new Date().getFullYear();
-        const budgetTotal = budgets.filter(b => b.tahun === year && b.bulan === month).reduce((sum, b) => sum + b.jumlah, 0);
-        const actualTotal = Storage.getExpenses().filter(e => {
-            const d = new Date(e.tanggal);
-            return d.getFullYear() === year && d.getMonth() === month;
-        }).reduce((sum, e) => sum + e.jumlah, 0);
-
-        if (budgetVsActualChart) budgetVsActualChart.destroy();
-        budgetVsActualChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Anggaran', 'Aktual'],
-                datasets: [{ data: [budgetTotal, actualTotal], backgroundColor: ['#3b82f6', '#22c55e'] }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => formatRupiah(ctx.raw) } } }
+    function exportTaxPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(16);
+        doc.text('Laporan Pajak', 15, 20);
+        doc.setFontSize(10);
+        let y = 30;
+        const start = E.taxPeriodStart?.value || getMonthStart();
+        const end = E.taxPeriodEnd?.value || getToday();
+        doc.text(`Periode: ${start} s/d ${end}`, 15, y);
+        y += 10;
+        const items = document.querySelectorAll('#taxBreakdownTable tr');
+        items.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length === 2) {
+                doc.text(`${cells[0].textContent}: ${cells[1].textContent}`, 15, y);
+                y += 8;
             }
         });
+        doc.save(`laporan_pajak_${start}_${end}.pdf`);
+        showToast('Sukses', 'PDF Pajak diunduh.', 'success');
     }
 
-    // ==================== BANK RECONCILIATION ====================
-    async function handleAddBankReconciliation(e) {
-        e.preventDefault();
-        const tanggal = elements.bankRecTanggal?.value;
-        const bank = elements.bankRecBank?.value;
-        const saldoBuku = parseFloat(elements.bankRecSaldoBuku?.value) || 0;
-        const saldoBank = parseFloat(elements.bankRecSaldoBank?.value) || 0;
-        const catatan = elements.bankRecCatatan?.value || '';
-        if (!tanggal || !bank) {
-            showToast('Error', 'Lengkapi data rekonsiliasi.', 'error');
-            return;
-        }
-        const selisih = saldoBank - saldoBuku;
-        bankReconciliations.push({ id: 'rec_' + Date.now(), tanggal, bank, saldoBuku, saldoBank, selisih, catatan });
-        await saveBankReconciliations();
-        showToast('Sukses', 'Rekonsiliasi dicatat.', 'success');
-        elements.bankRecForm.reset();
-        renderBankReconciliations();
-    }
-
-    function renderBankReconciliations() {
-        if (!elements.bankRecTableBody) return;
-        elements.bankRecTableBody.innerHTML = bankReconciliations.length === 0
-            ? '<tr><td colspan="7" class="text-center p-4 opacity-50">Belum ada rekonsiliasi.</td></tr>'
-            : bankReconciliations.map(r => `
-                <tr class="border-t">
-                    <td class="p-2">${r.tanggal}</td>
-                    <td class="p-2">${r.bank}</td>
-                    <td class="p-2 text-right">${formatRupiah(r.saldoBuku)}</td>
-                    <td class="p-2 text-right">${formatRupiah(r.saldoBank)}</td>
-                    <td class="p-2 text-right ${r.selisih === 0 ? 'text-green-600' : 'text-red-600'}">${formatRupiah(r.selisih)}</td>
-                    <td class="p-2">${r.catatan}</td>
-                </tr>
-            `).join('');
-    }
-
-    // ==================== EXPORT ====================
-    function exportJournalExcel() {
-        const startDate = elements.journalStartDate?.value || '1970-01-01';
-        const endDate = elements.journalEndDate?.value || '2099-12-31';
+    // ==================== EKSPOR ====================
+    function exportJurnalExcel() {
+        const startDate = E.journalStartDate?.value || '1970-01-01';
+        const endDate = E.journalEndDate?.value || '2099-12-31';
         const sales = Storage.getSales().filter(s => s.tanggal >= startDate && s.tanggal <= endDate);
         const expenses = Storage.getExpenses().filter(e => e.tanggal >= startDate && e.tanggal <= endDate);
-        const data = [['Tanggal','Deskripsi','Akun','Debet','Kredit']];
+        const data = [['Tanggal', 'Deskripsi', 'Akun', 'Debet', 'Kredit']];
         sales.forEach(s => {
-            data.push([s.tanggal, `Penjualan ${s.produk} ke ${s.klien}`, 'Kas', (s.qty * s.hargaJual) - (s.diskon || 0), 0]);
+            data.push([s.tanggal, `Penjualan ${s.produk} ke ${s.klien}`, 'Kas', (s.qty * s.hargaJual - (s.diskon || 0)), 0]);
             data.push([s.tanggal, `HPP ${s.produk}`, 'HPP', 0, s.qty * s.hpp]);
         });
         expenses.forEach(e => data.push([e.tanggal, e.deskripsi || e.akun, e.akun, 0, e.jumlah]));
@@ -604,64 +505,85 @@ window.CFS = window.CFS || {};
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Jurnal');
         XLSX.writeFile(wb, `jurnal_${startDate}_${endDate}.xlsx`);
-        showToast('Sukses', 'Jurnal diunduh sebagai Excel.', 'success');
+        showToast('Sukses', 'Jurnal diunduh.', 'success');
     }
 
-    function exportFullSalesExcel() {
+    function exportFullData() {
         const sales = Storage.getSales();
-        const data = [['Tanggal','Klien','Produk','Qty','Harga/kg','Total','Channel','Tier','HPP/kg','Laba']];
-        sales.forEach(s => data.push([s.tanggal, s.klien, s.produk, s.qty, s.hargaJual, (s.qty*s.hargaJual)-(s.diskon||0), s.channel, s.tier, s.hpp, ((s.hargaJual-s.hpp)*s.qty)-(s.diskon||0)]));
+        const data = [['Tanggal', 'Klien', 'Produk', 'Qty', 'Harga/kg', 'Total', 'Channel', 'Tier', 'HPP/kg', 'Laba']];
+        sales.forEach(s => data.push([s.tanggal, s.klien, s.produk, s.qty, s.hargaJual, (s.qty * s.hargaJual - (s.diskon || 0)), s.channel, s.tier, s.hpp, (s.hargaJual - s.hpp) * s.qty]));
         const ws = XLSX.utils.aoa_to_sheet(data);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Penjualan');
-        XLSX.writeFile(wb, 'data_penjualan_lengkap.xlsx');
-        showToast('Sukses', 'Excel lengkap diunduh.', 'success');
+        XLSX.utils.book_append_sheet(wb, ws, 'Data Lengkap');
+        XLSX.writeFile(wb, `data_penjualan_lengkap.xlsx`);
+        showToast('Sukses', 'Data lengkap diunduh.', 'success');
     }
 
-    function exportPLPDF() {
+    function exportLabaRugiPDF() {
+        const sales = Storage.getSales().filter(s => s.tanggal >= getMonthStart());
+        const expenses = Storage.getExpenses().filter(e => e.tanggal >= getMonthStart());
+        const pendapatan = sales.reduce((sum, s) => sum + (s.qty * s.hargaJual - (s.diskon || 0)), 0);
+        const hpp = sales.reduce((sum, s) => sum + (s.qty * s.hpp), 0);
+        const beban = expenses.reduce((sum, e) => sum + e.jumlah, 0);
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const sales = Storage.getSales();
-        const expenses = Storage.getExpenses();
-        const pendapatan = sales.reduce((a,s) => a+(s.qty*s.hargaJual)-(s.diskon||0), 0);
-        const hpp = sales.reduce((a,s) => a+s.qty*s.hpp, 0);
-        const beban = expenses.reduce((a,e) => a+e.jumlah, 0);
-        doc.setFontSize(16); doc.text('Laporan Laba Rugi', 20, 20);
-        doc.setFontSize(12);
-        doc.text(`Pendapatan: ${formatRupiah(pendapatan)}`, 20, 35);
-        doc.text(`HPP: ${formatRupiah(hpp)}`, 20, 45);
-        doc.text(`Laba Kotor: ${formatRupiah(pendapatan-hpp)}`, 20, 55);
-        doc.text(`Beban: ${formatRupiah(beban)}`, 20, 65);
-        doc.text(`Laba Bersih: ${formatRupiah(pendapatan-hpp-beban)}`, 20, 75);
+        doc.setFontSize(16);
+        doc.text('Laporan Laba Rugi', 15, 20);
+        doc.setFontSize(10);
+        let y = 30;
+        doc.text(`Pendapatan: ${formatRupiah(pendapatan)}`, 15, y); y += 8;
+        doc.text(`HPP: ${formatRupiah(hpp)}`, 15, y); y += 8;
+        doc.text(`Laba Kotor: ${formatRupiah(pendapatan - hpp)}`, 15, y); y += 8;
+        doc.text(`Beban: ${formatRupiah(beban)}`, 15, y); y += 8;
+        doc.text(`Laba Bersih: ${formatRupiah(pendapatan - hpp - beban)}`, 15, y);
         doc.save('laba_rugi.pdf');
-        showToast('Sukses', 'PDF diunduh.', 'success');
+        showToast('Sukses', 'PDF Laba Rugi diunduh.', 'success');
     }
 
     function exportNeracaPDF() {
+        const stockMap = CFS.Inventory ? CFS.Inventory.getStockPerProduct() : {};
+        const totalAset = Object.values(stockMap).reduce((a, b) => a + b * 30000, 0);
+        const labaBersih = Storage.getSales().reduce((a, s) => a + (s.qty * s.hargaJual - (s.diskon || 0)), 0) - Storage.getSales().reduce((a, s) => a + s.qty * s.hpp, 0) - Storage.getExpenses().reduce((a, e) => a + e.jumlah, 0);
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const stockMap = CFS.Inventory?.getStockPerProduct() || {};
-        const totalAset = Object.values(stockMap).reduce((a,b) => a+b*30000, 0);
-        const labaBersih = Storage.getSales().reduce((a,s) => a+(s.qty*s.hargaJual)-(s.qty*s.hpp)-(s.diskon||0), 0) - Storage.getExpenses().reduce((a,e) => a+e.jumlah, 0);
-        doc.setFontSize(16); doc.text('Neraca', 20, 20);
-        doc.setFontSize(12);
-        doc.text(`Aset (Stok): ${formatRupiah(totalAset)}`, 20, 35);
-        doc.text(`Kas: ${formatRupiah(labaBersih)}`, 20, 45);
-        doc.text(`Total Aset: ${formatRupiah(totalAset+labaBersih)}`, 20, 55);
-        doc.text(`Kewajiban: Rp 0`, 20, 70);
-        doc.text(`Ekuitas: ${formatRupiah(totalAset+labaBersih)}`, 20, 80);
+        doc.setFontSize(16);
+        doc.text('Neraca', 15, 20);
+        doc.setFontSize(10);
+        let y = 30;
+        doc.text(`Aset (Stok): ${formatRupiah(totalAset)}`, 15, y); y += 8;
+        doc.text(`Kas: ${formatRupiah(labaBersih)}`, 15, y); y += 8;
+        doc.text(`Total Aset: ${formatRupiah(totalAset + labaBersih)}`, 15, y); y += 8;
+        doc.text(`Kewajiban: Rp 0`, 15, y); y += 8;
+        doc.text(`Ekuitas: ${formatRupiah(totalAset + labaBersih)}`, 15, y);
         doc.save('neraca.pdf');
-        showToast('Sukses', 'PDF diunduh.', 'success');
+        showToast('Sukses', 'PDF Neraca diunduh.', 'success');
     }
 
-    // ==================== HELPER ====================
-    function formatRupiah(n) {
-        return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+    // ==================== EVENT BINDING ====================
+    function bindEvents() {
+        if (E.expenseForm) E.expenseForm.addEventListener('submit', handleAddExpense);
+        if (E.expenseSearch) E.expenseSearch.addEventListener('input', renderRecentExpenses);
+        if (E.expenseFilterAkun) E.expenseFilterAkun.addEventListener('change', renderRecentExpenses);
+
+        if (E.applyJournalFilter) E.applyJournalFilter.addEventListener('click', () => renderJournal(true));
+        if (E.loadMoreJournal) E.loadMoreJournal.addEventListener('click', () => { journalPage++; renderJournal(false); });
+        if (E.exportJournalExcel) E.exportJournalExcel.addEventListener('click', exportJurnalExcel);
+
+        if (E.applyCashflowFilter) E.applyCashflowFilter.addEventListener('click', refreshCashflow);
+
+        if (E.applyTaxFilter) E.applyTaxFilter.addEventListener('click', refreshTax);
+        if (E.exportTaxPDF) E.exportTaxPDF.addEventListener('click', exportTaxPDF);
+
+        if (E.exportFinanceExcelBtn) E.exportFinanceExcelBtn.addEventListener('click', exportJurnalExcel);
+        if (E.exportFinanceFullExcelBtn) E.exportFinanceFullExcelBtn.addEventListener('click', exportFullData);
+        if (E.exportFinancePDFBtn) E.exportFinancePDFBtn.addEventListener('click', exportLabaRugiPDF);
+        if (E.exportFinanceNeracaPDFBtn) E.exportFinanceNeracaPDFBtn.addEventListener('click', exportNeracaPDF);
     }
 
-    // ==================== EXTERNAL API ====================
-    CFS.Accounting = CFS.Accounting || {};
-    CFS.Accounting.init = initAccounting;
-    CFS.Accounting.refreshFinanceSummary = refreshFinanceOverview;
-    CFS.Accounting.renderYearlyChart = renderMonthlyPLChart;
+    // ==================== EXPORT API ====================
+    CFS.Accounting = {
+        init: initAccounting,
+        refreshFinanceSummary: refreshFinanceOverview,
+        renderYearlyChart: renderMonthlyPLChart
+    };
 })();
