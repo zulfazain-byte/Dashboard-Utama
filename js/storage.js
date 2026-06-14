@@ -71,7 +71,11 @@ let undoStack = [];
 const STORAGE_VERSION = '5.4.0';
 
 // --------------- DEFAULT VALUES ---------------
-const defaultProducts = [];                     // tidak ada produk bawaan
+// Produk bawaan
+const defaultProducts = [
+    'Ikan Kembung Banjar', 'Ikan Kembung Layang', 'Ikan Kembung Belo', 'Ikan Tongkol', 'Ikan Salem',
+    'Ikan Tenggiri', 'Bawal Laut', 'Cumi-Cumi', 'Ikan Dori Fillet'
+];
 const defaultSettings = {
     ppn: 12,
     pph25: 2,
