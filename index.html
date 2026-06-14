@@ -156,10 +156,20 @@
             .container-main { padding: 0 0.75rem; }
             .card { border-radius: 0.75rem; }
         }
-        /* ============ MOBILE RESPONSIVE ============ */
+      /* ============ MOBILE RESPONSIVE ============ */
 @media (max-width: 768px) {
     html { font-size: 15px; }
     body { -webkit-text-size-adjust: 100%; }
+
+    /* Tampilkan tombol hamburger */
+    #mobileMenuBtn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+    }
 
     /* Sidebar offcanvas */
     aside {
@@ -177,14 +187,15 @@
     }
     aside.open { left: 0 !important; }
 
-    /* Overlay saat sidebar terbuka */
-    aside.open::before {
-        content: '';
+    /* Overlay di belakang sidebar */
+    #sidebarOverlay {
+        display: none;
         position: fixed;
         inset: 0;
         background: rgba(0,0,0,0.4);
-        z-index: -1;
+        z-index: 55;
     }
+    #sidebarOverlay.show { display: block; }
 
     /* Container padding */
     .container-main { padding: 0 0.75rem; }
@@ -208,12 +219,7 @@
     }
 
     /* Tombol */
-    .btn {
-        padding: 0.65rem 1rem !important;
-        font-size: 0.9rem !important;
-        min-height: 44px;
-        border-radius: 0.6rem !important;
-    }
+    .btn { padding: 0.65rem 1rem !important; font-size: 0.9rem !important; min-height: 44px; border-radius: 0.6rem !important; }
     .btn-sm { padding: 0.5rem 0.75rem !important; font-size: 0.8rem !important; min-height: 38px; }
     .btn-xs { padding: 0.35rem 0.5rem !important; font-size: 0.7rem !important; min-height: 32px; }
 
@@ -240,7 +246,29 @@
 }
     </style>
 </head>
+    <script>
+    function toggleSidebar() {
+        var sidebar = document.querySelector('aside');
+        var overlay = document.getElementById('sidebarOverlay');
+        if (sidebar) sidebar.classList.toggle('open');
+        if (overlay) overlay.classList.toggle('show');
+    }
+
+    // Tutup sidebar saat link di dalamnya diklik
+    document.querySelectorAll('aside .tab-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var sidebar = document.querySelector('aside');
+            var overlay = document.getElementById('sidebarOverlay');
+            if (sidebar && window.innerWidth <= 768) {
+                sidebar.classList.remove('open');
+                if (overlay) overlay.classList.remove('show');
+            }
+        });
+    });
+</script>
 <body class="antialiased">
+    <!-- Overlay untuk sidebar mobile -->
+<div id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
 <!-- ==================== TOAST NOTIFICATION ==================== -->
 <div id="toast" class="toast">
