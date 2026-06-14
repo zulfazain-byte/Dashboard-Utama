@@ -54,6 +54,12 @@ window.CFS = window.CFS || {};
             activeBtn.classList.add('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
             activeBtn.classList.remove('opacity-70');
         }
+           // Isi ulang dropdown produk di semua tab
+    setTimeout(() => {
+        if (CFS.Inventory && typeof CFS.Inventory.populateProductDropdowns === 'function') {
+            CFS.Inventory.populateProductDropdowns();
+        }
+    }, 150);
 
         // Inisialisasi modul
         switch (tabId) {
