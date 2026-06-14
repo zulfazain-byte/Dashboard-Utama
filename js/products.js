@@ -1,6 +1,5 @@
 /* ============================================================
-   Cibitung Frozen ERP Ultimate v5.4 — Products Module (ULTIMATE)
-   Self‑contained, ±1200 baris, fitur kelas enterprise.
+   Cibitung Frozen ERP Ultimate v5.4 — Products Module (FIX)
    ============================================================ */
 window.CFS = window.CFS || {};
 
@@ -10,24 +9,24 @@ window.CFS = window.CFS || {};
     const Storage = CFS.Storage;
 
     // ==================== STATE ====================
-    let products = [];                 // mirror dari Storage.getProducts()
-    let categories = [];              // dari localforage 'cfs_product_categories'
-    let variants = [];                // dari localforage 'cfs_product_variants'
-    let filteredProducts = [];        // hasil filter
+    let products = [];
+    let categories = [];
+    let variants = [];
+    let filteredProducts = [];
     let currentFilter = {
         search: '',
         category: '',
-        sortBy: 'name',               // 'name' | 'sku' | 'stock' | 'minStock'
-        sortOrder: 'asc'              // 'asc' | 'desc'
+        sortBy: 'name',
+        sortOrder: 'asc'
     };
-    let selectedIds = new Set();      // untuk bulk delete
-    let editingId = null;             // null = tambah, string = edit
-    let undoStack = [];               // stack untuk undo delete produk (max 10)
+    let selectedIds = new Set();
+    let editingId = null;
+    let undoStack = [];
     let currentPage = 1;
     const PER_PAGE = 25;
 
     // ==================== CACHE ELEMEN ====================
-    const E = {};
+    let E = {};
     function cacheElements() {
         E = {
             // Statistik
@@ -48,12 +47,7 @@ window.CFS = window.CFS || {};
             productTableBody: document.getElementById('productTableBody'),
             prodSelectAll: document.getElementById('prodSelectAll'),
             prodBulkDelete: document.getElementById('prodBulkDelete'),
-            prodBulkCategory: document.getElementById('prodBulkCategory'),
-            prodBulkCategorySelect: document.getElementById('prodBulkCategorySelect'),
             exportProductsCSV2: document.getElementById('exportProductsCSV2'),
-            prodUndoBtn: document.getElementById('prodUndoBtn'),
-            prodShowingInfo: document.getElementById('prodShowingInfo'),
-            prodLoadMore: document.getElementById('prodLoadMore'),
 
             // Form
             productCustomForm: document.getElementById('productCustomForm'),
@@ -64,7 +58,6 @@ window.CFS = window.CFS || {};
             newProductMinStock: document.getElementById('newProductMinStock'),
             newProductUnit: document.getElementById('newProductUnit'),
             newProductBrand: document.getElementById('newProductBrand'),
-            newProductTags: document.getElementById('newProductTags'),
             prodSubmitBtn: document.getElementById('prodSubmitBtn'),
             prodCancelEditBtn: document.getElementById('prodCancelEditBtn'),
             prodFormTitle: document.getElementById('prodFormTitle'),
@@ -78,24 +71,12 @@ window.CFS = window.CFS || {};
             variantProduk: document.getElementById('variantProduk'),
             variantName: document.getElementById('variantName'),
             variantWeight: document.getElementById('variantWeight'),
-            variantPrice: document.getElementById('variantPrice'),
             addVariantBtn: document.getElementById('addVariantBtn'),
             variantTableBody: document.getElementById('variantTableBody'),
 
             // Import / Export
             exportProductsCSV: document.getElementById('exportProductsCSV'),
             importProductsCSV: document.getElementById('importProductsCSV'),
-            downloadTemplateCSV: document.getElementById('downloadTemplateCSV'),
-
-            // Quick Edit
-            quickEditModal: document.getElementById('quickEditModal'),
-            quickEditForm: document.getElementById('quickEditForm'),
-            quickEditName: document.getElementById('quickEditName'),
-            quickEditCategory: document.getElementById('quickEditCategory'),
-            quickEditMinStock: document.getElementById('quickEditMinStock'),
-            quickEditUnit: document.getElementById('quickEditUnit'),
-            quickEditId: document.getElementById('quickEditId'),
-            quickEditCloseBtn: document.getElementById('quickEditCloseBtn'),
         };
     }
 
@@ -104,11 +85,6 @@ window.CFS = window.CFS || {};
     function showToast(title, msg, type) {
         if (window.showToast) window.showToast(title, msg, type);
         else console.log(title, msg);
-    }
-    function escapeHtml(str) {
-        const div = document.createElement('div');
-        div.textContent = str;
-        return div.innerHTML;
     }
 
     // ==================== LOAD DATA ====================
@@ -126,12 +102,8 @@ window.CFS = window.CFS || {};
         }
     }
 
-    async function saveCategories() {
-        await localforage.setItem('cfs_product_categories', categories);
-    }
-    async function saveVariants() {
-        await localforage.setItem('cfs_product_variants', variants);
-    }
+    async function saveCategories() { await localforage.setItem('cfs_product_categories', categories); }
+    async function saveVariants() { await localforage.setItem('cfs_product_variants', variants); }
 
     // ==================== SUB TAB SWITCHING ====================
     function setupSubTabs() {
@@ -177,41 +149,22 @@ window.CFS = window.CFS || {};
         if (E.variantProduk) {
             E.variantProduk.innerHTML = '<option value="">Pilih Produk</option>' + products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
         }
-        if (E.prodBulkCategorySelect) {
-            E.prodBulkCategorySelect.innerHTML = '<option value="">--Pilih Kategori--</option>' + categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-        }
-        if (E.quickEditCategory) {
-            E.quickEditCategory.innerHTML = '<option value="">Tanpa Kategori</option>' + categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-        }
     }
 
     // ==================== FILTER & SORT ====================
     function applyFilterAndRender() {
         let data = [...products];
-
-        // Filter
         if (currentFilter.search) {
             const kw = currentFilter.search.toLowerCase();
-            data = data.filter(p => p.name.toLowerCase().includes(kw) || (p.sku || '').toLowerCase().includes(kw) || (p.brand || '').toLowerCase().includes(kw));
+            data = data.filter(p => p.name.toLowerCase().includes(kw) || (p.sku || '').toLowerCase().includes(kw));
         }
         if (currentFilter.category) {
             data = data.filter(p => (p.category || '') === currentFilter.category);
         }
-
-        // Sort
         const sortKey = currentFilter.sortBy;
         const order = currentFilter.sortOrder === 'desc' ? -1 : 1;
-        if (sortKey === 'name') {
-            data.sort((a, b) => order * a.name.localeCompare(b.name, 'id'));
-        } else if (sortKey === 'sku') {
-            data.sort((a, b) => order * (a.sku || '').localeCompare(b.sku || '', 'id'));
-        } else if (sortKey === 'stock') {
-            const stockMap = CFS.Inventory ? CFS.Inventory.getStockPerProduct() : {};
-            data.sort((a, b) => order * ((stockMap[a.name] || 0) - (stockMap[b.name] || 0)));
-        } else if (sortKey === 'minStock') {
-            data.sort((a, b) => order * ((a.minStock || 10) - (b.minStock || 10)));
-        }
-
+        if (sortKey === 'name') data.sort((a, b) => order * a.name.localeCompare(b.name, 'id'));
+        else if (sortKey === 'sku') data.sort((a, b) => order * (a.sku || '').localeCompare(b.sku || '', 'id'));
         filteredProducts = data;
         renderProductTable();
     }
@@ -225,36 +178,27 @@ window.CFS = window.CFS || {};
         const pageData = filteredProducts.slice(startIdx, startIdx + PER_PAGE);
 
         if (pageData.length === 0) {
-            E.productTableBody.innerHTML = `<tr><td colspan="8" class="text-center py-10 opacity-50">
-                <i class="ph ph-package text-4xl block mb-3"></i>
-                <p class="text-sm">Tidak ada produk.</p>
-            </td></tr>`;
+            E.productTableBody.innerHTML = `<tr><td colspan="7" class="text-center py-8 opacity-50">Tidak ada produk.</td></tr>`;
             return;
         }
 
         E.productTableBody.innerHTML = pageData.map(p => {
             const currentStock = stockMap[p.name] || 0;
             const stockColor = currentStock === 0 ? 'text-red-500' : currentStock < (p.minStock || 10) ? 'text-amber-500' : 'text-green-500';
-            const categoryName = p.category || '-';
             return `<tr class="border-t hover:bg-slate-50 dark:hover:bg-slate-700 transition text-sm">
                 <td class="p-2"><input type="checkbox" class="prod-checkbox" data-id="${p.id}" ${selectedIds.has(p.id) ? 'checked' : ''}></td>
-                <td class="p-2 font-medium">${escapeHtml(p.name)}</td>
-                <td class="p-2">${escapeHtml(categoryName)}</td>
+                <td class="p-2 font-medium">${p.name}</td>
+                <td class="p-2">${p.category || '-'}</td>
                 <td class="p-2">${p.sku || '-'}</td>
                 <td class="p-2 text-right">${p.minStock || 10} ${p.unit || 'kg'}</td>
                 <td class="p-2 text-center font-semibold ${stockColor}">${currentStock} ${p.unit || 'kg'}</td>
-                <td class="p-2 text-xs opacity-70">${p.brand || '-'}</td>
                 <td class="p-2 text-center">
                     <button class="btn btn-xs btn-secondary" onclick="CFS.Products.editProduct('${p.id}')" title="Edit"><i class="ph ph-pencil"></i></button>
-                    <button class="btn btn-xs btn-primary" onclick="CFS.Products.quickEdit('${p.id}')" title="Quick Edit"><i class="ph ph-lightning"></i></button>
                     <button class="btn btn-xs btn-warning" onclick="CFS.Products.duplicateProduct('${p.id}')" title="Duplikat"><i class="ph ph-copy"></i></button>
                     <button class="btn btn-xs btn-danger" onclick="CFS.Products.deleteProduct('${p.id}')" title="Hapus"><i class="ph ph-trash"></i></button>
                 </td>
             </tr>`;
         }).join('');
-
-        if (E.prodShowingInfo) E.prodShowingInfo.textContent = `Halaman ${currentPage} dari ${totalPages} (${filteredProducts.length} produk)`;
-        if (E.prodLoadMore) E.prodLoadMore.style.display = currentPage < totalPages ? '' : 'none';
     }
 
     // ==================== FORM TAMBAH / EDIT ====================
@@ -269,7 +213,6 @@ window.CFS = window.CFS || {};
         E.newProductMinStock.value = p.minStock || 10;
         E.newProductUnit.value = p.unit || 'kg';
         E.newProductBrand.value = p.brand || '';
-        E.newProductTags.value = (p.tags || []).join(', ');
         E.prodFormTitle.textContent = 'Edit Produk';
         E.prodSubmitBtn.textContent = '💾 Simpan Perubahan';
         E.prodCancelEditBtn.style.display = 'inline-flex';
@@ -296,11 +239,10 @@ window.CFS = window.CFS || {};
         const minStock = parseInt(E.newProductMinStock.value) || 10;
         const unit = E.newProductUnit.value.trim() || 'kg';
         const brand = E.newProductBrand.value.trim();
-        const tags = (E.newProductTags.value || '').split(',').map(t => t.trim()).filter(Boolean);
 
         if (!name) { showToast('Error', 'Nama produk wajib diisi.', 'error'); return; }
 
-        const data = { name, category, sku, minStock, unit, brand, tags };
+        const data = { name, category, sku, minStock, unit, brand };
 
         if (id) {
             const product = products.find(p => p.id === id);
@@ -316,7 +258,8 @@ window.CFS = window.CFS || {};
         }
 
         cancelEdit();
-        await reloadProducts();
+        products = Storage.getProducts();
+        filteredProducts = [...products];
         refreshStats();
         applyFilterAndRender();
         populateDropdowns();
@@ -328,29 +271,17 @@ window.CFS = window.CFS || {};
         if (!confirm('Hapus produk? Batch yang terkait tidak akan terhapus.')) return;
         const product = products.find(p => p.id === id);
         if (!product) return;
-        // Simpan di undo stack
         undoStack.push({ ...product });
         if (undoStack.length > 10) undoStack.shift();
         await Storage.deleteProduct(id);
         selectedIds.delete(id);
-        await reloadProducts();
+        products = Storage.getProducts();
+        filteredProducts = [...products];
         refreshStats();
         applyFilterAndRender();
         populateDropdowns();
         if (CFS.Inventory) CFS.Inventory.populateProductDropdowns();
-        showToast('Sukses', `Produk "${product.name}" dihapus. Undo tersedia.`, 'success');
-    }
-
-    async function undoDelete() {
-        if (undoStack.length === 0) { showToast('Info', 'Tidak ada yang bisa di-undo.', 'info'); return; }
-        const product = undoStack.pop();
-        await Storage.addProduct(product);
-        await reloadProducts();
-        refreshStats();
-        applyFilterAndRender();
-        populateDropdowns();
-        if (CFS.Inventory) CFS.Inventory.populateProductDropdowns();
-        showToast('Sukses', `Produk "${product.name}" dikembalikan.`, 'success');
+        showToast('Sukses', `Produk "${product.name}" dihapus.`, 'success');
     }
 
     function duplicateProduct(id) {
@@ -363,11 +294,11 @@ window.CFS = window.CFS || {};
             sku: (p.sku || '') + '-COPY',
             minStock: p.minStock,
             unit: p.unit,
-            brand: p.brand,
-            tags: [...(p.tags || [])]
+            brand: p.brand
         };
-        Storage.addProduct(newProduct).then(async () => {
-            await reloadProducts();
+        Storage.addProduct(newProduct).then(() => {
+            products = Storage.getProducts();
+            filteredProducts = [...products];
             refreshStats();
             applyFilterAndRender();
             populateDropdowns();
@@ -375,53 +306,16 @@ window.CFS = window.CFS || {};
         });
     }
 
-    // ==================== QUICK EDIT ====================
-    function quickEdit(id) {
-        const p = products.find(x => x.id === id);
-        if (!p) return;
-        E.quickEditId.value = p.id;
-        E.quickEditName.value = p.name;
-        E.quickEditCategory.value = p.category || '';
-        E.quickEditMinStock.value = p.minStock || 10;
-        E.quickEditUnit.value = p.unit || 'kg';
-        if (E.quickEditModal) E.quickEditModal.classList.remove('hidden');
-    }
-
-    async function handleQuickEditSubmit(e) {
-        e.preventDefault();
-        const id = E.quickEditId.value;
-        const name = E.quickEditName.value.trim();
-        const category = E.quickEditCategory.value;
-        const minStock = parseInt(E.quickEditMinStock.value) || 10;
-        const unit = E.quickEditUnit.value.trim() || 'kg';
-
-        if (!name) { showToast('Error', 'Nama produk wajib diisi.', 'error'); return; }
-
-        const product = products.find(p => p.id === id);
-        if (product) {
-            product.name = name;
-            product.category = category;
-            product.minStock = minStock;
-            product.unit = unit;
-            await Storage.saveAllData();
-            showToast('Sukses', 'Produk diperbarui (quick edit).', 'success');
-            if (E.quickEditModal) E.quickEditModal.classList.add('hidden');
-            await reloadProducts();
-            applyFilterAndRender();
-            populateDropdowns();
-            if (CFS.Inventory) CFS.Inventory.populateProductDropdowns();
-        }
-    }
-
-    // ==================== BULK ACTIONS ====================
+    // ==================== BULK DELETE ====================
     async function bulkDeleteProducts() {
-        if (selectedIds.size === 0) { showToast('Info', 'Tidak ada produk terpilih.', 'info'); return; }
+        if (selectedIds.size === 0) return;
         if (!confirm(`Hapus ${selectedIds.size} produk terpilih?`)) return;
         for (const id of selectedIds) {
             await Storage.deleteProduct(id);
         }
         selectedIds.clear();
-        await reloadProducts();
+        products = Storage.getProducts();
+        filteredProducts = [...products];
         refreshStats();
         applyFilterAndRender();
         populateDropdowns();
@@ -429,43 +323,19 @@ window.CFS = window.CFS || {};
         showToast('Sukses', 'Produk terpilih dihapus.', 'success');
     }
 
-    async function bulkChangeCategory() {
-        if (selectedIds.size === 0) { showToast('Info', 'Tidak ada produk terpilih.', 'info'); return; }
-        const newCat = E.prodBulkCategorySelect ? E.prodBulkCategorySelect.value : '';
-        if (!newCat) { showToast('Info', 'Pilih kategori tujuan.', 'info'); return; }
-        for (const id of selectedIds) {
-            const p = products.find(x => x.id === id);
-            if (p) p.category = newCat;
-        }
-        await Storage.saveAllData();
-        selectedIds.clear();
-        await reloadProducts();
-        applyFilterAndRender();
-        populateDropdowns();
-        showToast('Sukses', `Kategori diubah menjadi "${newCat}".`, 'success');
-    }
-
     // ==================== KATEGORI ====================
     function renderCategoryTable() {
         if (!E.categoryTableBody) return;
         E.categoryTableBody.innerHTML = categories.map(c => {
             const count = products.filter(p => (p.category || '') === c.name).length;
-            return `<tr class="border-t text-sm">
-                <td class="p-2">${c.name}</td>
-                <td class="p-2 text-right">${count} produk</td>
-                <td class="p-2 text-center">
-                    <button class="btn btn-xs btn-secondary" onclick="CFS.Products.editCategory('${c.id}')" title="Edit"><i class="ph ph-pencil"></i></button>
-                    <button class="btn btn-xs btn-danger" onclick="CFS.Products.deleteCategory('${c.id}')" title="Hapus"><i class="ph ph-trash"></i></button>
-                </td>
-            </tr>`;
+            return `<tr class="border-t text-sm"><td class="p-2">${c.name}</td><td class="p-2 text-right">${count}</td><td class="p-2 text-center"><button class="btn btn-xs btn-danger" onclick="CFS.Products.deleteCategory('${c.id}')" title="Hapus"><i class="ph ph-trash"></i></button></td></tr>`;
         }).join('') || '<tr><td colspan="3" class="text-center p-4 opacity-50">Belum ada kategori.</td></tr>';
     }
 
     async function addCategory() {
         const name = E.newCategoryName?.value.trim();
         if (!name) return;
-        const id = 'cat_' + Date.now();
-        categories.push({ id, name });
+        categories.push({ id: 'cat_' + Date.now(), name });
         await saveCategories();
         E.newCategoryName.value = '';
         renderCategoryTable();
@@ -473,21 +343,8 @@ window.CFS = window.CFS || {};
         showToast('Sukses', 'Kategori ditambahkan.', 'success');
     }
 
-    function editCategory(id) {
-        const cat = categories.find(c => c.id === id);
-        if (!cat) return;
-        const newName = prompt('Nama kategori baru:', cat.name);
-        if (!newName) return;
-        cat.name = newName.trim();
-        saveCategories().then(() => {
-            renderCategoryTable();
-            populateDropdowns();
-            showToast('Sukses', 'Kategori diperbarui.', 'success');
-        });
-    }
-
     async function deleteCategory(id) {
-        if (!confirm('Hapus kategori? Produk dalam kategori ini akan kehilangan kategorinya.')) return;
+        if (!confirm('Hapus kategori?')) return;
         const target = categories.find(c => c.id === id);
         if (target) {
             categories = categories.filter(c => c.id !== id);
@@ -505,30 +362,22 @@ window.CFS = window.CFS || {};
         if (!E.variantTableBody) return;
         E.variantTableBody.innerHTML = variants.map(v => {
             const prod = products.find(p => p.id === v.productId);
-            return `<tr class="border-t text-sm">
-                <td class="p-2">${prod ? prod.name : '?'}</td>
-                <td class="p-2">${v.name}</td>
-                <td class="p-2 text-right">${v.weight} kg</td>
-                <td class="p-2 text-right">${v.price ? 'Rp ' + v.price.toLocaleString('id-ID') : '-'}</td>
-                <td class="p-2 text-center"><button class="btn btn-xs btn-danger" onclick="CFS.Products.deleteVariant('${v.id}')" title="Hapus"><i class="ph ph-trash"></i></button></td>
-            </tr>`;
-        }).join('') || '<tr><td colspan="5" class="text-center p-4 opacity-50">Belum ada varian.</td></tr>';
+            return `<tr class="border-t text-sm"><td class="p-2">${prod ? prod.name : '?'}</td><td class="p-2">${v.name}</td><td class="p-2 text-right">${v.weight} kg</td><td class="p-2 text-center"><button class="btn btn-xs btn-danger" onclick="CFS.Products.deleteVariant('${v.id}')" title="Hapus"><i class="ph ph-trash"></i></button></td></tr>`;
+        }).join('') || '<tr><td colspan="4" class="text-center p-4 opacity-50">Belum ada varian.</td></tr>';
     }
 
     async function addVariant() {
         const productId = E.variantProduk?.value;
         const name = E.variantName?.value.trim();
         const weight = parseFloat(E.variantWeight?.value);
-        const price = parseFloat(E.variantPrice?.value) || undefined;
         if (!productId || !name || isNaN(weight) || weight <= 0) {
-            showToast('Error', 'Lengkapi data varian dengan benar.', 'error');
+            showToast('Error', 'Lengkapi data varian.', 'error');
             return;
         }
-        variants.push({ id: 'var_' + Date.now(), productId, name, weight, price });
+        variants.push({ id: 'var_' + Date.now(), productId, name, weight });
         await saveVariants();
         E.variantName.value = '';
         E.variantWeight.value = '';
-        E.variantPrice.value = '';
         renderVariantTable();
         refreshStats();
         showToast('Sukses', 'Varian kemasan ditambahkan.', 'success');
@@ -545,8 +394,8 @@ window.CFS = window.CFS || {};
 
     // ==================== IMPORT / EXPORT ====================
     function exportToCSV() {
-        const rows = [['Nama', 'Kategori', 'SKU', 'Merek', 'Stok Minimum', 'Satuan', 'Tags']];
-        products.forEach(p => rows.push([p.name, p.category || '', p.sku || '', p.brand || '', p.minStock || 10, p.unit || 'kg', (p.tags || []).join(';')]));
+        const rows = [['Nama', 'Kategori', 'SKU', 'Merek', 'Stok Minimum', 'Satuan']];
+        products.forEach(p => rows.push([p.name, p.category || '', p.sku || '', p.brand || '', p.minStock || 10, p.unit || 'kg']));
         const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
         const blob = new Blob([csv], { type: 'text/csv' });
         const a = document.createElement('a');
@@ -554,15 +403,6 @@ window.CFS = window.CFS || {};
         a.download = `produk_${new Date().toISOString().slice(0, 10)}.csv`;
         a.click();
         showToast('Sukses', 'Data produk diekspor.', 'success');
-    }
-
-    function downloadTemplate() {
-        const csv = 'Nama,Kategori,SKU,Merek,Stok Minimum,Satuan,Tags\nContoh Produk,Ikan Laut,SKU001,MerekA,10,kg,tag1;tag2';
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'template_produk.csv';
-        a.click();
     }
 
     function importFromCSV() {
@@ -575,11 +415,10 @@ window.CFS = window.CFS || {};
             const text = await file.text();
             const lines = text.split('\n').filter(l => l.trim());
             if (lines.length < 2) return;
-            let imported = 0;
             for (let i = 1; i < lines.length; i++) {
                 const cols = lines[i].split(',').map(c => c.replace(/"/g, '').trim());
                 if (cols.length < 6) continue;
-                const [name, category, sku, brand, minStock, unit, tagsStr] = cols;
+                const [name, category, sku, brand, minStock, unit] = cols;
                 if (!name) continue;
                 await Storage.addProduct({
                     id: 'prd_' + Date.now() + i,
@@ -588,24 +427,22 @@ window.CFS = window.CFS || {};
                     sku: sku || '',
                     brand: brand || '',
                     minStock: parseInt(minStock) || 10,
-                    unit: unit || 'kg',
-                    tags: tagsStr ? tagsStr.split(';').map(t => t.trim()) : []
+                    unit: unit || 'kg'
                 });
-                imported++;
             }
-            await reloadProducts();
+            products = Storage.getProducts();
+            filteredProducts = [...products];
             refreshStats();
             applyFilterAndRender();
             populateDropdowns();
             if (CFS.Inventory) CFS.Inventory.populateProductDropdowns();
-            showToast('Sukses', `${imported} produk diimpor.`, 'success');
+            showToast('Sukses', 'Produk diimpor dari CSV.', 'success');
         };
         input.click();
     }
 
     // ==================== EVENT BINDING ====================
     function bindEvents() {
-        // Filter produk
         if (E.applyProdFilter) E.applyProdFilter.addEventListener('click', () => {
             currentFilter.search = E.prodSearch?.value || '';
             currentFilter.category = E.prodFilterCategory?.value || '';
@@ -613,19 +450,15 @@ window.CFS = window.CFS || {};
             applyFilterAndRender();
         });
 
-        // Form submit
         if (E.productCustomForm) {
             E.productCustomForm.addEventListener('submit', handleProductSubmit);
             E.productCustomForm.dataset.listener = 'true';
         }
         if (E.prodCancelEditBtn) E.prodCancelEditBtn.addEventListener('click', cancelEdit);
 
-        // Bulk
         if (E.prodBulkDelete) E.prodBulkDelete.addEventListener('click', bulkDeleteProducts);
-        if (E.prodBulkCategory) E.prodBulkCategory.addEventListener('click', bulkChangeCategory);
         if (E.prodSelectAll) E.prodSelectAll.addEventListener('change', function () {
-            const checks = document.querySelectorAll('.prod-checkbox');
-            checks.forEach(c => c.checked = this.checked);
+            document.querySelectorAll('.prod-checkbox').forEach(c => c.checked = this.checked);
             updateSelectedProducts();
         });
         if (E.productTableBody) {
@@ -634,46 +467,12 @@ window.CFS = window.CFS || {};
             });
         }
 
-        // Undo
-        if (E.prodUndoBtn) E.prodUndoBtn.addEventListener('click', undoDelete);
-
-        // Load more
-        if (E.prodLoadMore) E.prodLoadMore.addEventListener('click', () => {
-            currentPage++;
-            renderProductTable();
-        });
-
-        // Kategori
         if (E.addCategoryBtn) E.addCategoryBtn.addEventListener('click', addCategory);
-
-        // Varian
         if (E.addVariantBtn) E.addVariantBtn.addEventListener('click', addVariant);
 
-        // Export / Import
         if (E.exportProductsCSV) E.exportProductsCSV.addEventListener('click', exportToCSV);
         if (E.exportProductsCSV2) E.exportProductsCSV2.addEventListener('click', exportToCSV);
         if (E.importProductsCSV) E.importProductsCSV.addEventListener('click', importFromCSV);
-        if (E.downloadTemplateCSV) E.downloadTemplateCSV.addEventListener('click', downloadTemplate);
-
-        // Quick Edit
-        if (E.quickEditForm) E.quickEditForm.addEventListener('submit', handleQuickEditSubmit);
-        if (E.quickEditCloseBtn) E.quickEditCloseBtn.addEventListener('click', () => {
-            if (E.quickEditModal) E.quickEditModal.classList.add('hidden');
-        });
-
-        // Sort
-        document.querySelectorAll('.sort-link').forEach(link => {
-            link.addEventListener('click', function () {
-                const sortBy = this.dataset.sort;
-                if (currentFilter.sortBy === sortBy) {
-                    currentFilter.sortOrder = currentFilter.sortOrder === 'asc' ? 'desc' : 'asc';
-                } else {
-                    currentFilter.sortBy = sortBy;
-                    currentFilter.sortOrder = 'asc';
-                }
-                applyFilterAndRender();
-            });
-        });
     }
 
     function updateSelectedProducts() {
@@ -684,7 +483,6 @@ window.CFS = window.CFS || {};
     }
 
     function switchToSubTab(tabId) {
-        if (!E.subTabBtns) return;
         E.subTabBtns.forEach(b => { b.classList.remove('btn-primary', 'active'); b.classList.add('btn-secondary'); });
         const btn = document.querySelector(`.products-subtab-btn[data-products-tab="${tabId}"]`);
         if (btn) { btn.classList.add('btn-primary', 'active'); btn.classList.remove('btn-secondary'); }
@@ -693,13 +491,6 @@ window.CFS = window.CFS || {};
         if (target) target.classList.remove('hidden');
     }
 
-    async function reloadProducts() {
-        products = Storage.getProducts();
-        filteredProducts = [...products];
-        applyFilterAndRender();
-    }
-
-    // ==================== INIT ====================
     async function init() {
         await loadData();
         cacheElements();
@@ -710,14 +501,11 @@ window.CFS = window.CFS || {};
         applyFilterAndRender();
     }
 
-    // ==================== EXPORT API ====================
     CFS.Products = {
         init,
         editProduct,
-        quickEdit,
         deleteProduct,
         duplicateProduct,
-        editCategory,
         deleteCategory,
         deleteVariant
     };
