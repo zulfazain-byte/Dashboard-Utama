@@ -156,218 +156,200 @@
             .container-main { padding: 0 0.75rem; }
             .card { border-radius: 0.75rem; }
         }
-      /* ============ MOBILE RESPONSIVE ============ */
-@media (max-width: 768px) {
-    html { font-size: 15px; }
-    body { -webkit-text-size-adjust: 100%; }
 
-    /* Tampilkan tombol hamburger */
-    #mobileMenuBtn {
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        font-size: 1.5rem;
-    }
+        /* ============ MOBILE RESPONSIVE ============ */
+        @media (max-width: 768px) {
+            html { font-size: 15px; }
+            body { -webkit-text-size-adjust: 100%; }
 
-    /* Sidebar offcanvas */
-    aside {
-        position: fixed !important;
-        left: -100% !important;
-        top: 0 !important;
-        z-index: 60 !important;
-        width: 80vw !important;
-        max-width: 300px !important;
-        height: 100vh !important;
-        overflow-y: auto !important;
-        background: var(--surface) !important;
-        box-shadow: 2px 0 15px rgba(0,0,0,0.25) !important;
-        transition: left 0.3s ease !important;
-    }
-    aside.open { left: 0 !important; }
+            /* Tampilkan tombol hamburger */
+            #mobileMenuBtn {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                font-size: 1.5rem;
+            }
 
-    /* Overlay di belakang sidebar */
-    #sidebarOverlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.4);
-        z-index: 55;
-    }
-    #sidebarOverlay.show { display: block; }
+            /* Sidebar offcanvas */
+            aside {
+                position: fixed !important;
+                left: -100% !important;
+                top: 0 !important;
+                z-index: 60 !important;
+                width: 80vw !important;
+                max-width: 300px !important;
+                height: 100vh !important;
+                overflow-y: auto !important;
+                background: var(--surface) !important;
+                box-shadow: 2px 0 15px rgba(0,0,0,0.25) !important;
+                transition: left 0.3s ease !important;
+            }
+            aside.open { left: 0 !important; }
 
-    /* Container padding */
-    .container-main { padding: 0 0.75rem; }
+            /* Overlay di belakang sidebar */
+            #sidebarOverlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.4);
+                z-index: 55;
+            }
+            #sidebarOverlay.show { display: block; }
 
-    /* Card lebih compact */
-    .card { padding: 1rem !important; margin-bottom: 0.75rem; }
+            /* Container padding */
+            .container-main { padding: 0 0.75rem; }
 
-    /* Grid jadi 1 kolom, kecuali grid kecil */
-    .grid { grid-template-columns: 1fr !important; gap: 0.75rem !important; }
-    .grid.grid-cols-2 { grid-template-columns: 1fr 1fr !important; }
+            /* Card lebih compact */
+            .card { padding: 1rem !important; margin-bottom: 0.75rem; }
 
-    /* Tabel scrollable */
-    table { font-size: 0.8rem; }
-    th, td { padding: 0.5rem 0.4rem !important; white-space: nowrap; }
+            /* Grid jadi 1 kolom, kecuali grid kecil */
+            .grid { grid-template-columns: 1fr !important; gap: 0.75rem !important; }
+            .grid.grid-cols-2 { grid-template-columns: 1fr 1fr !important; }
 
-    /* Form input */
-    input, select, textarea {
-        font-size: 1rem !important;
-        padding: 0.75rem 0.6rem !important;
-        border-radius: 0.5rem !important;
-    }
+            /* Tabel scrollable */
+            table { font-size: 0.8rem; }
+            th, td { padding: 0.5rem 0.4rem !important; white-space: nowrap; }
 
-    /* Tombol */
-    .btn { padding: 0.65rem 1rem !important; font-size: 0.9rem !important; min-height: 44px; border-radius: 0.6rem !important; }
-    .btn-sm { padding: 0.5rem 0.75rem !important; font-size: 0.8rem !important; min-height: 38px; }
-    .btn-xs { padding: 0.35rem 0.5rem !important; font-size: 0.7rem !important; min-height: 32px; }
+            /* Form input */
+            input, select, textarea {
+                font-size: 1rem !important;
+                padding: 0.75rem 0.6rem !important;
+                border-radius: 0.5rem !important;
+            }
 
-    /* Modal */
-    .modal-backdrop .card { width: 90vw !important; max-height: 85vh; overflow-y: auto; padding: 1.25rem !important; }
+            /* Tombol */
+            .btn { padding: 0.65rem 1rem !important; font-size: 0.9rem !important; min-height: 44px; border-radius: 0.6rem !important; }
+            .btn-sm { padding: 0.5rem 0.75rem !important; font-size: 0.8rem !important; min-height: 38px; }
+            .btn-xs { padding: 0.35rem 0.5rem !important; font-size: 0.7rem !important; min-height: 32px; }
 
-    /* Toast */
-    .toast { width: 90vw; left: 5vw; right: auto; bottom: 1rem; }
+            /* Modal */
+            .modal-backdrop .card { width: 90vw !important; max-height: 85vh; overflow-y: auto; padding: 1.25rem !important; }
 
-    /* Kalender */
-    .fc-toolbar-title { font-size: 1rem !important; }
-    .fc-button { padding: 0.3rem 0.5rem !important; font-size: 0.75rem !important; }
+            /* Toast */
+            .toast { width: 90vw; left: 5vw; right: auto; bottom: 1rem; }
 
-    /* Progress bar */
-    .progress-bar { height: 0.7rem; }
+            /* Kalender */
+            .fc-toolbar-title { font-size: 1rem !important; }
+            .fc-button { padding: 0.3rem 0.5rem !important; font-size: 0.75rem !important; }
 
-    /* Toggle switch */
-    .toggle-checkbox { width: 1.4rem; height: 1.4rem; top: 0.1rem; left: 0.1rem; }
-    .toggle-label { width: 3rem; height: 1.8rem; }
-    .toggle-checkbox:checked { left: 1.6rem; }
+            /* Progress bar */
+            .progress-bar { height: 0.7rem; }
 
-    /* Tab navigasi */
-    .tab-btn { padding: 0.6rem 0.8rem !important; font-size: 0.85rem !important; }
-}
+            /* Toggle switch */
+            .toggle-checkbox { width: 1.4rem; height: 1.4rem; top: 0.1rem; left: 0.1rem; }
+            .toggle-label { width: 3rem; height: 1.8rem; }
+            .toggle-checkbox:checked { left: 1.6rem; }
+
+            /* Tab navigasi */
+            .tab-btn { padding: 0.6rem 0.8rem !important; font-size: 0.85rem !important; }
+        }
     </style>
 </head>
-    <script>
-    function toggleSidebar() {
-        var sidebar = document.querySelector('aside');
-        var overlay = document.getElementById('sidebarOverlay');
-        if (sidebar) sidebar.classList.toggle('open');
-        if (overlay) overlay.classList.toggle('show');
-    }
-
-    // Tutup sidebar saat link di dalamnya diklik
-    document.querySelectorAll('aside .tab-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var sidebar = document.querySelector('aside');
-            var overlay = document.getElementById('sidebarOverlay');
-            if (sidebar && window.innerWidth <= 768) {
-                sidebar.classList.remove('open');
-                if (overlay) overlay.classList.remove('show');
-            }
-        });
-    });
-</script>
 <body class="antialiased">
     <!-- Overlay untuk sidebar mobile -->
-<div id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-<!-- ==================== TOAST NOTIFICATION ==================== -->
-<div id="toast" class="toast">
-    <div id="toastIcon" class="w-9 h-9 rounded-full flex items-center justify-center text-white"></div>
-    <div>
-        <h4 id="toastTitle" class="text-sm font-bold"></h4>
-        <p id="toastMsg" class="text-xs opacity-70 mt-0.5"></p>
-    </div>
-</div>
-
-<!-- ==================== NAVIGATION BAR ==================== -->
-<nav class="sticky top-0 z-40 border-b shadow-sm backdrop-blur-md" style="background: var(--surface); border-color: var(--border);">
-    <div class="container-main flex items-center justify-between h-16">
-        <button id="mobileMenuBtn" class="p-2 mr-2 rounded-xl border hidden sm:flex" style="border-color: var(--border);" onclick="document.querySelector('aside').classList.toggle('open')">
-    <i class="ph ph-list text-xl"></i>
-</button>
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-600/20">
-                <i class="ph-fill ph-fish-simple text-2xl"></i>
-            </div>
-            <div>
-                <span class="font-extrabold text-xl tracking-tight" style="color: var(--text);">Cibitung<span class="text-primary-600">Frozen</span></span>
-                <p class="text-[10px] uppercase font-bold tracking-widest opacity-50 -mt-1">ERP Ultimate v5.4</p>
-            </div>
-        </div>
-        <div class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-            <span class="w-2 h-2 rounded-full bg-green-500 pulse-dot"></span>
-            <span class="text-xs font-medium text-green-700 dark:text-green-400">Sistem Online</span>
-        </div>
-        <div class="flex items-center gap-2 sm:gap-3">
-            <button onclick="CFS.App.backupData()" class="btn btn-secondary text-sm py-2 px-3 hidden sm:flex tooltip">
-                <i class="ph ph-download-simple"></i> <span class="hidden md:inline">Backup</span>
-                <span class="tooltip-text">Unduh semua data sebagai JSON</span>
-            </button>
-            <button onclick="CFS.App.restorePrompt()" class="btn btn-secondary text-sm py-2 px-3 hidden sm:flex tooltip">
-                <i class="ph ph-upload-simple"></i> <span class="hidden md:inline">Restore</span>
-                <span class="tooltip-text">Pulihkan data dari file backup</span>
-            </button>
-            <button onclick="switchTab('tab-notifications')" class="p-2 rounded-xl border relative tooltip" style="border-color: var(--border);">
-                <i class="ph ph-bell text-lg"></i>
-                <span id="notifBadge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold hidden">0</span>
-                <span class="tooltip-text">Notifikasi</span>
-            </button>
-            <button onclick="toggleDarkMode()" class="p-2 rounded-xl border tooltip" style="border-color: var(--border);">
-                <i class="ph ph-moon text-lg" id="darkIcon"></i>
-                <span class="tooltip-text">Ganti tema gelap/terang</span>
-            </button>
+    <!-- ==================== TOAST NOTIFICATION ==================== -->
+    <div id="toast" class="toast">
+        <div id="toastIcon" class="w-9 h-9 rounded-full flex items-center justify-center text-white"></div>
+        <div>
+            <h4 id="toastTitle" class="text-sm font-bold"></h4>
+            <p id="toastMsg" class="text-xs opacity-70 mt-0.5"></p>
         </div>
     </div>
-</nav>
 
-<!-- ==================== MAIN LAYOUT ==================== -->
-<div class="container-main py-6 flex-1 flex flex-col lg:flex-row gap-6" id="main-content">
-    <!-- ==================== SIDEBAR NAVIGATION ==================== -->
-    <aside class="lg:w-72 flex-shrink-0">
-        <div class="card sticky top-24 overflow-hidden">
-            <div class="p-5 border-b" style="border-color: var(--border);">
-                <h3 class="font-bold text-sm uppercase tracking-wider opacity-70">📋 Modul Operasional</h3>
+    <!-- ==================== NAVIGATION BAR ==================== -->
+    <nav class="sticky top-0 z-40 border-b shadow-sm backdrop-blur-md" style="background: var(--surface); border-color: var(--border);">
+        <div class="container-main flex items-center justify-between h-16">
+            <!-- Tombol hamburger: class 'hidden' dihapus, hanya tampil di mobile via CSS -->
+            <button id="mobileMenuBtn" class="p-2 mr-2 rounded-xl border" style="border-color: var(--border); display: none;" onclick="toggleSidebar()">
+                <i class="ph ph-list text-xl"></i>
+            </button>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-600/20">
+                    <i class="ph-fill ph-fish-simple text-2xl"></i>
+                </div>
+                <div>
+                    <span class="font-extrabold text-xl tracking-tight" style="color: var(--text);">Cibitung<span class="text-primary-600">Frozen</span></span>
+                    <p class="text-[10px] uppercase font-bold tracking-widest opacity-50 -mt-1">ERP Ultimate v5.4</p>
+                </div>
             </div>
-            <nav class="p-2 space-y-1" id="tabs">
-                <button onclick="switchTab('tab-dashboard')" data-tab="tab-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition active bg-primary-50 text-primary-700 font-semibold"><i class="ph ph-chart-bar text-lg"></i> Dashboard</button>
-                <button onclick="switchTab('tab-stock')" data-tab="tab-stock" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-package text-lg"></i> Stok & Batch</button>
-                <button onclick="switchTab('tab-sales')" data-tab="tab-sales" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-shopping-cart text-lg"></i> Penjualan</button>
-                <button onclick="switchTab('tab-purchase')" data-tab="tab-purchase" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-truck text-lg"></i> Pembelian</button>
-                <button onclick="switchTab('tab-supplier')" data-tab="tab-supplier" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-buildings text-lg"></i> Supplier</button>
-                <button onclick="switchTab('tab-products')" data-tab="tab-products" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-list-checks text-lg"></i> Kustomisasi Produk</button>
-                <button onclick="switchTab('tab-crm')" data-tab="tab-crm" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-users text-lg"></i> CRM Pelanggan</button>
-                <button onclick="switchTab('tab-crm-detail')" data-tab="tab-crm-detail" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-address-book text-lg"></i> Detail Pelanggan</button>
-                <button onclick="switchTab('tab-pricing')" data-tab="tab-pricing" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-currency-circle-dollar text-lg"></i> Harga Jual (Online/Offline)</button>
-                <button onclick="switchTab('tab-finance')" data-tab="tab-finance" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-wallet text-lg"></i> Keuangan</button>
-                <button onclick="switchTab('tab-delivery')" data-tab="tab-delivery" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-truck-trailer text-lg"></i> Pengiriman</button>
-                <button onclick="switchTab('tab-opname')" data-tab="tab-opname" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-clipboard-text text-lg"></i> Stock Opname</button>
-                <button onclick="switchTab('tab-return')" data-tab="tab-return" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-arrow-u-up-left text-lg"></i> Retur</button>
-                <button onclick="switchTab('tab-history')" data-tab="tab-history" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-clock-counter-clockwise text-lg"></i> Riwayat</button>
-                <button onclick="switchTab('tab-audit')" data-tab="tab-audit" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-files text-lg"></i> Audit Trail</button>
-                <button onclick="switchTab('tab-reports')" data-tab="tab-reports" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-file-text text-lg"></i> Laporan</button>
-                <button onclick="switchTab('tab-notifications')" data-tab="tab-notifications" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-bell text-lg"></i> Notifikasi</button>
-                <button onclick="switchTab('tab-settings')" data-tab="tab-settings" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-gear text-lg"></i> Pengaturan</button>
-                <button onclick="switchTab('tab-help')" data-tab="tab-help" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-question text-lg"></i> Bantuan</button>
-            </nav>
-            <div class="p-4 border-t mt-2" style="border-color: var(--border);">
-                <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">💡 Tips Cepat</h4>
-                <p class="text-xs opacity-60 leading-relaxed">Gunakan <strong>FEFO</strong> untuk produk frozen agar batch terdekat expired terjual lebih dulu. Backup data setiap minggu untuk keamanan.</p>
+            <div class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                <span class="w-2 h-2 rounded-full bg-green-500 pulse-dot"></span>
+                <span class="text-xs font-medium text-green-700 dark:text-green-400">Sistem Online</span>
             </div>
-            <div class="p-4 border-t mt-2" style="border-color: var(--border);">
-                <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">📌 Status Data</h4>
-                <p class="text-xs opacity-50">Batch: <span id="storedBatchesCount">-</span></p>
-                <p class="text-xs opacity-50">Transaksi: <span id="storedTransactionsCount">-</span></p>
-                <p class="text-xs opacity-50">Pelanggan: <span id="storedCustomersCount">-</span></p>
-                <p class="text-xs opacity-50">Supplier: <span id="storedSuppliersCount">-</span></p>
-                <p class="text-xs opacity-50">Pengiriman: <span id="storedDeliveriesCount">-</span></p>
-                <p class="text-xs opacity-50">Mode: <span id="sidebar-mode">Terang</span></p>
-            </div>
-            <div class="p-4 border-t mt-2" style="border-color: var(--border);">
-                <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">⌨️ Shortcut</h4>
-                <p class="text-xs opacity-40 leading-relaxed"><kbd>Ctrl+D</kbd> Dashboard · <kbd>Ctrl+S</kbd> Stok · <kbd>Ctrl+B</kbd> Backup</p>
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button onclick="CFS.App.backupData()" class="btn btn-secondary text-sm py-2 px-3 hidden sm:flex tooltip">
+                    <i class="ph ph-download-simple"></i> <span class="hidden md:inline">Backup</span>
+                    <span class="tooltip-text">Unduh semua data sebagai JSON</span>
+                </button>
+                <button onclick="CFS.App.restorePrompt()" class="btn btn-secondary text-sm py-2 px-3 hidden sm:flex tooltip">
+                    <i class="ph ph-upload-simple"></i> <span class="hidden md:inline">Restore</span>
+                    <span class="tooltip-text">Pulihkan data dari file backup</span>
+                </button>
+                <button onclick="switchTab('tab-notifications')" class="p-2 rounded-xl border relative tooltip" style="border-color: var(--border);">
+                    <i class="ph ph-bell text-lg"></i>
+                    <span id="notifBadge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold hidden">0</span>
+                    <span class="tooltip-text">Notifikasi</span>
+                </button>
+                <button onclick="toggleDarkMode()" class="p-2 rounded-xl border tooltip" style="border-color: var(--border);">
+                    <i class="ph ph-moon text-lg" id="darkIcon"></i>
+                    <span class="tooltip-text">Ganti tema gelap/terang</span>
+                </button>
             </div>
         </div>
-    </aside>
+    </nav>
+
+    <!-- ==================== MAIN LAYOUT ==================== -->
+    <div class="container-main py-6 flex-1 flex flex-col lg:flex-row gap-6" id="main-content">
+        <!-- ==================== SIDEBAR NAVIGATION ==================== -->
+        <aside class="lg:w-72 flex-shrink-0">
+            <div class="card sticky top-24 overflow-hidden">
+                <div class="p-5 border-b" style="border-color: var(--border);">
+                    <h3 class="font-bold text-sm uppercase tracking-wider opacity-70">📋 Modul Operasional</h3>
+                </div>
+                <nav class="p-2 space-y-1" id="tabs">
+                    <button onclick="switchTab('tab-dashboard')" data-tab="tab-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition active bg-primary-50 text-primary-700 font-semibold"><i class="ph ph-chart-bar text-lg"></i> Dashboard</button>
+                    <button onclick="switchTab('tab-stock')" data-tab="tab-stock" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-package text-lg"></i> Stok & Batch</button>
+                    <button onclick="switchTab('tab-sales')" data-tab="tab-sales" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-shopping-cart text-lg"></i> Penjualan</button>
+                    <button onclick="switchTab('tab-purchase')" data-tab="tab-purchase" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-truck text-lg"></i> Pembelian</button>
+                    <button onclick="switchTab('tab-supplier')" data-tab="tab-supplier" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-buildings text-lg"></i> Supplier</button>
+                    <button onclick="switchTab('tab-products')" data-tab="tab-products" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-list-checks text-lg"></i> Kustomisasi Produk</button>
+                    <button onclick="switchTab('tab-crm')" data-tab="tab-crm" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-users text-lg"></i> CRM Pelanggan</button>
+                    <button onclick="switchTab('tab-crm-detail')" data-tab="tab-crm-detail" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-address-book text-lg"></i> Detail Pelanggan</button>
+                    <button onclick="switchTab('tab-pricing')" data-tab="tab-pricing" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-currency-circle-dollar text-lg"></i> Harga Jual (Online/Offline)</button>
+                    <button onclick="switchTab('tab-finance')" data-tab="tab-finance" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-wallet text-lg"></i> Keuangan</button>
+                    <button onclick="switchTab('tab-delivery')" data-tab="tab-delivery" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-truck-trailer text-lg"></i> Pengiriman</button>
+                    <button onclick="switchTab('tab-opname')" data-tab="tab-opname" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-clipboard-text text-lg"></i> Stock Opname</button>
+                    <button onclick="switchTab('tab-return')" data-tab="tab-return" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-arrow-u-up-left text-lg"></i> Retur</button>
+                    <button onclick="switchTab('tab-history')" data-tab="tab-history" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-clock-counter-clockwise text-lg"></i> Riwayat</button>
+                    <button onclick="switchTab('tab-audit')" data-tab="tab-audit" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-files text-lg"></i> Audit Trail</button>
+                    <button onclick="switchTab('tab-reports')" data-tab="tab-reports" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-file-text text-lg"></i> Laporan</button>
+                    <button onclick="switchTab('tab-notifications')" data-tab="tab-notifications" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-bell text-lg"></i> Notifikasi</button>
+                    <button onclick="switchTab('tab-settings')" data-tab="tab-settings" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-gear text-lg"></i> Pengaturan</button>
+                    <button onclick="switchTab('tab-help')" data-tab="tab-help" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-question text-lg"></i> Bantuan</button>
+                </nav>
+                <div class="p-4 border-t mt-2" style="border-color: var(--border);">
+                    <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">💡 Tips Cepat</h4>
+                    <p class="text-xs opacity-60 leading-relaxed">Gunakan <strong>FEFO</strong> untuk produk frozen agar batch terdekat expired terjual lebih dulu. Backup data setiap minggu untuk keamanan.</p>
+                </div>
+                <div class="p-4 border-t mt-2" style="border-color: var(--border);">
+                    <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">📌 Status Data</h4>
+                    <p class="text-xs opacity-50">Batch: <span id="storedBatchesCount">-</span></p>
+                    <p class="text-xs opacity-50">Transaksi: <span id="storedTransactionsCount">-</span></p>
+                    <p class="text-xs opacity-50">Pelanggan: <span id="storedCustomersCount">-</span></p>
+                    <p class="text-xs opacity-50">Supplier: <span id="storedSuppliersCount">-</span></p>
+                    <p class="text-xs opacity-50">Pengiriman: <span id="storedDeliveriesCount">-</span></p>
+                    <p class="text-xs opacity-50">Mode: <span id="sidebar-mode">Terang</span></p>
+                </div>
+                <div class="p-4 border-t mt-2" style="border-color: var(--border);">
+                    <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">⌨️ Shortcut</h4>
+                    <p class="text-xs opacity-40 leading-relaxed"><kbd>Ctrl+D</kbd> Dashboard · <kbd>Ctrl+S</kbd> Stok · <kbd>Ctrl+B</kbd> Backup</p>
+                </div>
+            </div>
+        </aside>
 
     <!-- ==================== MAIN CONTENT AREA ==================== -->
     <main class="flex-1 min-w-0">
@@ -3203,6 +3185,29 @@
 <script src="js/audit.js"></script>
 <script src="js/app.js"></script>
 
+<!-- ==================== MOBILE SCRIPTS ==================== -->
+    <script>
+        function toggleSidebar() {
+            var sidebar = document.querySelector('aside');
+            var overlay = document.getElementById('sidebarOverlay');
+            if (sidebar) sidebar.classList.toggle('open');
+            if (overlay) overlay.classList.toggle('show');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tutup sidebar saat link di dalamnya diklik (mobile)
+            document.querySelectorAll('aside .tab-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var sidebar = document.querySelector('aside');
+                    var overlay = document.getElementById('sidebarOverlay');
+                    if (sidebar && window.innerWidth <= 768) {
+                        sidebar.classList.remove('open');
+                        if (overlay) overlay.classList.remove('show');
+                    }
+                });
+            });
+        });
+    </script>
 <!-- ==================== INLINE SCRIPTS ==================== -->
 <script>
     function toggleDarkMode() {
