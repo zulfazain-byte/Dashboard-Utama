@@ -45,6 +45,38 @@ window.CFS = window.CFS || {};
             btn.classList.remove('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
             btn.classList.add('opacity-70');
         });
+           // === PERBAIKI DROPDOWN PRODUK DI SEMUA TAB ===
+    if (CFS.Storage) {
+        const produkList = CFS.Storage.getProducts().length > 0
+            ? CFS.Storage.getProducts().map(p => p.name)
+            : (CFS.Storage.defaultProducts || []);
+
+        const ids = [
+            'salesProduk',        // Penjualan
+            'stockProduk',        // Stok & Batch
+            'opnameProduk',       // Stock Opname
+            'filterProduk',       // Riwayat (filter)
+            'purchaseProduk',     // Pembelian (PO)
+            'batchFilterProduk'   // Filter Batch
+        ];
+
+        ids.forEach(function(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                // Simpan nilai yang sedang dipilih
+                const currentVal = el.value;
+                // Isi ulang options
+                el.innerHTML = '<option value="">Pilih Produk</option>' +
+                    produkList.map(function(p) {
+                        return '<option value="' + p + '">' + p + '</option>';
+                    }).join('');
+                // Kembalikan nilai jika masih ada di daftar
+                if (currentVal && produkList.indexOf(currentVal) !== -1) {
+                    el.value = currentVal;
+                }
+            }
+        });
+    }
 
         const target = document.getElementById(tabId);
         if (target) target.classList.add('active');
