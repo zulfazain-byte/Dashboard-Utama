@@ -3831,11 +3831,11 @@
 <script src="js/crm.js"></script>
 <script src="js/crm-detail.js"></script>
 <script src="js/purchase.js"></script>
-<script src="js/supplier.js"></script>
-<script src="js/notifications.js"></script>
 <script src="js/history.js"></script>
 <script src="js/reports.js"></script>
 <script src="js/audit.js"></script>
+<script src="js/supplier.js"></script>
+<script src="js/notifications.js"></script>
 <script src="js/app.js"></script>
 
 <!-- ==================== INLINE SCRIPTS ==================== -->
@@ -3870,5 +3870,198 @@
         }
     })();
 </script>
+    <!-- ==================== MOBILE NATIVE ENHANCEMENTS ==================== -->
+<script>
+(function() {
+    'use strict';
+
+    const isMobile = () => window.innerWidth <= 768;
+
+    // ============ BOTTOM NAVIGATION ============
+    function createBottomNav() {
+        if (!isMobile()) return;
+        const existing = document.querySelector('.bottom-nav');
+        if (existing) existing.remove();
+
+        const bottomNav = document.createElement('div');
+        bottomNav.className = 'bottom-nav';
+        bottomNav.innerHTML = `
+            <div class="bottom-nav-item ripple active" data-tab="tab-dashboard">
+                <i class="ph ph-house"></i>
+                <span>Beranda</span>
+            </div>
+            <div class="bottom-nav-item ripple" data-tab="tab-stock">
+                <i class="ph ph-package"></i>
+                <span>Stok</span>
+            </div>
+            <div class="bottom-nav-item ripple" data-tab="tab-sales">
+                <i class="ph ph-shopping-cart"></i>
+                <span>Jual</span>
+            </div>
+            <div class="bottom-nav-item ripple" data-tab="tab-finance">
+                <i class="ph ph-wallet"></i>
+                <span>Keuangan</span>
+            </div>
+            <div class="bottom-nav-item ripple" onclick="toggleSidebar()">
+                <i class="ph ph-dots-three-outline"></i>
+                <span>Lainnya</span>
+            </div>
+        `;
+        document.body.appendChild(bottomNav);
+
+        bottomNav.querySelectorAll('.bottom-nav-item[data-tab]').forEach(item => {
+            item.addEventListener('click', function() {
+                const tab = this.dataset.tab;
+                if (tab && typeof switchTab === 'function') {
+                    switchTab(tab);
+                    updateBottomNavActive(tab);
+                    triggerHaptic();
+                }
+            });
+        });
+    }
+
+    function updateBottomNavActive(activeTab) {
+        document.querySelectorAll('.bottom-nav-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.tab === activeTab) item.classList.add('active');
+        });
+    }
+
+    // ============ SIDEBAR MOBILE ============
+    function enhanceSidebar() {
+        if (!isMobile()) return;
+        const aside = document.querySelector('aside');
+        if (!aside) return;
+
+        const firstChild = aside.querySelector('.card');
+        if (firstChild && !firstChild.querySelector('.sidebar-header')) {
+            const header = document.createElement('div');
+            header.className = 'sidebar-header';
+            header.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white">
+                        <i class="ph-fill ph-fish-simple text-xl"></i>
+                    </div>
+                    <span class="font-bold">Menu</span>
+                </div>
+                <button class="sidebar-close-btn haptic" onclick="toggleSidebar()">
+                    <i class="ph ph-x text-xl"></i>
+                </button>
+            `;
+            firstChild.insertBefore(header, firstChild.firstChild);
+        }
+    }
+
+    // ============ HAPTIC ============
+    function triggerHaptic(type = 'light') {
+        if ('vibrate' in navigator) {
+            const patterns = { light: 10, medium: 25, heavy: 50, success: [10,50,10], error: [50,50,50] };
+            navigator.vibrate(patterns[type] || patterns.light);
+        }
+    }
+    window.triggerHaptic = triggerHaptic;
+
+    // ============ PULL TO REFRESH ============
+    function initPullToRefresh() {
+        if (!isMobile()) return;
+        let startY = 0, pulling = false;
+        const indicator = document.createElement('div');
+        indicator.className = 'ptr-indicator';
+        indicator.innerHTML = '<i class="ph ph-arrows-clockwise"></i>';
+        document.body.appendChild(indicator);
+
+        document.addEventListener('touchstart', e => { if (window.scrollY === 0) { startY = e.touches[0].pageY; pulling = true; } }, { passive: true });
+        document.addEventListener('touchmove', e => { if (!pulling) return; if (e.touches[0].pageY - startY > 60 && window.scrollY === 0) indicator.classList.add('visible'); }, { passive: true });
+        document.addEventListener('touchend', () => { if (indicator.classList.contains('visible')) { indicator.classList.remove('visible'); triggerHaptic('medium'); if (typeof CFS !== 'undefined' && CFS.UI && CFS.UI.refreshAll) CFS.UI.refreshAll(); } pulling = false; });
+    }
+
+    // ============ SWIPE ============
+    function initSwipeNavigation() {
+        if (!isMobile()) return;
+        const mainContent = document.getElementById('main-content');
+        if (!mainContent) return;
+        let touchStartX = 0, touchEndX = 0;
+        const tabs = ['tab-dashboard','tab-stock','tab-sales','tab-purchase','tab-finance'];
+
+        mainContent.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+        mainContent.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) < 80) return;
+            const activeTab = document.querySelector('.tab-content.active');
+            if (!activeTab) return;
+            const idx = tabs.indexOf(activeTab.id);
+            if (idx === -1) return;
+            if (diff > 0 && idx < tabs.length-1) { switchTab(tabs[idx+1]); updateBottomNavActive(tabs[idx+1]); triggerHaptic(); }
+            else if (diff < 0 && idx > 0) { switchTab(tabs[idx-1]); updateBottomNavActive(tabs[idx-1]); triggerHaptic(); }
+        }, { passive: true });
+    }
+
+    // ============ FAB ============
+    function createFAB() {
+        if (!isMobile()) return;
+        const existing = document.querySelector('.fab');
+        if (existing) existing.remove();
+        const fab = document.createElement('button');
+        fab.className = 'fab haptic';
+        fab.innerHTML = '<i class="ph ph-plus"></i>';
+        fab.onclick = () => { triggerHaptic(); };
+        document.body.appendChild(fab);
+
+        let lastScrollY = window.scrollY;
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > lastScrollY && window.scrollY > 100) fab.style.transform = 'translateY(120px)';
+            else fab.style.transform = 'translateY(0)';
+            lastScrollY = window.scrollY;
+        }, { passive: true });
+    }
+
+    // ============ MODALS ============
+    function enhanceModals() {
+        if (!isMobile()) return;
+        new MutationObserver(mutations => {
+            mutations.forEach(m => {
+                m.addedNodes.forEach(node => {
+                    if (node.classList && node.classList.contains('modal-backdrop')) {
+                        const card = node.querySelector('.card');
+                        if (card && !card.querySelector('.modal-swipe-indicator')) {
+                            const indicator = document.createElement('div');
+                            indicator.className = 'modal-swipe-indicator';
+                            card.insertBefore(indicator, card.firstChild);
+                        }
+                    }
+                });
+            });
+        }).observe(document.body, { childList: true, subtree: true });
+    }
+
+    // ============ TOGGLE SIDEBAR ============
+    window.toggleSidebar = function() {
+        const sidebar = document.querySelector('aside');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (sidebar) sidebar.classList.toggle('open');
+        if (overlay) overlay.classList.toggle('show');
+        if (sidebar && sidebar.classList.contains('open')) document.body.style.overflow = 'hidden';
+        else document.body.style.overflow = '';
+    };
+
+    // ============ INIT ============
+    function initMobileEnhancements() {
+        createBottomNav();
+        enhanceSidebar();
+        initPullToRefresh();
+        initSwipeNavigation();
+        createFAB();
+        enhanceModals();
+        window.addEventListener('resize', () => { if (isMobile()) { createBottomNav(); createFAB(); } else { const bn = document.querySelector('.bottom-nav'); const f = document.querySelector('.fab'); if (bn) bn.remove(); if (f) f.remove(); } });
+        document.querySelectorAll('.tab-btn').forEach(btn => { btn.addEventListener('click', () => { if (isMobile()) toggleSidebar(); }); });
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initMobileEnhancements);
+    else initMobileEnhancements();
+})();
+</script>
+    
 </body>
 </html>
