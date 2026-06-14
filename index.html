@@ -2991,203 +2991,350 @@
     </div>
 </div>
 
-        <!-- ==================== TAB BANTUAN (LENGKAP) ==================== -->
+<!-- ==================== TAB BANTUAN (PANDUAN INPUT & PENGGUNAAN) ==================== -->
 <div id="tab-help" class="tab-content space-y-6">
     <div class="card p-6">
-        <h2 class="text-xl font-bold mb-4"><i class="ph ph-question text-blue-600"></i> Pusat Bantuan & Panduan</h2>
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+            <i class="ph ph-question text-blue-600"></i> Pusat Bantuan & Panduan Penggunaan
+        </h2>
+        <p class="text-sm opacity-70 mb-6">
+            Pelajari cara menginput data dan menggunakan setiap modul di Cibitung Frozen ERP.
+        </p>
 
-        <!-- FAQ Umum -->
+        <!-- ==================== TUTORIAL INPUT DATA ==================== -->
         <div class="mb-8">
-            <h3 class="font-semibold text-lg mb-3"><i class="ph ph-files text-blue-500"></i> Pertanyaan Umum (FAQ)</h3>
+            <h3 class="font-semibold text-lg mb-3 flex items-center gap-2">
+                <i class="ph ph-book-open text-purple-500"></i> Cara Input Data & Penggunaan Modul
+            </h3>
             <div class="space-y-3">
+
+                <!-- 1. Dashboard -->
                 <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
                     <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
-                        <i class="ph ph-caret-right text-blue-500 transition-transform duration-200"></i>
-                        📘 Bagaimana cara menambah stok baru?
+                        <i class="ph ph-caret-right text-blue-500"></i> 1. Dashboard – Ringkasan & Navigasi
                     </summary>
-                    <p class="mt-2 text-sm opacity-80 pl-6">
-                        Buka tab <strong>Stok & Batch</strong>, isi form <strong>Tambah Batch Baru</strong> dengan:
-                        <ul class="list-disc list-inside ml-4 mt-1">
-                            <li>Pilih produk dari dropdown</li>
-                            <li>Masukkan berat kotor batch (kg)</li>
-                            <li>Masukkan harga beli per kg dari supplier</li>
-                            <li>Isi ongkir, bensin, dan bongkar muat jika ada</li>
-                            <li>Pilih tanggal produksi dan kadaluarsa</li>
-                            <li>Klik <strong>Simpan Batch</strong></li>
-                        </ul>
-                        Batch baru akan langsung masuk ke sistem dan stok produk bertambah.
-                    </p>
+                    <div class="mt-3 pl-6 text-sm space-y-2 opacity-80">
+                        <p><strong>Cara menggunakan:</strong> Dashboard adalah halaman utama yang menampilkan ringkasan stok, pendapatan, laba, dan aktivitas terbaru.</p>
+                        <p>• Gunakan <strong>widget toggle</strong> (centang) untuk menampilkan/menyembunyikan informasi tertentu.</p>
+                        <p>• Klik <strong>Segarkan</strong> (jika tersedia) atau biarkan auto‑refresh 30 detik untuk data terkini.</p>
+                        <p>• Klik tombol <strong>Aksi Cepat</strong> untuk langsung menuju modul terkait (Tambah Stok, Catat Penjualan, dll).</p>
+                    </div>
                 </details>
 
+                <!-- 2. Stok & Batch -->
                 <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
                     <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
-                        <i class="ph ph-caret-right text-blue-500 transition-transform duration-200"></i>
-                        📗 Apa perbedaan FEFO dan FIFO?
+                        <i class="ph ph-caret-right text-blue-500"></i> 2. Stok & Batch – Input Batch Baru
                     </summary>
-                    <p class="mt-2 text-sm opacity-80 pl-6">
-                        <strong>FEFO</strong> (First Expired First Out) – Batch dengan tanggal kadaluarsa terdekat akan dijual lebih dulu. Cocok untuk produk frozen yang sensitif terhadap masa simpan.<br>
-                        <strong>FIFO</strong> (First In First Out) – Batch yang masuk pertama akan dikeluarkan lebih dulu. Cocok untuk produk non‑perishable.<br>
-                        Anda bisa mengubah metode ini di tab <strong>Pengaturan</strong>.
-                    </p>
+                    <div class="mt-3 pl-6 text-sm space-y-2 opacity-80">
+                        <p><strong>Sub‑tab Ringkasan:</strong> Lihat stok per produk, status (aman/menipis/kosong), dan grafik stok.</p>
+                        <p><strong>Sub‑tab Daftar Batch:</strong> Tampilkan semua batch dengan filter produk, gudang, status. Klik ✏️ untuk edit, 🗑️ untuk hapus.</p>
+                        <p><strong>Sub‑tab Tambah Batch:</strong></p>
+                        <ol class="list-decimal ml-4 space-y-1">
+                            <li>Pilih <strong>Produk</strong> dari dropdown.</li>
+                            <li>Isi <strong>Berat (kg)</strong> – berat kotor batch.</li>
+                            <li>Isi <strong>Harga Beli per kg</strong> dari supplier.</li>
+                            <li>Opsional: isi <strong>Ongkir</strong>, <strong>Biaya Bensin</strong>, <strong>Bongkar Muat</strong> (centang toggle, lalu masukkan nominal).</li>
+                            <li>Pilih <strong>Jenis Pajak</strong> (jika ada) – Persentase atau Nominal.</li>
+                            <li>Pilih <strong>Tanggal Produksi</strong> dan <strong>Tanggal Kadaluarsa</strong>.</li>
+                            <li>Opsional: pilih <strong>Supplier</strong> dan <strong>Gudang</strong>.</li>
+                            <li>Klik <strong>Simpan Batch</strong>.</li>
+                        </ol>
+                        <p><strong>Sub‑tab Kadaluarsa:</strong> Pantau batch yang akan/sudah kadaluarsa dengan tombol 7 hari, 30 hari, Expired.</p>
+                        <p><strong>Sub‑tab Gudang:</strong> Lihat distribusi stok antar gudang dan kapasitas terpakai.</p>
+                        <p><strong>Sub‑tab Analisis:</strong> Grafik stok per produk dan rekomendasi restock.</p>
+                    </div>
                 </details>
 
+                <!-- 3. Penjualan -->
                 <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
                     <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
-                        <i class="ph ph-caret-right text-blue-500 transition-transform duration-200"></i>
-                        📙 Bagaimana cara backup dan restore data?
+                        <i class="ph ph-caret-right text-blue-500"></i> 3. Penjualan – Input Penjualan & Cetak Invoice
                     </summary>
-                    <p class="mt-2 text-sm opacity-80 pl-6">
-                        Klik tombol <strong>Backup</strong> di pojok kanan atas → file JSON akan terunduh.<br>
-                        Untuk memulihkan, klik <strong>Restore</strong> → pilih file backup → data akan dikembalikan dan halaman dimuat ulang.<br>
-                        <em>Tips: Backup setiap minggu untuk keamanan.</em>
-                    </p>
+                    <div class="mt-3 pl-6 text-sm space-y-2 opacity-80">
+                        <p><strong>Sub‑tab Catat Penjualan:</strong></p>
+                        <ol class="list-decimal ml-4 space-y-1">
+                            <li>Masukkan <strong>Nama Klien</strong> (wajib).</li>
+                            <li>Pilih <strong>Produk</strong> dari dropdown.</li>
+                            <li>Masukkan <strong>Jumlah (kg)</strong>.</li>
+                            <li>Pilih <strong>Tier</strong> (Ecer/Grosir/Partai).</li>
+                            <li>Pilih <strong>Channel</strong> (Offline – toko, Online – marketplace).</li>
+                            <li>Opsional: masukkan <strong>Harga Jual/kg</strong> jika ingin override harga otomatis.</li>
+                            <li>Opsional: pilih <strong>Metode Pembayaran</strong> (Tunai/Transfer/QRIS/COD) dan <strong>Diskon (Rp)</strong>.</li>
+                            <li>Klik <strong>🔍 Preview Harga</strong> untuk melihat rincian sebelum transaksi.</li>
+                            <li>Klik <strong>💰 Proses Penjualan</strong>.</li>
+                            <li>Setelah sukses, tombol <strong>Cetak Invoice</strong> dan <strong>Share WhatsApp</strong> akan aktif.</li>
+                        </ol>
+                        <p><strong>Sub‑tab Hari Ini:</strong> Daftar penjualan hari ini, bisa diekspor CSV.</p>
+                        <p><strong>Sub‑tab Riwayat:</strong> Semua transaksi dengan filter tanggal, channel, produk.</p>
+                        <p><strong>Sub‑tab Analisis:</strong> Grafik tren 30 hari dan komposisi channel.</p>
+                    </div>
                 </details>
 
+                <!-- 4. Pembelian -->
                 <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
                     <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
-                        <i class="ph ph-caret-right text-blue-500 transition-transform duration-200"></i>
-                        📕 Apa itu HPP dan bagaimana cara menghitungnya?
+                        <i class="ph ph-caret-right text-blue-500"></i> 4. Pembelian – Input Purchase Order (PO)
                     </summary>
-                    <p class="mt-2 text-sm opacity-80 pl-6">
-                        HPP (Harga Pokok Penjualan) adalah total biaya yang dikeluarkan untuk memperoleh produk per kg. Sistem menghitungnya dari:<br>
-                        <code>(Harga Beli × Berat) + Ongkir + Bensin + Bongkar</code> dibagi <code>Berat</code>.<br>
-                        Anda bisa melihat HPP setiap batch di modal <strong>Detail Batch</strong>.
-                    </p>
+                    <div class="mt-3 pl-6 text-sm space-y-2 opacity-80">
+                        <p><strong>Sub‑tab Daftar PO:</strong> Lihat semua PO dengan filter. Klik ✅ Terima untuk menambah stok, ❌ Batal untuk membatalkan.</p>
+                        <p><strong>Sub‑tab Buat PO Baru:</strong></p>
+                        <ol class="list-decimal ml-4 space-y-1">
+                            <li>Pilih <strong>Supplier</strong> dari dropdown.</li>
+                            <li>Pilih <strong>Produk</strong>.</li>
+                            <li>Masukkan <strong>Jumlah (kg)</strong> dan <strong>Harga Beli per kg</strong>.</li>
+                            <li>Pilih <strong>Tanggal PO</strong>.</li>
+                            <li>Opsional: isi <strong>Estimasi Sampai</strong> dan <strong>Catatan</strong>.</li>
+                            <li>Klik <strong>Buat PO</strong>. PO akan muncul di daftar dengan status "Draft".</li>
+                        </ol>
+                        <p><strong>Sub‑tab Riwayat:</strong> Semua PO yang pernah dibuat.</p>
+                        <p><strong>Sub‑tab Analisis:</strong> Grafik pembelian bulanan dan tabel per supplier.</p>
+                    </div>
                 </details>
 
+                <!-- 5. Supplier -->
                 <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
                     <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
-                        <i class="ph ph-caret-right text-blue-500 transition-transform duration-200"></i>
-                        📒 Bagaimana mengatur harga jual online vs offline?
+                        <i class="ph ph-caret-right text-blue-500"></i> 5. Supplier – Input Data Supplier
                     </summary>
-                    <p class="mt-2 text-sm opacity-80 pl-6">
-                        Buka tab <strong>Harga Jual (Online/Offline)</strong>. Di sana Anda bisa menentukan harga per kg untuk masing‑masing channel. Harga online biasanya lebih tinggi untuk menutupi komisi marketplace. Jika dikosongkan, sistem otomatis menghitung dari HPP + margin.
-                    </p>
+                    <div class="mt-3 pl-6 text-sm space-y-2 opacity-80">
+                        <p><strong>Sub‑tab Daftar Supplier:</strong> Cari, edit, hapus supplier.</p>
+                        <p><strong>Sub‑tab Tambah / Edit:</strong></p>
+                        <ol class="list-decimal ml-4 space-y-1">
+                            <li>Isi <strong>Nama Supplier</strong> (wajib).</li>
+                            <li>Opsional: Kontak, Alamat, Email, Rekening Bank, NPWP, Catatan.</li>
+                            <li>Klik <strong>Simpan</strong>.</li>
+                        </ol>
+                        <p><strong>Sub‑tab Riwayat Pembelian:</strong> Lihat semua batch yang dibeli dari supplier tertentu.</p>
+                        <p><strong>Sub‑tab Analisis:</strong> Volume pembelian per supplier.</p>
+                    </div>
                 </details>
 
+                <!-- 6. Kustomisasi Produk -->
                 <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
                     <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
-                        <i class="ph ph-caret-right text-blue-500 transition-transform duration-200"></i>
-                        📓 Bagaimana cara melakukan Stock Opname?
+                        <i class="ph ph-caret-right text-blue-500"></i> 6. Kustomisasi Produk – Input & Kelola Produk
                     </summary>
-                    <p class="mt-2 text-sm opacity-80 pl-6">
-                        Buka tab <strong>Stock Opname</strong>, pilih produk, masukkan jumlah fisik yang ada di gudang (hasil timbangan), dan sistem akan mencatat selisih dengan stok sistem. Lakukan ini secara berkala untuk menjaga akurasi data.
-                    </p>
+                    <div class="mt-3 pl-6 text-sm space-y-2 opacity-80">
+                        <p><strong>Sub‑tab Daftar Produk:</strong> Lihat semua produk dengan filter, sort, dan checkbox untuk hapus massal.</p>
+                        <p><strong>Sub‑tab Tambah / Edit:</strong></p>
+                        <ol class="list-decimal ml-4 space-y-1">
+                            <li>Isi <strong>Nama Produk</strong> (wajib).</li>
+                            <li>Opsional: Kategori, SKU, Merek, Stok Minimum, Satuan, Tags (pisahkan dengan koma).</li>
+                            <li>Klik <strong>Simpan</strong>.</li>
+                            <li>Gunakan tombol <strong>⚡ Quick Edit</strong> di tabel untuk mengubah nama, kategori, stok min, dan satuan tanpa pindah halaman.</li>
+                            <li>Gunakan <strong>Duplikat</strong> untuk menyalin produk.</li>
+                        </ol>
+                        <p><strong>Sub‑tab Kategori:</strong> Tambah, edit, hapus kategori produk.</p>
+                        <p><strong>Sub‑tab Varian Kemasan:</strong> Tambah varian (misal 500g, 1kg) dengan berat dan harga khusus.</p>
+                        <p><strong>Sub‑tab Import/Export:</strong> Unduh template CSV, impor produk massal, atau ekspor semua produk ke CSV.</p>
+                    </div>
                 </details>
+
+                <!-- 7. CRM -->
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
+                        <i class="ph ph-caret-right text-blue-500"></i> 7. CRM Pelanggan – Input & Analisis
+                    </summary>
+                    <div class="mt-3 pl-6 text-sm space-y-2 opacity-80">
+                        <p><strong>Sub‑tab Daftar Pelanggan:</strong> Lihat, filter, ekspor CSV. Segmentasi otomatis berdasarkan total pembelian.</p>
+                        <p><strong>Sub‑tab Segmentasi:</strong> Lihat jumlah pelanggan Top, Regular, New, Churn. Klik untuk filter.</p>
+                        <p><strong>Sub‑tab Analisis:</strong> Grafik channel dan frekuensi pembelian.</p>
+                        <p><strong>Tab Detail Pelanggan:</strong> Isi data lengkap (telepon, email, alamat, KTP, NPWP) melalui form atau edit dari daftar.</p>
+                    </div>
+                </details>
+
+                <!-- 8. Harga Jual -->
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
+                        <i class="ph ph-caret-right text-blue-500"></i> 8. Harga Jual – Input Harga Online/Offline
+                    </summary>
+                    <div class="mt-3 pl-6 text-sm space-y-2 opacity-80">
+                        <p><strong>Cara input:</strong></p>
+                        <ol class="list-decimal ml-4 space-y-1">
+                            <li>Buka tab <strong>💲 Harga Jual</strong>.</li>
+                            <li>Di tabel, masukkan harga <strong>Offline/kg</strong> dan <strong>Online/kg</strong> untuk setiap produk.</li>
+                            <li>Opsional: masukkan <strong>Komisi (%)</strong> untuk channel online.</li>
+                            <li>Klik <strong>Simpan</strong> per produk, atau gunakan <strong>Simpan Semua</strong>.</li>
+                            <li>Gunakan <strong>Formula Default</strong> untuk mengisi otomatis berdasarkan HPP + margin.</li>
+                            <li>Klik baris produk untuk melihat <strong>simulasi margin</strong> (laba kotor, laba bersih setelah komisi).</li>
+                        </ol>
+                    </div>
+                </details>
+
+                <!-- 9. Keuangan -->
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
+                        <i class="ph ph-caret-right text-blue-500"></i> 9. Keuangan – Input Beban & Laporan
+                    </summary>
+                    <div class="mt-3 pl-6 text-sm space-y-2 opacity-80">
+                        <p><strong>Sub‑tab Catat Beban:</strong></p>
+                        <ol class="list-decimal ml-4 space-y-1">
+                            <li>Pilih <strong>Akun Beban</strong> (Listrik, Sewa, Gaji, dll).</li>
+                            <li>Masukkan <strong>Jumlah (Rp)</strong>.</li>
+                            <li>Pilih <strong>Tanggal</strong>.</li>
+                            <li>Opsional: isi <strong>Deskripsi</strong>.</li>
+                            <li>Klik <strong>Simpan Beban</strong>.</li>
+                        </ol>
+                        <p><strong>Sub‑tab Buku Besar:</strong> Jurnal semua transaksi (penjualan & beban) dengan filter tanggal dan akun.</p>
+                        <p><strong>Sub‑tab Arus Kas:</strong> Pilih bulan & tahun untuk melihat kas masuk, kas keluar, dan saldo bersih.</p>
+                        <p><strong>Sub‑tab Analisis:</strong> Margin laba kotor, margin laba bersih, rasio beban, ROA, ROE, dan rekomendasi.</p>
+                        <p><strong>Sub‑tab Pajak:</strong> Hitung DPP, PPN, PPh 25, PPh 21 otomatis berdasarkan periode.</p>
+                    </div>
+                </details>
+
+                <!-- 10. Stock Opname -->
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
+                        <i class="ph ph-caret-right text-blue-500"></i> 10. Stock Opname – Input Fisik
+                    </summary>
+                    <div class="mt-3 pl-6 text-sm space-y-2 opacity-80">
+                        <ol class="list-decimal ml-4 space-y-1">
+                            <li>Pilih <strong>Produk</strong>.</li>
+                            <li>Masukkan <strong>Stok Fisik (kg)</strong> hasil timbangan.</li>
+                            <li>Pilih <strong>Tanggal Opname</strong>.</li>
+                            <li>Opsional: isi <strong>Catatan</strong>.</li>
+                            <li>Klik <strong>Simpan Opname</strong>. Sistem akan menghitung selisih dan mencatatnya.</li>
+                        </ol>
+                    </div>
+                </details>
+
+                <!-- 11. Retur -->
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
+                        <i class="ph ph-caret-right text-blue-500"></i> 11. Retur – Input Pengembalian
+                    </summary>
+                    <div class="mt-3 pl-6 text-sm space-y-2 opacity-80">
+                        <ol class="list-decimal ml-4 space-y-1">
+                            <li>Pilih <strong>Transaksi Penjualan</strong> yang diretur.</li>
+                            <li>Masukkan <strong>Jumlah Retur (kg)</strong>.</li>
+                            <li>Pilih <strong>Alasan Retur</strong> (Rusak, Kualitas, Kadaluarsa, dll).</li>
+                            <li>Klik <strong>Proses Retur</strong>. Stok akan otomatis kembali.</li>
+                        </ol>
+                    </div>
+                </details>
+
+                <!-- 12. Riwayat & Audit -->
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
+                        <i class="ph ph-caret-right text-blue-500"></i> 12. Riwayat & Audit Trail
+                    </summary>
+                    <div class="mt-3 pl-6 text-sm space-y-2 opacity-80">
+                        <p><strong>Riwayat:</strong> Filter transaksi berdasarkan tanggal, produk, channel, klien. Bookmark transaksi penting. Hapus transaksi jika perlu.</p>
+                        <p><strong>Audit Trail:</strong> Log semua perubahan data. Filter berdasarkan kategori (Tambah, Edit, Hapus), tanggal, dan cari teks. Pin log penting, bandingkan dengan log sebelumnya.</p>
+                    </div>
+                </details>
+
+                <!-- 13. Laporan -->
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
+                        <i class="ph ph-caret-right text-blue-500"></i> 13. Laporan – Cara Membaca & Ekspor
+                    </summary>
+                    <div class="mt-3 pl-6 text-sm space-y-2 opacity-80">
+                        <p>Gunakan filter periode, channel, dan produk untuk menampilkan laporan yang diinginkan.</p>
+                        <p>Laporan Laba Rugi, Neraca, Stok per Gudang, Margin per Produk, Top Pelanggan, Retur, Opname, Proyeksi 3 bulan tersedia.</p>
+                        <p>Klik <strong>Ekspor Excel</strong> atau <strong>Ekspor PDF</strong> untuk mengunduh.</p>
+                    </div>
+                </details>
+
+                <!-- 14. Pengaturan -->
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
+                    <summary class="font-semibold cursor-pointer list-none flex items-center gap-2">
+                        <i class="ph ph-caret-right text-blue-500"></i> 14. Pengaturan – Konfigurasi Sistem
+                    </summary>
+                    <div class="mt-3 pl-6 text-sm space-y-2 opacity-80">
+                        <p>Setiap sub‑tab di Pengaturan memiliki form yang langsung terhubung ke data. Ubah nilai, lalu klik <strong>Simpan Semua Pengaturan</strong> di bagian bawah.</p>
+                        <p><strong>Umum:</strong> Nama bisnis, mata uang, zona waktu, format tanggal, target penjualan.</p>
+                        <p><strong>Pajak & Legal:</strong> PPN, PPh, NPWP, SIUP, NIB.</p>
+                        <p><strong>Margin & Harga:</strong> Margin default, minimum, selisih grosir, komisi marketplace, pembulatan harga.</p>
+                        <p><strong>Stok & Gudang:</strong> Metode alokasi (FEFO/FIFO), biaya gudang, kapasitas cold storage.</p>
+                        <p><strong>Backup & Data:</strong> Interval auto backup, kompresi, pembersihan data kuno.</p>
+                        <p><strong>Tampilan:</strong> Tema default, ukuran font, animasi, suara notifikasi.</p>
+                        <p><strong>Profil Usaha:</strong> Nama, alamat, kontak, logo, catatan kaki invoice.</p>
+                    </div>
+                </details>
+
             </div>
         </div>
 
-        <!-- Panduan Modul -->
+        <!-- ==================== PANDUAN SINGKAT ==================== -->
         <div class="mb-8">
-            <h3 class="font-semibold text-lg mb-3"><i class="ph ph-book-open text-purple-500"></i> Panduan Modul Utama</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="border rounded-lg p-4 bg-white dark:bg-slate-800">
-                    <h4 class="font-semibold flex items-center gap-1"><i class="ph ph-package text-primary-600"></i> Stok & Batch</h4>
-                    <ul class="text-sm opacity-80 mt-2 space-y-1 list-disc list-inside">
-                        <li>Tambah batch baru lengkap dengan landed cost.</li>
-                        <li>Lihat ringkasan stok per produk dan status (aman/menipis/kosong).</li>
-                        <li>Detail batch: edit, hapus, dan pantau HPP.</li>
-                        <li>Batch terpakai hari ini ditampilkan otomatis.</li>
-                    </ul>
-                </div>
-                <div class="border rounded-lg p-4 bg-white dark:bg-slate-800">
-                    <h4 class="font-semibold flex items-center gap-1"><i class="ph ph-shopping-cart text-emerald-600"></i> Penjualan</h4>
-                    <ul class="text-sm opacity-80 mt-2 space-y-1 list-disc list-inside">
-                        <li>Catat penjualan offline (toko) dan online (marketplace).</li>
-                        <li>Preview harga sebelum memproses transaksi.</li>
-                        <li>Invoice PDF profesional dengan DPP & PPN.</li>
-                        <li>Bagikan invoice via WhatsApp langsung.</li>
-                    </ul>
-                </div>
-                <div class="border rounded-lg p-4 bg-white dark:bg-slate-800">
-                    <h4 class="font-semibold flex items-center gap-1"><i class="ph ph-wallet text-blue-600"></i> Keuangan</h4>
-                    <ul class="text-sm opacity-80 mt-2 space-y-1 list-disc list-inside">
-                        <li>Ringkasan pendapatan, HPP, laba kotor, dan laba bersih bulan berjalan.</li>
-                        <li>Catat beban operasional (listrik, sewa, gaji, dll).</li>
-                        <li>Buku besar (jurnal) dengan ekspor Excel dan PDF.</li>
-                        <li>Grafik laba rugi tahunan.</li>
-                    </ul>
-                </div>
-                <div class="border rounded-lg p-4 bg-white dark:bg-slate-800">
-                    <h4 class="font-semibold flex items-center gap-1"><i class="ph ph-file-text text-violet-600"></i> Laporan</h4>
-                    <ul class="text-sm opacity-80 mt-2 space-y-1 list-disc list-inside">
-                        <li>Laba rugi detail, neraca, dan stok per gudang.</li>
-                        <li>Penjualan per channel, top pelanggan, retur.</li>
-                        <li>Proyeksi keuangan 3 bulan ke depan.</li>
-                        <li>Grafik tren penjualan bulanan.</li>
-                    </ul>
-                </div>
+            <h3 class="font-semibold text-lg mb-3 flex items-center gap-2">
+                <i class="ph ph-list-checks text-emerald-500"></i> Panduan Singkat Semua Modul
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                <div class="border rounded-lg p-3 bg-white dark:bg-slate-800"><p class="font-semibold">📊 Dashboard</p><p class="opacity-70 text-xs mt-1">Ringkasan stok, pendapatan, laba, aktivitas, kalender. Widget dapat dikustomisasi.</p></div>
+                <div class="border rounded-lg p-3 bg-white dark:bg-slate-800"><p class="font-semibold">📦 Stok & Batch</p><p class="opacity-70 text-xs mt-1">Tambah batch dengan landed cost lengkap. Lihat stok per gudang, pantau kadaluarsa.</p></div>
+                <div class="border rounded-lg p-3 bg-white dark:bg-slate-800"><p class="font-semibold">🛒 Penjualan</p><p class="opacity-70 text-xs mt-1">Input penjualan, preview harga, diskon, multi‑channel, cetak invoice PDF, share WA.</p></div>
+                <div class="border rounded-lg p-3 bg-white dark:bg-slate-800"><p class="font-semibold">🚚 Pembelian</p><p class="opacity-70 text-xs mt-1">Buat PO ke supplier, terima barang, stok otomatis bertambah.</p></div>
+                <div class="border rounded-lg p-3 bg-white dark:bg-slate-800"><p class="font-semibold">🏭 Supplier</p><p class="opacity-70 text-xs mt-1">Data supplier, riwayat pembelian, analisis volume.</p></div>
+                <div class="border rounded-lg p-3 bg-white dark:bg-slate-800"><p class="font-semibold">🗂️ Produk</p><p class="opacity-70 text-xs mt-1">Tambah/edit/hapus produk, kategori, varian, impor/ekspor CSV, quick edit.</p></div>
+                <div class="border rounded-lg p-3 bg-white dark:bg-slate-800"><p class="font-semibold">👥 CRM</p><p class="opacity-70 text-xs mt-1">Segmentasi otomatis, detail pelanggan, riwayat transaksi per pelanggan.</p></div>
+                <div class="border rounded-lg p-3 bg-white dark:bg-slate-800"><p class="font-semibold">💲 Harga Jual</p><p class="opacity-70 text-xs mt-1">Atur harga online/offline, simulasi margin, formula default.</p></div>
+                <div class="border rounded-lg p-3 bg-white dark:bg-slate-800"><p class="font-semibold">💰 Keuangan</p><p class="opacity-70 text-xs mt-1">Catat beban, buku besar, arus kas, analisis, laporan pajak.</p></div>
+                <div class="border rounded-lg p-3 bg-white dark:bg-slate-800"><p class="font-semibold">📋 Opname</p><p class="opacity-70 text-xs mt-1">Input stok fisik, bandingkan dengan sistem, catat selisih.</p></div>
+                <div class="border rounded-lg p-3 bg-white dark:bg-slate-800"><p class="font-semibold">↩️ Retur</p><p class="opacity-70 text-xs mt-1">Proses pengembalian, stok kembali otomatis.</p></div>
+                <div class="border rounded-lg p-3 bg-white dark:bg-slate-800"><p class="font-semibold">📜 Riwayat</p><p class="opacity-70 text-xs mt-1">Semua transaksi, filter, bookmark, hapus.</p></div>
+                <div class="border rounded-lg p-3 bg-white dark:bg-slate-800"><p class="font-semibold">🕵️ Audit</p><p class="opacity-70 text-xs mt-1">Log perubahan data, filter, pin, bandingkan.</p></div>
+                <div class="border rounded-lg p-3 bg-white dark:bg-slate-800"><p class="font-semibold">📊 Laporan</p><p class="opacity-70 text-xs mt-1">Laba rugi, neraca, stok, margin, proyeksi, ekspor.</p></div>
+                <div class="border rounded-lg p-3 bg-white dark:bg-slate-800"><p class="font-semibold">🔔 Notifikasi</p><p class="opacity-70 text-xs mt-1">Peringatan stok menipis, batch kadaluarsa, target tercapai.</p></div>
+                <div class="border rounded-lg p-3 bg-white dark:bg-slate-800"><p class="font-semibold">⚙️ Pengaturan</p><p class="opacity-70 text-xs mt-1">Pajak, margin, profil, tampilan, backup, reset.</p></div>
             </div>
         </div>
 
-        <!-- Tips & Trik -->
+        <!-- ==================== FAQ ==================== -->
         <div class="mb-8">
-            <h3 class="font-semibold text-lg mb-3"><i class="ph ph-lightbulb text-yellow-500"></i> Tips & Trik</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="border rounded-lg p-4 bg-white dark:bg-slate-800">
-                    <h4 class="font-semibold text-sm">🚀 Efisiensi Operasional</h4>
-                    <ul class="text-sm opacity-80 mt-2 space-y-1 list-disc list-inside">
-                        <li>Gunakan shortcut <kbd>Ctrl+D</kbd> (Dashboard), <kbd>Ctrl+S</kbd> (Stok), <kbd>Ctrl+B</kbd> (Backup).</li>
-                        <li>Setel target penjualan bulanan di Pengaturan untuk memantau progres di dashboard.</li>
-                        <li>Manfaatkan widget toggle di dashboard untuk menampilkan hanya informasi yang Anda butuhkan.</li>
-                    </ul>
-                </div>
-                <div class="border rounded-lg p-4 bg-white dark:bg-slate-800">
-                    <h4 class="font-semibold text-sm">💰 Margin & Harga</h4>
-                    <ul class="text-sm opacity-80 mt-2 space-y-1 list-disc list-inside">
-                        <li>Tetapkan margin default di Pengaturan, lalu sesuaikan harga online/offline secara manual jika perlu.</li>
-                        <li>Gunakan fitur Preview Harga sebelum menjual untuk melihat estimasi laba.</li>
-                        <li>Pantau laporan Margin per Produk untuk mengidentifikasi produk paling menguntungkan.</li>
-                    </ul>
-                </div>
-                <div class="border rounded-lg p-4 bg-white dark:bg-slate-800">
-                    <h4 class="font-semibold text-sm">📦 Manajemen Stok</h4>
-                    <ul class="text-sm opacity-80 mt-2 space-y-1 list-disc list-inside">
-                        <li>Lakukan stock opname rutin untuk mendeteksi selisih sejak dini.</li>
-                        <li>Perhatikan indikator warna di tabel stok: 🔴 Kosong, 🟡 Menipis, 🟢 Aman.</li>
-                        <li>Batch hampir kadaluarsa akan muncul di dashboard agar segera diprioritaskan.</li>
-                    </ul>
-                </div>
-                <div class="border rounded-lg p-4 bg-white dark:bg-slate-800">
-                    <h4 class="font-semibold text-sm">📊 Pelaporan</h4>
-                    <ul class="text-sm opacity-80 mt-2 space-y-1 list-disc list-inside">
-                        <li>Gunakan filter tanggal di tab Laporan untuk melihat periode tertentu.</li>
-                        <li>Ekspor laporan ke Excel atau PDF untuk keperluan akuntansi atau pajak.</li>
-                        <li>Audit Trail mencatat semua perubahan data – berguna untuk investigasi kesalahan.</li>
-                    </ul>
-                </div>
+            <h3 class="font-semibold text-lg mb-3 flex items-center gap-2">
+                <i class="ph ph-chats text-blue-500"></i> Pertanyaan Umum (FAQ)
+            </h3>
+            <div class="space-y-3">
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm"><summary class="font-semibold cursor-pointer">❓ Bagaimana cara menambah produk baru?</summary><p class="mt-2 text-sm opacity-80 pl-6">Buka Kustomisasi Produk → Tambah / Edit, isi nama, simpan. Atau impor CSV.</p></details>
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm"><summary class="font-semibold cursor-pointer">❓ Apa beda FEFO dan FIFO?</summary><p class="mt-2 text-sm opacity-80 pl-6">FEFO = kadaluarsa terdekat dijual dulu. FIFO = masuk pertama keluar pertama. Ubah di Pengaturan.</p></details>
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm"><summary class="font-semibold cursor-pointer">❓ Bagaimana cara mencatat penjualan online?</summary><p class="mt-2 text-sm opacity-80 pl-6">Di Penjualan, pilih channel "Online". Harga akan disesuaikan dengan komisi marketplace.</p></details>
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm"><summary class="font-semibold cursor-pointer">❓ Bagaimana cara menambah stok?</summary><p class="mt-2 text-sm opacity-80 pl-6">Lewat Stok & Batch → Tambah Batch, atau lewat Pembelian → Buat PO lalu Terima.</p></details>
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm"><summary class="font-semibold cursor-pointer">❓ Apakah data aman?</summary><p class="mt-2 text-sm opacity-80 pl-6">Data disimpan di browser Anda. Lakukan backup rutin dan simpan file JSON di tempat aman.</p></details>
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm"><summary class="font-semibold cursor-pointer">❓ Bagaimana cara mengganti tema?</summary><p class="mt-2 text-sm opacity-80 pl-6">Klik ikon bulan/matahari di navbar, atau atur di Pengaturan → Tampilan.</p></details>
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm"><summary class="font-semibold cursor-pointer">❓ Bagaimana cara backup otomatis?</summary><p class="mt-2 text-sm opacity-80 pl-6">Buka Pengaturan → Backup & Data, atur interval (hari), simpan.</p></details>
+                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm"><summary class="font-semibold cursor-pointer">❓ Apa itu Quick Edit di Produk?</summary><p class="mt-2 text-sm opacity-80 pl-6">Tombol ⚡ di tabel produk untuk mengubah nama, kategori, stok min, dan satuan secara cepat.</p></details>
             </div>
         </div>
 
-        <!-- Troubleshooting -->
+        <!-- ==================== GLOSARIUM ==================== -->
+        <div class="mb-8">
+            <h3 class="font-semibold text-lg mb-3 flex items-center gap-2">
+                <i class="ph ph-bookmarks text-amber-500"></i> Glosarium Istilah
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                <div class="border rounded p-2 bg-white dark:bg-slate-800"><strong>HPP</strong> – Harga Pokok Penjualan, biaya per kg setelah ditambah ongkir, bensin, bongkar.</div>
+                <div class="border rounded p-2 bg-white dark:bg-slate-800"><strong>FEFO</strong> – First Expired First Out, batch kadaluarsa terdekat dijual lebih dulu.</div>
+                <div class="border rounded p-2 bg-white dark:bg-slate-800"><strong>FIFO</strong> – First In First Out, batch yang masuk lebih dulu dijual lebih dulu.</div>
+                <div class="border rounded p-2 bg-white dark:bg-slate-800"><strong>DPP</strong> – Dasar Pengenaan Pajak, nilai sebelum PPN.</div>
+                <div class="border rounded p-2 bg-white dark:bg-slate-800"><strong>PPN</strong> – Pajak Pertambahan Nilai (default 12%).</div>
+                <div class="border rounded p-2 bg-white dark:bg-slate-800"><strong>PPh 25</strong> – Pajak Penghasilan Pasal 25 (angsuran).</div>
+                <div class="border rounded p-2 bg-white dark:bg-slate-800"><strong>PPh 21</strong> – Pajak Penghasilan Pasal 21 (pemotongan).</div>
+                <div class="border rounded p-2 bg-white dark:bg-slate-800"><strong>Margin</strong> – Selisih antara harga jual dan HPP.</div>
+                <div class="border rounded p-2 bg-white dark:bg-slate-800"><strong>ROA</strong> – Return on Assets, laba bersih dibagi total aset.</div>
+                <div class="border rounded p-2 bg-white dark:bg-slate-800"><strong>ROE</strong> – Return on Equity, laba bersih dibagi ekuitas.</div>
+                <div class="border rounded p-2 bg-white dark:bg-slate-800"><strong>Batch</strong> – Satu lot stok dengan tanggal produksi dan kadaluarsa tertentu.</div>
+                <div class="border rounded p-2 bg-white dark:bg-slate-800"><strong>PO</strong> – Purchase Order, pesanan ke supplier.</div>
+            </div>
+        </div>
+
+        <!-- ==================== TIPS ==================== -->
         <div>
-            <h3 class="font-semibold text-lg mb-3"><i class="ph ph-wrench text-red-500"></i> Pemecahan Masalah Umum</h3>
-            <div class="space-y-3">
-                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
-                    <summary class="font-semibold cursor-pointer">❌ Tombol di sidebar tidak bisa diklik</summary>
-                    <p class="mt-2 text-sm opacity-80 pl-6">
-                        Lakukan <strong>hard reload</strong> (Ctrl+Shift+R) untuk membersihkan cache. Jika masih bermasalah, periksa Console browser (F12) – biasanya ada file JavaScript yang gagal dimuat. Pastikan semua file .js di folder <code>js/</code> tersedia.
-                    </p>
-                </details>
-                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
-                    <summary class="font-semibold cursor-pointer">💾 Data tidak tersimpan setelah refresh</summary>
-                    <p class="mt-2 text-sm opacity-80 pl-6">
-                        Data disimpan di browser menggunakan <strong>localforage</strong> (IndexedDB). Pastikan browser tidak dalam mode Private/Incognito. Jika penyimpanan browser penuh, hapus data aplikasi lain atau lakukan backup manual.
-                    </p>
-                </details>
-                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
-                    <summary class="font-semibold cursor-pointer">🖨️ Invoice PDF tidak muncul</summary>
-                    <p class="mt-2 text-sm opacity-80 pl-6">
-                        Pastikan pop‑up tidak diblokir. Browser mungkin meminta izin untuk mengunduh file. Coba nonaktifkan pemblokir pop‑up sementara.
-                    </p>
-                </details>
-                <details class="border rounded-lg p-4 bg-white dark:bg-slate-800 shadow-sm">
-                    <summary class="font-semibold cursor-pointer">📈 Grafik tidak tampil</summary>
-                    <p class="mt-2 text-sm opacity-80 pl-6">
-                        Grafik menggunakan Chart.js yang dimuat dari CDN. Periksa koneksi internet. Jika offline, grafik tidak akan dirender, tetapi data tetap bisa diakses melalui tabel.
-                    </p>
-                </details>
-            </div>
+            <h3 class="font-semibold text-lg mb-3 flex items-center gap-2">
+                <i class="ph ph-lightbulb text-yellow-500"></i> Tips & Trik
+            </h3>
+            <ul class="list-disc list-inside text-sm space-y-1 opacity-80">
+                <li>Gunakan <strong>Preview Harga</strong> sebelum menjual untuk memastikan margin.</li>
+                <li>Manfaatkan <strong>Quick Edit</strong> (ikon ⚡) di tabel Produk untuk ubah cepat.</li>
+                <li>Filter di <strong>Riwayat</strong> bisa dikombinasikan (tanggal + channel + produk).</li>
+                <li>Backup data minimal seminggu sekali.</li>
+                <li>Gunakan <strong>Pembelian</strong> untuk mencatat PO, bukan langsung Tambah Batch, agar riwayat supplier tercatat.</li>
+                <li>Aktifkan <strong>Auto Refresh</strong> di Dashboard agar data selalu terbarui.</li>
+                <li>Gunakan <strong>Formula Default</strong> di Harga Jual untuk mengisi harga dengan satu klik.</li>
+            </ul>
+        </div>
         </div>
     </div>
 </div>
