@@ -331,24 +331,60 @@
                     <button onclick="switchTab('tab-settings')" data-tab="tab-settings" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-gear text-lg"></i> Pengaturan</button>
                     <button onclick="switchTab('tab-help')" data-tab="tab-help" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition opacity-70 hover:opacity-100"><i class="ph ph-question text-lg"></i> Bantuan</button>
                 </nav>
-                <div class="p-4 border-t mt-2" style="border-color: var(--border);">
-                    <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">💡 Tips Cepat</h4>
-                    <p class="text-xs opacity-60 leading-relaxed">Gunakan <strong>FEFO</strong> untuk produk frozen agar batch terdekat expired terjual lebih dulu. Backup data setiap minggu untuk keamanan.</p>
-                </div>
-                <div class="p-4 border-t mt-2" style="border-color: var(--border);">
-                    <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">📌 Status Data</h4>
-                    <p class="text-xs opacity-50">Batch: <span id="storedBatchesCount">-</span></p>
-                    <p class="text-xs opacity-50">Transaksi: <span id="storedTransactionsCount">-</span></p>
-                    <p class="text-xs opacity-50">Pelanggan: <span id="storedCustomersCount">-</span></p>
-                    <p class="text-xs opacity-50">Supplier: <span id="storedSuppliersCount">-</span></p>
-                    <p class="text-xs opacity-50">Pengiriman: <span id="storedDeliveriesCount">-</span></p>
-                    <p class="text-xs opacity-50">Mode: <span id="sidebar-mode">Terang</span></p>
-                </div>
-                <div class="p-4 border-t mt-2" style="border-color: var(--border);">
-                    <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-2">⌨️ Shortcut</h4>
-                    <p class="text-xs opacity-40 leading-relaxed"><kbd>Ctrl+D</kbd> Dashboard · <kbd>Ctrl+S</kbd> Stok · <kbd>Ctrl+B</kbd> Backup</p>
-                </div>
+                <!-- ============ STATUS DATA MODERN ============ -->
+<div class="p-4 border-t mt-2" style="border-color: var(--border);">
+    <h4 class="text-xs font-bold uppercase tracking-wider opacity-50 mb-3 flex items-center gap-1">
+        <i class="ph ph-info"></i> Status Data
+    </h4>
+
+    <!-- Ringkasan Utama -->
+    <div class="grid grid-cols-2 gap-2 mb-3">
+        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 text-center">
+            <span class="text-lg font-bold text-blue-600 dark:text-blue-400" id="storedBatchesCount">0</span>
+            <p class="text-[10px] opacity-60">Batch</p>
+        </div>
+        <div class="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-2 text-center">
+            <span class="text-lg font-bold text-emerald-600 dark:text-emerald-400" id="storedTransactionsCount">0</span>
+            <p class="text-[10px] opacity-60">Transaksi</p>
+        </div>
+        <div class="bg-violet-50 dark:bg-violet-900/20 rounded-lg p-2 text-center">
+            <span class="text-lg font-bold text-violet-600 dark:text-violet-400" id="storedCustomersCount">0</span>
+            <p class="text-[10px] opacity-60">Pelanggan</p>
+        </div>
+        <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-2 text-center">
+            <span class="text-lg font-bold text-amber-600 dark:text-amber-400" id="storedSuppliersCount">0</span>
+            <p class="text-[10px] opacity-60">Supplier</p>
+        </div>
+        <div class="bg-rose-50 dark:bg-rose-900/20 rounded-lg p-2 text-center col-span-2">
+            <span class="text-lg font-bold text-rose-600 dark:text-rose-400" id="storedDeliveriesCount">0</span>
+            <p class="text-[10px] opacity-60">Pengiriman Aktif</p>
+        </div>
+    </div>
+
+    <!-- Status Sistem -->
+    <div class="flex items-center justify-between text-[10px] opacity-50 mb-3 px-1">
+        <div class="flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-green-500 pulse-dot"></span>
+            <span>Sistem Online</span>
+        </div>
+        <div class="flex items-center gap-1">
+            <i class="ph ph-moon text-xs"></i>
+            <span id="sidebar-mode">Terang</span>
+        </div>
+    </div>
+
+    <!-- Shortcut Keyboard Modern -->
+    <div class="border-t pt-3 mt-2" style="border-color: var(--border);">
+        <div class="flex items-center justify-between opacity-40">
+            <span class="text-[10px] flex items-center gap-1"><i class="ph ph-keyboard text-xs"></i> Shortcut</span>
+            <div class="flex gap-1">
+                <span class="bg-gray-100 dark:bg-gray-700 text-[9px] px-1.5 py-0.5 rounded font-mono">Ctrl+D</span>
+                <span class="bg-gray-100 dark:bg-gray-700 text-[9px] px-1.5 py-0.5 rounded font-mono">Ctrl+S</span>
+                <span class="bg-gray-100 dark:bg-gray-700 text-[9px] px-1.5 py-0.5 rounded font-mono">Ctrl+B</span>
             </div>
+        </div>
+    </div>
+</div>
         </aside>
 
     <!-- ==================== MAIN CONTENT AREA ==================== -->
