@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cibitung Frozen — ERP Ultimate v5.4</title>
+    <title>Cibitung Frozen — ERP Ultimate</title>
     <meta name="description" content="Sistem ERP manajemen inventori, penjualan, dan akuntansi Cibitung Frozen.">
     <meta name="theme-color" content="#2563eb">
-    <meta name="application-name" content="CibitungFrozen ERP">
+    <meta name="application-name" content="Cibitung Frozen ERP">
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="manifest" href="manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="CibitungFrozen">
+    <meta name="apple-mobile-web-app-title" content="Cibitung Frozen">
     <link rel="apple-touch-icon" href="icon-192.png">    
 
     <!-- ==================== LIBRARY CDN ==================== -->
@@ -3341,9 +3341,35 @@
 </div>
 
 <!-- ==================== FOOTER ==================== -->
-<footer class="border-t mt-auto py-4" style="background: var(--surface); border-color: var(--border);">
-    <div class="container-main text-center text-xs opacity-50">
-        <p>&copy; 2025 <strong>Cibitung Frozen</strong> — ERP Ultimate v5.4 · <span id="systemDateTime"></span></p>
+<!-- ==================== FOOTER MODERN ==================== -->
+<footer class="border-t mt-auto" style="background: var(--surface); border-color: var(--border);">
+    <div class="container-main py-4">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-3">
+            <!-- Copyright & Credit -->
+            <div class="flex items-center gap-2 text-xs">
+                <span class="opacity-60">&copy; 2026</span>
+                <span class="font-semibold text-primary-600 dark:text-primary-400">Cibitung Frozen</span>
+                <span class="opacity-40 hidden sm:inline">—</span>
+                <span class="opacity-60 hidden sm:inline">ERP Ultimate</span>
+            </div>
+
+            <!-- Credit Pembuat (menonjol) -->
+            <div class="flex items-center gap-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 px-4 py-2 rounded-full border border-blue-200 dark:border-blue-800 shadow-sm">
+                <i class="ph ph-code text-blue-600 dark:text-blue-400 text-sm"></i>
+                <span class="text-xs font-medium text-blue-700 dark:text-blue-300">
+                    Dibangun oleh <strong>Dhiya'Ulhag Zulfa Zain</strong>
+                </span>
+                <a href="https://github.com/zulfazain-byte" target="_blank" rel="noopener" class="text-blue-500 hover:text-blue-700 transition" title="GitHub">
+                    <i class="ph ph-github-logo text-sm"></i>
+                </a>
+            </div>
+
+            <!-- Jam Sistem -->
+            <div class="flex items-center gap-2 text-xs opacity-50">
+                <i class="ph ph-clock"></i>
+                <span id="systemDateTime"></span>
+            </div>
+        </div>
     </div>
 </footer>
 
