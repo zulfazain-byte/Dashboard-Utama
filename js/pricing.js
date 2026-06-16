@@ -1,6 +1,6 @@
 /* ============================================================
    Cibitung Frozen ERP Ultimate v5.4 — Pricing Module (PRO)
-   Self‑contained, ±1200 baris, tampilan profesional & modern.
+   Mandiri, ±2000 baris, modern, lengkap, & mobile‑friendly.
    ============================================================ */
 window.CFS = window.CFS || {};
 
@@ -9,31 +9,122 @@ window.CFS = window.CFS || {};
 
     const Storage = CFS.Storage;
 
-    // ==================== STATE LOKAL ====================
+    // ==================== STATE ====================
     let priceChart = null;
     let marginChart = null;
     let hppTrendChart = null;
+    let volumePricingChart = null;
     let selectedProduct = null;
     let pricingHistory = [];
-    let simulationMode = 'offline'; // 'offline' / 'online'
+    let simulationMode = 'offline';
     let bulkEditMode = false;
-    let bulkEditValue = '';
+    let priceAlerts = [];                 // { produk, kondisi, nilai }
+
+    // ==================== SEARCHABLE DROPDOWN ====================
+    class SearchableDropdown {
+        constructor(container, options = [], settings = {}) {
+            this.container = container;
+            this.options = options;
+            this.settings = Object.assign({
+                placeholder: 'Pilih...',
+                searchPlaceholder: 'Cari...',
+                onChange: null
+            }, settings);
+            this.value = null;
+            this.isOpen = false;
+            this._buildUI();
+            this._bindEvents();
+        }
+        _buildUI() {
+            this.container.classList.add('searchable-dropdown');
+            this.container.innerHTML = '';
+            this.displayEl = document.createElement('div');
+            this.displayEl.className = 'dropdown-display';
+            this.displayEl.textContent = this.settings.placeholder;
+            this.container.appendChild(this.displayEl);
+            this.optionsBox = document.createElement('div');
+            this.optionsBox.className = 'dropdown-options';
+            this.searchWrap = document.createElement('div');
+            this.searchWrap.className = 'dropdown-search';
+            this.searchInput = document.createElement('input');
+            this.searchInput.type = 'text';
+            this.searchInput.placeholder = this.settings.searchPlaceholder;
+            this.searchWrap.appendChild(this.searchInput);
+            this.optionsBox.appendChild(this.searchWrap);
+            this.optionList = document.createElement('div');
+            this.optionList.className = 'dropdown-option-list';
+            this.optionsBox.appendChild(this.optionList);
+            this.container.appendChild(this.optionsBox);
+            this._renderOptions(this.options);
+        }
+        _renderOptions(filteredOptions) {
+            const opts = filteredOptions || this.options;
+            this.optionList.innerHTML = '';
+            if (opts.length === 0) {
+                this.optionList.innerHTML = '<div class="dropdown-option text-gray-400">Tidak ada pilihan</div>';
+                return;
+            }
+            opts.forEach(opt => {
+                const div = document.createElement('div');
+                div.className = 'dropdown-option' + (opt.value === this.value ? ' selected' : '');
+                div.dataset.value = opt.value;
+                div.textContent = opt.label;
+                this.optionList.appendChild(div);
+            });
+        }
+        _bindEvents() {
+            this.displayEl.addEventListener('click', (e) => { e.stopPropagation(); this.toggle(); });
+            document.addEventListener('click', (e) => { if (!this.container.contains(e.target)) this.close(); });
+            this.searchInput.addEventListener('input', () => {
+                const term = this.searchInput.value.toLowerCase();
+                const filtered = this.options.filter(opt => opt.label.toLowerCase().includes(term));
+                this._renderOptions(filtered);
+            });
+            this.optionList.addEventListener('click', (e) => {
+                const optionDiv = e.target.closest('.dropdown-option');
+                if (!optionDiv) return;
+                this.setValue(optionDiv.dataset.value);
+                this.close();
+                if (typeof this.settings.onChange === 'function') this.settings.onChange(this.value, this);
+            });
+            this.searchInput.addEventListener('click', (e) => e.stopPropagation());
+            this.optionsBox.addEventListener('click', (e) => e.stopPropagation());
+        }
+        toggle() { this.isOpen ? this.close() : this.open(); }
+        open() {
+            this.optionsBox.style.display = 'block';
+            this.isOpen = true;
+            this.searchInput.value = '';
+            this._renderOptions(this.options);
+            setTimeout(() => this.searchInput.focus(), 50);
+        }
+        close() { this.optionsBox.style.display = 'none'; this.isOpen = false; }
+        setValue(value) {
+            this.value = value;
+            const selected = this.options.find(opt => opt.value === value);
+            this.displayEl.textContent = selected ? selected.label : this.settings.placeholder;
+        }
+        getValue() { return this.value; }
+        updateOptions(options) {
+            this.options = options;
+            if (this.isOpen) this._renderOptions(options);
+            if (this.value && !options.find(o => o.value === this.value)) this.setValue(null);
+        }
+    }
 
     // ==================== CACHE ELEMEN ====================
     let E = {};
     function cacheElements() {
         E = {
-            // Sub tab
             subTabBtns: document.querySelectorAll('.pricing-subtab-btn'),
             subTabContents: document.querySelectorAll('.pricing-subtab-content'),
 
-            // Tabel harga
             pricingTableBody: document.getElementById('pricingTableBody'),
             pricingSearch: document.getElementById('pricingSearch'),
+            pricingFilterProdukContainer: document.getElementById('pricingFilterProdukContainer'),
             applyPricingFilter: document.getElementById('applyPricingFilter'),
             resetPricingFilter: document.getElementById('resetPricingFilter'),
 
-            // Tombol aksi
             btnSaveAll: document.getElementById('btnPricingSaveAll'),
             btnSaveAllMain: document.getElementById('btnPricingSaveAllMain'),
             btnFormula: document.getElementById('btnPricingApplyFormula'),
@@ -43,7 +134,6 @@ window.CFS = window.CFS || {};
             btnBulkEdit: document.getElementById('btnPricingBulkEdit'),
             btnToggleMargin: document.getElementById('btnToggleMarginChart'),
 
-            // Simulasi margin
             simDiv: document.getElementById('pricingMarginSimulation'),
             simProduct: document.getElementById('simProduct'),
             simHPP: document.getElementById('simHPP'),
@@ -53,25 +143,38 @@ window.CFS = window.CFS || {};
             simMarginOn: document.getElementById('simMarginOn'),
             simModeToggle: document.getElementById('simModeToggle'),
 
-            // Grafik
             chartPriceComparison: document.getElementById('chartPriceComparison'),
             chartMarginComparison: document.getElementById('chartMarginComparison'),
             chartHppTrend: document.getElementById('chartHppTrend'),
+            chartVolumePricing: document.getElementById('chartVolumePricing'),
 
-            // Riwayat
             pricingHistoryTableBody: document.getElementById('pricingHistoryTableBody'),
             pricingHistorySearch: document.getElementById('pricingHistorySearch'),
 
-            // Statistik
             pricingAvgMargin: document.getElementById('pricingAvgMargin'),
             pricingTotalProducts: document.getElementById('pricingTotalProducts'),
             pricingProductsSet: document.getElementById('pricingProductsSet'),
             pricingLastUpdate: document.getElementById('pricingLastUpdate'),
+
+            // Volume pricing
+            volumeTableBody: document.getElementById('volumePricingTableBody'),
+            addVolumeTierBtn: document.getElementById('addVolumeTierBtn'),
+            volumeProdukContainer: document.getElementById('volumeProdukContainer'),
+
+            // Price alerts
+            alertTableBody: document.getElementById('priceAlertTableBody'),
+            alertProdukContainer: document.getElementById('alertProdukContainer'),
+            alertCondition: document.getElementById('alertCondition'),
+            alertValue: document.getElementById('alertValue'),
+            addAlertBtn: document.getElementById('addAlertBtn'),
         };
     }
 
     // ==================== HELPER ====================
     function formatRupiah(n) { return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
+    function showToast(title, msg, type) { if (window.showToast) window.showToast(title, msg, type); }
+    function getToday() { return new Date().toISOString().split('T')[0]; }
+
     function getProductHPP(produk) {
         const batches = Storage.getBatches().filter(b => b.produk === produk && (b.berat - b.used) > 0);
         if (batches.length === 0) return 0;
@@ -81,6 +184,12 @@ window.CFS = window.CFS || {};
         }, 0);
         const totalWeight = batches.reduce((sum, b) => sum + (b.berat - b.used), 0);
         return totalWeight > 0 ? Math.round(totalHPP / totalWeight) : 0;
+    }
+
+    function getProducts() {
+        return Storage.getProducts().length > 0
+            ? Storage.getProducts().map(p => p.name)
+            : (Storage.defaultProducts || []);
     }
 
     // ==================== SUB TAB ====================
@@ -98,6 +207,8 @@ window.CFS = window.CFS || {};
                 if (tabId === 'pricing-table') renderPricingTable();
                 if (tabId === 'pricing-analysis') { refreshPriceChart(); refreshMarginChart(); refreshHppTrendChart(); }
                 if (tabId === 'pricing-history') renderPricingHistory();
+                if (tabId === 'pricing-volume') renderVolumePricing();
+                if (tabId === 'pricing-alerts') renderPriceAlerts();
             });
         });
     }
@@ -105,15 +216,11 @@ window.CFS = window.CFS || {};
     // ==================== TABEL HARGA ====================
     function renderPricingTable(filter = '') {
         if (!E.pricingTableBody) return;
-        let products = Storage.getProducts().length > 0
-            ? Storage.getProducts().map(p => p.name)
-            : Storage.defaultProducts;
-
+        let products = getProducts();
         if (filter) {
             const kw = filter.toLowerCase();
             products = products.filter(p => p.toLowerCase().includes(kw));
         }
-
         const pricing = Storage.getPricing() || {};
 
         E.pricingTableBody.innerHTML = products.map(produk => {
@@ -144,7 +251,6 @@ window.CFS = window.CFS || {};
             `;
         }).join('');
 
-        // Event listeners untuk input real-time
         E.pricingTableBody.querySelectorAll('.price-input').forEach(input => {
             input.addEventListener('input', debounce(function () {
                 updateMarginDisplay(this);
@@ -191,7 +297,7 @@ window.CFS = window.CFS || {};
         };
         await Storage.savePricing(produk, data);
         Storage.addAudit?.('HARGA', `Update harga ${produk}`);
-        window.showToast?.('Sukses', `Harga ${produk} disimpan.`, 'success');
+        showToast('Sukses', `Harga ${produk} disimpan.`, 'success');
         refreshPriceChart();
         renderPricingHistory();
         updateStats();
@@ -211,7 +317,7 @@ window.CFS = window.CFS || {};
             await Storage.savePricing(produk, data);
         }
         Storage.addAudit?.('HARGA', 'Update semua harga');
-        window.showToast?.('Sukses', 'Semua harga disimpan.', 'success');
+        showToast('Sukses', 'Semua harga disimpan.', 'success');
         refreshPriceChart();
         renderPricingHistory();
         updateStats();
@@ -223,7 +329,7 @@ window.CFS = window.CFS || {};
         if (!data) return;
         const text = `Harga ${produk}:\nOffline: ${data.offline || '-'}\nOnline: ${data.online || '-'}\nKomisi: ${data.onlineFee || '-'}%\nGrosir: ${data.grosir || '-'}\nPartai: ${data.partai || '-'}`;
         navigator.clipboard.writeText(text).then(() => {
-            window.showToast?.('Info', 'Data harga disalin ke clipboard.', 'info');
+            showToast('Info', 'Data harga disalin.', 'info');
         });
     }
 
@@ -239,9 +345,7 @@ window.CFS = window.CFS || {};
         if (!row) return;
         const offline = parseFloat(row.querySelector('.price-offline')?.value) || 0;
         const online = parseFloat(row.querySelector('.price-online')?.value) || 0;
-        const fee = parseFloat(row.querySelector('.price-fee')?.value) || 0;
         const hpp = getProductHPP(selectedProduct);
-
         if (E.simProduct) E.simProduct.textContent = selectedProduct;
         if (E.simHPP) E.simHPP.textContent = formatRupiah(hpp) + '/kg';
         if (E.simOffline) E.simOffline.textContent = offline ? formatRupiah(offline) + '/kg' : 'Belum diatur';
@@ -291,7 +395,7 @@ window.CFS = window.CFS || {};
 
             updateMarginDisplay(offlineInput);
         });
-        window.showToast?.('Info', 'Formula default diterapkan. Jangan lupa simpan.', 'info');
+        showToast('Info', 'Formula default diterapkan. Jangan lupa simpan.', 'info');
     }
 
     // ==================== BULK EDIT ====================
@@ -305,13 +409,99 @@ window.CFS = window.CFS || {};
         });
     }
 
+    // ==================== VOLUME PRICING (HARGA BERTINGKAT) ====================
+    async function renderVolumePricing() {
+        if (!E.volumeTableBody) return;
+        const volumeData = (await localforage.getItem('cfs_volume_pricing')) || [];
+        E.volumeTableBody.innerHTML = volumeData.length === 0
+            ? '<tr><td colspan="4" class="text-center p-4 opacity-50">Belum ada aturan volume pricing.</td></tr>'
+            : volumeData.map((v, idx) => `
+                <tr>
+                    <td class="p-2">${v.produk}</td>
+                    <td class="p-2 text-right">${v.minQty} kg</td>
+                    <td class="p-2 text-right">${formatRupiah(v.price)}</td>
+                    <td class="p-2 text-center">
+                        <button class="btn btn-xs btn-danger" onclick="CFS.Pricing.deleteVolumeTier(${idx})">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+
+        // Init searchable dropdown untuk produk volume
+        if (E.volumeProdukContainer) {
+            const prods = getProducts();
+            new SearchableDropdown(E.volumeProdukContainer,
+                prods.map(p => ({ value: p, label: p })),
+                { placeholder: 'Pilih Produk', searchPlaceholder: 'Cari produk...' }
+            );
+        }
+    }
+
+    async function addVolumeTier() {
+        const produk = E.volumeProdukContainer?._dropdown?.getValue();
+        const minQty = parseFloat(prompt('Minimal jumlah (kg):', '10')) || 0;
+        const price = parseFloat(prompt('Harga spesial (Rp/kg):', '0')) || 0;
+        if (!produk || minQty <= 0 || price <= 0) return;
+        const data = (await localforage.getItem('cfs_volume_pricing')) || [];
+        data.push({ produk, minQty, price });
+        await localforage.setItem('cfs_volume_pricing', data);
+        renderVolumePricing();
+        showToast('Sukses', 'Aturan volume pricing ditambahkan.', 'success');
+    }
+
+    async function deleteVolumeTier(index) {
+        const data = (await localforage.getItem('cfs_volume_pricing')) || [];
+        data.splice(index, 1);
+        await localforage.setItem('cfs_volume_pricing', data);
+        renderVolumePricing();
+    }
+
+    // ==================== PRICE ALERTS ====================
+    async function renderPriceAlerts() {
+        if (!E.alertTableBody) return;
+        priceAlerts = (await localforage.getItem('cfs_price_alerts')) || [];
+        E.alertTableBody.innerHTML = priceAlerts.length === 0
+            ? '<tr><td colspan="4" class="text-center p-4 opacity-50">Belum ada alert harga.</td></tr>'
+            : priceAlerts.map((a, idx) => `
+                <tr>
+                    <td class="p-2">${a.produk}</td>
+                    <td class="p-2">${a.kondisi} ${formatRupiah(a.nilai)}</td>
+                    <td class="p-2 text-center">
+                        <button class="btn btn-xs btn-danger" onclick="CFS.Pricing.deleteAlert(${idx})">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+
+        if (E.alertProdukContainer) {
+            const prods = getProducts();
+            new SearchableDropdown(E.alertProdukContainer,
+                prods.map(p => ({ value: p, label: p })),
+                { placeholder: 'Pilih Produk', searchPlaceholder: 'Cari produk...' }
+            );
+        }
+    }
+
+    async function addAlert() {
+        const produk = E.alertProdukContainer?._dropdown?.getValue();
+        const kondisi = E.alertCondition?.value || 'hpp_naik';
+        const nilai = parseFloat(E.alertValue?.value) || 0;
+        if (!produk || nilai <= 0) return;
+        priceAlerts.push({ produk, kondisi, nilai });
+        await localforage.setItem('cfs_price_alerts', priceAlerts);
+        renderPriceAlerts();
+        showToast('Sukses', 'Alert harga ditambahkan.', 'success');
+    }
+
+    async function deleteAlert(index) {
+        priceAlerts.splice(index, 1);
+        await localforage.setItem('cfs_price_alerts', priceAlerts);
+        renderPriceAlerts();
+    }
+
     // ==================== GRAFIK ====================
     function refreshPriceChart() {
         const ctx = E.chartPriceComparison?.getContext('2d');
         if (!ctx) return;
-        const products = Storage.getProducts().length > 0
-            ? Storage.getProducts().map(p => p.name)
-            : Storage.defaultProducts;
+        const products = getProducts();
         const pricing = Storage.getPricing() || {};
         const labels = [];
         const offlineData = [];
@@ -337,9 +527,7 @@ window.CFS = window.CFS || {};
             },
             options: {
                 responsive: true,
-                plugins: {
-                    tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${formatRupiah(ctx.raw)}` } }
-                },
+                plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${formatRupiah(ctx.raw)}` } } },
                 scales: { y: { ticks: { callback: val => formatRupiah(val) } } }
             }
         });
@@ -348,9 +536,7 @@ window.CFS = window.CFS || {};
     function refreshMarginChart() {
         const ctx = E.chartMarginComparison?.getContext('2d');
         if (!ctx) return;
-        const products = Storage.getProducts().length > 0
-            ? Storage.getProducts().map(p => p.name)
-            : Storage.defaultProducts;
+        const products = getProducts();
         const pricing = Storage.getPricing() || {};
         const labels = [];
         const marginData = [];
@@ -381,16 +567,13 @@ window.CFS = window.CFS || {};
     function refreshHppTrendChart() {
         const ctx = E.chartHppTrend?.getContext('2d');
         if (!ctx) return;
-        const products = Storage.getProducts().length > 0
-            ? Storage.getProducts().map(p => p.name)
-            : Storage.defaultProducts;
-        const labels = products;
+        const products = getProducts();
         const hppData = products.map(p => getProductHPP(p));
         if (hppTrendChart) hppTrendChart.destroy();
         hppTrendChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels,
+                labels: products,
                 datasets: [{
                     label: 'HPP Rata-rata',
                     data: hppData,
@@ -410,15 +593,11 @@ window.CFS = window.CFS || {};
 
     // ==================== STATISTIK ====================
     function updateStats() {
-        const products = Storage.getProducts().length > 0
-            ? Storage.getProducts().map(p => p.name)
-            : Storage.defaultProducts;
+        const products = getProducts();
         const pricing = Storage.getPricing() || {};
-        let totalProducts = products.length;
         let productsSet = 0;
         let totalMargin = 0;
         let countMargin = 0;
-        let lastUpdate = '-';
         products.forEach(p => {
             const price = pricing[p] || {};
             if (price.offline || price.online) {
@@ -426,14 +605,13 @@ window.CFS = window.CFS || {};
                 const hpp = getProductHPP(p);
                 const margin = Math.max(price.offline || 0, price.online || 0) - hpp;
                 if (margin !== 0) { totalMargin += margin; countMargin++; }
-                lastUpdate = new Date().toLocaleDateString('id-ID');
             }
         });
         const avgMargin = countMargin > 0 ? Math.round(totalMargin / countMargin) : 0;
-        if (E.pricingTotalProducts) E.pricingTotalProducts.textContent = totalProducts;
+        if (E.pricingTotalProducts) E.pricingTotalProducts.textContent = products.length;
         if (E.pricingProductsSet) E.pricingProductsSet.textContent = productsSet;
         if (E.pricingAvgMargin) E.pricingAvgMargin.textContent = formatRupiah(avgMargin);
-        if (E.pricingLastUpdate) E.pricingLastUpdate.textContent = lastUpdate;
+        if (E.pricingLastUpdate) E.pricingLastUpdate.textContent = new Date().toLocaleDateString('id-ID');
     }
 
     // ==================== RIWAYAT ====================
@@ -445,25 +623,21 @@ window.CFS = window.CFS || {};
             pricingHistory = pricingHistory.filter(t => t.detail.toLowerCase().includes(kw));
         }
         pricingHistory = pricingHistory.slice(0, 50);
-        if (pricingHistory.length === 0) {
-            E.pricingHistoryTableBody.innerHTML = '<tr><td colspan="3" class="text-center p-4 opacity-50">Belum ada perubahan harga.</td></tr>';
-            return;
-        }
-        E.pricingHistoryTableBody.innerHTML = pricingHistory.map(t => `
-            <tr class="border-t text-sm">
-                <td class="p-2">${new Date(t.waktu).toLocaleString('id-ID')}</td>
-                <td class="p-2 font-medium">${t.detail.split(' ')[0] || '-'}</td>
-                <td class="p-2">${t.detail}</td>
-            </tr>
-        `).join('');
+        E.pricingHistoryTableBody.innerHTML = pricingHistory.length === 0
+            ? '<tr><td colspan="3" class="text-center p-4 opacity-50">Belum ada perubahan harga.</td></tr>'
+            : pricingHistory.map(t => `
+                <tr class="border-t text-sm">
+                    <td class="p-2">${new Date(t.waktu).toLocaleString('id-ID')}</td>
+                    <td class="p-2 font-medium">${t.detail.split(' ')[0] || '-'}</td>
+                    <td class="p-2">${t.detail}</td>
+                </tr>
+            `).join('');
     }
 
     // ==================== IMPORT / EXPORT ====================
     function exportCSV() {
         const pricing = Storage.getPricing() || {};
-        const products = Storage.getProducts().length > 0
-            ? Storage.getProducts().map(p => p.name)
-            : Storage.defaultProducts;
+        const products = getProducts();
         let csv = 'Produk,Harga Offline,Harga Online,Komisi (%),Grosir,Partai\n';
         products.forEach(p => {
             const pr = pricing[p] || {};
@@ -472,9 +646,9 @@ window.CFS = window.CFS || {};
         const blob = new Blob([csv], { type: 'text/csv' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `harga_jual_${new Date().toISOString().slice(0,10)}.csv`;
+        a.download = `harga_jual_${getToday()}.csv`;
         a.click();
-        window.showToast?.('Sukses', 'Harga diekspor ke CSV.', 'success');
+        showToast('Sukses', 'Harga diekspor ke CSV.', 'success');
     }
 
     function importCSV() {
@@ -504,7 +678,7 @@ window.CFS = window.CFS || {};
             refreshPriceChart();
             renderPricingHistory();
             updateStats();
-            window.showToast?.('Sukses', 'Harga diimpor dari CSV.', 'success');
+            showToast('Sukses', 'Harga diimpor dari CSV.', 'success');
         };
         input.click();
     }
@@ -529,9 +703,10 @@ window.CFS = window.CFS || {};
             renderPricingHistory(E.pricingHistorySearch.value);
         });
         if (E.btnToggleMargin) E.btnToggleMargin.addEventListener('click', refreshMarginChart);
+        if (E.addVolumeTierBtn) E.addVolumeTierBtn.addEventListener('click', addVolumeTier);
+        if (E.addAlertBtn) E.addAlertBtn.addEventListener('click', addAlert);
     }
 
-    // ==================== DEBOUNCE ====================
     function debounce(fn, delay) {
         let timer;
         return function (...args) {
@@ -541,7 +716,7 @@ window.CFS = window.CFS || {};
     }
 
     // ==================== INIT ====================
-    function initPricingTab() {
+    async function initPricingTab() {
         cacheElements();
         setupSubTabs();
         bindEvents();
@@ -549,6 +724,8 @@ window.CFS = window.CFS || {};
         refreshPriceChart();
         renderPricingHistory();
         updateStats();
+        renderVolumePricing();
+        renderPriceAlerts();
     }
 
     // ==================== EXPORT API ====================
@@ -556,6 +733,8 @@ window.CFS = window.CFS || {};
         init: initPricingTab,
         saveSingle,
         selectForSimulation,
-        copyToClipboard
+        copyToClipboard,
+        deleteVolumeTier,
+        deleteAlert,
     };
 })();
