@@ -1852,61 +1852,166 @@
     </div>
 </div>
 
-        <!-- ==================== TAB HARGA JUAL (UPGRADE LENGKAP) ==================== -->
+<!-- ==================== TAB HARGA JUAL (PRO) ==================== -->
 <div id="tab-pricing" class="tab-content space-y-6">
     <div class="card p-6">
-        <h2 class="text-xl font-bold mb-4"><i class="ph ph-currency-circle-dollar text-purple-600"></i> Penentuan Harga Jual (Online vs Offline)</h2>
-        <p class="text-sm opacity-70 mb-4">Atur harga jual per produk untuk setiap channel. Klik baris produk untuk simulasi margin.</p>
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-currency-circle-dollar text-purple-600"></i> Penentuan Harga Jual (Pro)</h2>
+        <p class="text-sm opacity-70 mb-4">Atur harga jual per produk, simulasi margin, aturan volume, dan alert harga otomatis.</p>
 
-        <!-- Tombol Aksi Cepat -->
-        <div class="flex flex-wrap gap-3 mb-6">
-            <button id="btnPricingSaveAll" class="btn btn-primary"><i class="ph ph-floppy-disk"></i> Simpan Semua Perubahan</button>
-            <button id="btnPricingApplyFormula" class="btn btn-secondary"><i class="ph ph-calculator"></i> Terapkan Formula Default</button>
-            <button id="btnPricingExport" class="btn btn-secondary btn-sm"><i class="ph ph-file-csv"></i> Ekspor CSV</button>
-            <button id="btnPricingImport" class="btn btn-secondary btn-sm"><i class="ph ph-upload-simple"></i> Impor CSV</button>
+        <!-- Statistik Ringkas -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="card p-3 text-center"><span class="text-xs opacity-60">Total Produk</span><p class="font-bold text-lg" id="pricingTotalProducts">0</p></div>
+            <div class="card p-3 text-center"><span class="text-xs opacity-60">Produk Berharga</span><p class="font-bold text-lg" id="pricingProductsSet">0</p></div>
+            <div class="card p-3 text-center"><span class="text-xs opacity-60">Rata‑rata Margin</span><p class="font-bold text-lg" id="pricingAvgMargin">Rp 0</p></div>
+            <div class="card p-3 text-center"><span class="text-xs opacity-60">Update Terakhir</span><p class="font-bold text-lg" id="pricingLastUpdate">-</p></div>
         </div>
 
-        <!-- Tabel Harga Interaktif -->
-        <div class="overflow-x-auto mb-6">
-            <table class="w-full text-sm">
-                <thead class="bg-slate-100 dark:bg-slate-700">
-                    <tr>
-                        <th class="p-2 text-left">Produk</th>
-                        <th class="p-2 text-right">HPP Rata²</th>
-                        <th class="p-2 text-right">Offline/kg</th>
-                        <th class="p-2 text-right">Online/kg</th>
-                        <th class="p-2 text-right">Komisi (%)</th>
-                        <th class="p-2 text-right">Grosir/kg</th>
-                        <th class="p-2 text-right">Partai/kg</th>
-                        <th class="p-2 text-right">Margin Off</th>
-                        <th class="p-2 text-right">Margin On</th>
-                        <th class="p-2 text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="pricingTableBody"></tbody>
-            </table>
+        <!-- Sub‑tab Navigasi -->
+        <div class="flex flex-wrap gap-2 mb-6 border-b pb-3">
+            <button class="btn btn-sm btn-primary pricing-subtab-btn active" data-pricing-tab="pricing-table">📋 Daftar Harga</button>
+            <button class="btn btn-sm btn-secondary pricing-subtab-btn" data-pricing-tab="pricing-analysis">📊 Analisis</button>
+            <button class="btn btn-sm btn-secondary pricing-subtab-btn" data-pricing-tab="pricing-history">📜 Riwayat</button>
+            <button class="btn btn-sm btn-secondary pricing-subtab-btn" data-pricing-tab="pricing-volume">📦 Volume</button>
+            <button class="btn btn-sm btn-secondary pricing-subtab-btn" data-pricing-tab="pricing-alerts">⚠️ Alert</button>
         </div>
 
-        <!-- Simulasi Margin (muncul saat klik baris) -->
-        <div class="card p-4 bg-slate-50 dark:bg-slate-800 rounded-lg mb-6" id="pricingMarginSimulation">
-            <p class="opacity-50">Klik pada baris produk untuk melihat simulasi margin.</p>
-        </div>
+        <!-- ==================== SUB‑TAB: DAFTAR HARGA ==================== -->
+        <div id="pricing-table" class="pricing-subtab-content">
+            <!-- Tombol Aksi Cepat -->
+            <div class="flex flex-wrap gap-3 mb-4">
+                <button id="btnPricingSaveAll" class="btn btn-primary"><i class="ph ph-floppy-disk"></i> Simpan Semua</button>
+                <button id="btnPricingApplyFormula" class="btn btn-secondary"><i class="ph ph-calculator"></i> Formula Otomatis</button>
+                <button id="btnPricingBulkEdit" class="btn btn-secondary">✏️ Bulk Edit</button>
+                <button id="btnPricingExport" class="btn btn-secondary btn-sm"><i class="ph ph-file-csv"></i> CSV</button>
+                <button id="btnPricingImport" class="btn btn-secondary btn-sm"><i class="ph ph-upload-simple"></i> Impor</button>
+            </div>
 
-        <!-- Grafik Perbandingan Harga -->
-        <div class="mb-6">
-            <h3 class="font-semibold mb-2">Grafik Perbandingan Harga</h3>
-            <canvas id="chartPriceComparison" height="200"></canvas>
-        </div>
+            <!-- Filter Pencarian -->
+            <div class="flex flex-wrap gap-3 mb-4 items-end">
+                <div>
+                    <label class="text-xs">Cari Produk</label>
+                    <div id="pricingFilterProdukContainer" class="searchable-dropdown-wrapper w-56"></div>
+                </div>
+                <button id="applyPricingFilter" class="btn btn-primary btn-sm h-9">🔍 Tampilkan</button>
+                <button id="resetPricingFilter" class="btn btn-secondary btn-sm h-9">↺ Reset</button>
+            </div>
 
-        <!-- Riwayat Perubahan Harga -->
-        <div>
-            <h3 class="font-semibold mb-2">Riwayat Perubahan Harga</h3>
-            <div class="overflow-x-auto max-h-48 border rounded-lg bg-white dark:bg-slate-800">
+            <!-- Tabel Harga Interaktif -->
+            <div class="overflow-x-auto mb-6">
                 <table class="w-full text-sm">
-                    <thead class="bg-slate-100 dark:bg-slate-700"><tr><th class="p-2">Waktu</th><th>Produk</th><th>Detail</th></tr></thead>
-                    <tbody id="pricingHistoryTableBody">
-                        <tr><td colspan="3" class="text-center p-4 opacity-50">Belum ada perubahan.</td></tr>
-                    </tbody>
+                    <thead class="bg-slate-100 dark:bg-slate-700">
+                        <tr>
+                            <th class="p-2 text-left">Produk</th>
+                            <th class="p-2 text-right">HPP Rata²</th>
+                            <th class="p-2 text-right">Offline/kg</th>
+                            <th class="p-2 text-right">Online/kg</th>
+                            <th class="p-2 text-right">Komisi (%)</th>
+                            <th class="p-2 text-right">Grosir/kg</th>
+                            <th class="p-2 text-right">Partai/kg</th>
+                            <th class="p-2 text-right">Margin Off</th>
+                            <th class="p-2 text-right">Margin On</th>
+                            <th class="p-2 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pricingTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Simulasi Margin -->
+            <div class="card p-4 bg-slate-50 dark:bg-slate-800 rounded-lg mb-6" id="pricingMarginSimulation">
+                <p class="text-sm font-medium mb-2">Simulasi Margin</p>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                    <div><span class="opacity-60">Produk:</span> <strong id="simProduct">-</strong></div>
+                    <div><span class="opacity-60">HPP Rata²:</span> <strong id="simHPP">-</strong></div>
+                    <div></div>
+                    <div><span class="opacity-60">Harga Offline:</span> <strong id="simOffline">-</strong></div>
+                    <div><span class="opacity-60">Margin Offline:</span> <strong id="simMarginOff">-</strong></div>
+                    <div></div>
+                    <div><span class="opacity-60">Harga Online:</span> <strong id="simOnline">-</strong></div>
+                    <div><span class="opacity-60">Margin Online:</span> <strong id="simMarginOn">-</strong></div>
+                    <div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SUB‑TAB: ANALISIS ==================== -->
+        <div id="pricing-analysis" class="pricing-subtab-content hidden">
+            <h3 class="font-semibold text-lg mb-4">Analisis Harga & Margin</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div><h4 class="font-semibold mb-2">Perbandingan Harga</h4><canvas id="chartPriceComparison" height="200"></canvas></div>
+                <div><h4 class="font-semibold mb-2">Margin per Produk</h4><canvas id="chartMarginComparison" height="200"></canvas></div>
+            </div>
+            <div>
+                <h4 class="font-semibold mb-2">Tren HPP</h4><canvas id="chartHppTrend" height="150"></canvas>
+            </div>
+        </div>
+
+        <!-- ==================== SUB‑TAB: RIWAYAT ==================== -->
+        <div id="pricing-history" class="pricing-subtab-content hidden">
+            <h3 class="font-semibold text-lg mb-4">Riwayat Perubahan Harga</h3>
+            <div class="mb-4">
+                <input type="text" id="pricingHistorySearch" placeholder="Cari riwayat..." class="w-64 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+            </div>
+            <div class="overflow-x-auto max-h-96 border rounded-lg bg-white dark:bg-slate-800">
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-100 dark:bg-slate-700 sticky top-0">
+                        <tr><th class="p-2">Waktu</th><th>Produk</th><th>Detail</th></tr>
+                    </thead>
+                    <tbody id="pricingHistoryTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ==================== SUB‑TAB: VOLUME PRICING ==================== -->
+        <div id="pricing-volume" class="pricing-subtab-content hidden">
+            <h3 class="font-semibold text-lg mb-4">Harga Bertingkat (Volume)</h3>
+            <div class="flex flex-wrap gap-3 mb-4 items-end">
+                <div>
+                    <label class="text-xs">Produk</label>
+                    <div id="volumeProdukContainer" class="searchable-dropdown-wrapper w-56"></div>
+                </div>
+                <div>
+                    <button id="addVolumeTierBtn" class="btn btn-primary btn-sm h-9">+ Tambah Aturan</button>
+                </div>
+            </div>
+            <div class="overflow-x-auto border rounded-lg bg-white dark:bg-slate-800">
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-100 dark:bg-slate-700">
+                        <tr><th class="p-2">Produk</th><th class="p-2 text-right">Min. Qty (kg)</th><th class="p-2 text-right">Harga (Rp/kg)</th><th class="p-2 text-center">Aksi</th></tr>
+                    </thead>
+                    <tbody id="volumeTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ==================== SUB‑TAB: PRICE ALERTS ==================== -->
+        <div id="pricing-alerts" class="pricing-subtab-content hidden">
+            <h3 class="font-semibold text-lg mb-4">Alert Harga Otomatis</h3>
+            <div class="flex flex-wrap gap-3 mb-4 items-end">
+                <div>
+                    <label class="text-xs">Produk</label>
+                    <div id="alertProdukContainer" class="searchable-dropdown-wrapper w-56"></div>
+                </div>
+                <div>
+                    <label class="text-xs">Kondisi</label>
+                    <select id="alertCondition" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                        <option value="hpp_naik">HPP Naik &gt;</option>
+                        <option value="hpp_turun">HPP Turun &gt;</option>
+                        <option value="margin_kecil">Margin &lt;</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs">Nilai (Rp)</label>
+                    <input type="number" id="alertValue" class="w-28 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                </div>
+                <button id="addAlertBtn" class="btn btn-primary btn-sm h-9">+ Tambah Alert</button>
+            </div>
+            <div class="overflow-x-auto border rounded-lg bg-white dark:bg-slate-800">
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-100 dark:bg-slate-700">
+                        <tr><th class="p-2">Produk</th><th class="p-2">Kondisi</th><th class="p-2 text-center">Aksi</th></tr>
+                    </thead>
+                    <tbody id="alertTableBody"></tbody>
                 </table>
             </div>
         </div>
