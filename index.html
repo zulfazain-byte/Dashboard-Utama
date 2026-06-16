@@ -2523,7 +2523,7 @@
     </div>
 </div>
 
-<!-- ==================== TAB RIWAYAT (PRO) ==================== -->
+<!-- ==================== TAB RIWAYAT (PRO - FIXED LAYOUT) ==================== -->
 <div id="tab-history" class="tab-content space-y-6">
     <div class="card p-6">
         <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-clock-counter-clockwise text-amber-600"></i> Riwayat Transaksi Lengkap</h2>
@@ -2539,26 +2539,27 @@
             </div>
         </div>
 
-        <!-- Filter & Pencarian Lanjutan -->
+        <!-- Filter & Pencarian (FIXED: flex layout, export di baris terpisah) -->
         <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-                <div>
+            <!-- Baris Filter -->
+            <div class="flex flex-wrap gap-3 items-end">
+                <div class="flex-1 min-w-[140px]">
                     <label class="text-xs font-medium block mb-1">Dari Tanggal</label>
                     <input type="date" id="filterStart" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                 </div>
-                <div>
+                <div class="flex-1 min-w-[140px]">
                     <label class="text-xs font-medium block mb-1">Sampai Tanggal</label>
                     <input type="date" id="filterEnd" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                 </div>
-                <div>
+                <div class="flex-1 min-w-[160px]">
                     <label class="text-xs font-medium block mb-1">Produk</label>
                     <div id="filterProdukContainer" class="searchable-dropdown-wrapper"></div>
                 </div>
-                <div>
+                <div class="flex-1 min-w-[160px]">
                     <label class="text-xs font-medium block mb-1">Pelanggan</label>
                     <div id="filterKlienContainer" class="searchable-dropdown-wrapper"></div>
                 </div>
-                <div>
+                <div class="flex-1 min-w-[120px]">
                     <label class="text-xs font-medium block mb-1">Channel</label>
                     <select id="filterChannel" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                         <option value="">Semua</option>
@@ -2566,7 +2567,7 @@
                         <option value="offline">🏪 Offline</option>
                     </select>
                 </div>
-                <div>
+                <div class="flex-1 min-w-[120px]">
                     <label class="text-xs font-medium block mb-1">Tier</label>
                     <select id="filterTier" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                         <option value="">Semua</option>
@@ -2575,7 +2576,7 @@
                         <option value="partai">Partai</option>
                     </select>
                 </div>
-                <div>
+                <div class="flex-1 min-w-[120px]">
                     <label class="text-xs font-medium block mb-1">Pembayaran</label>
                     <select id="filterPaymentMethod" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                         <option value="">Semua</option>
@@ -2589,12 +2590,14 @@
                     <button id="applyHistoryFilter" class="btn btn-primary btn-sm h-9">🔍 Tampilkan</button>
                     <button id="resetHistoryFilter" class="btn btn-secondary btn-sm h-9">↺ Reset</button>
                 </div>
-                <div class="flex items-end gap-2 justify-end">
-                    <button id="exportHistoryCSV" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-csv"></i> CSV</button>
-                    <button id="exportHistoryExcel" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-xls"></i> Excel</button>
-                    <button id="exportHistoryPDF" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-pdf"></i> PDF</button>
-                    <button id="exportHistoryJSON" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file"></i> JSON</button>
-                </div>
+            </div>
+
+            <!-- Baris Ekspor (terpisah, rata kanan) -->
+            <div class="flex flex-wrap justify-end gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                <button id="exportHistoryCSV" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-csv"></i> CSV</button>
+                <button id="exportHistoryExcel" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-xls"></i> Excel</button>
+                <button id="exportHistoryPDF" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-pdf"></i> PDF</button>
+                <button id="exportHistoryJSON" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file"></i> JSON</button>
             </div>
             <p class="text-xs opacity-50 mt-2" id="historyFilterInfo">Menampilkan semua transaksi</p>
         </div>
