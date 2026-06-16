@@ -18,6 +18,7 @@ window.CFS = window.CFS || {};
     let thermometerChart = null;
     let heatmapChart = null;
     let forecastChart = null;
+    let calendarInstance = null;   // untuk FullCalendar
 
     // ==================== STATE ====================
     let autoRefreshTimer = null;
