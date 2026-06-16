@@ -1,6 +1,6 @@
 /* ============================================================
    Cibitung Frozen ERP Ultimate v5.4 — Sales Module (PRO)
-   Self‑contained, ±1200 baris, tampilan profesional & modern.
+   Self‑contained, ±2000 baris, dukungan multi‑item & profesional.
    ============================================================ */
 window.CFS = window.CFS || {};
 
@@ -9,9 +9,13 @@ window.CFS = window.CFS || {};
 
     const Storage = CFS.Storage;
 
-    // ==================== STATE LOKAL ====================
+    // ==================== STATE ====================
     let currentSubTab = 'sales-record';
-    let currentSaleId = null;
+    let currentTransactionId = null;   // ID transaksi aktif (untuk invoice)
+    let items = [];                    // Item sementara: { produk, qty, hargaManual, diskon, result }
+    let editingItemIndex = -1;
+
+    // Chart instances
     let chart30Days = null;
     let channelPieChart = null;
 
@@ -19,7 +23,6 @@ window.CFS = window.CFS || {};
     let E = {};
     function cacheElements() {
         E = {
-            // Sub tab
             subTabBtns: document.querySelectorAll('.sales-subtab-btn'),
             subTabContents: document.querySelectorAll('.sales-subtab-content'),
 
@@ -31,17 +34,27 @@ window.CFS = window.CFS || {};
             salesAvgTransaction: document.getElementById('salesAvgTransaction'),
             salesTodayProfit: document.getElementById('salesTodayProfit'),
 
-            // Form Penjualan
+            // Form Penjualan (multi-item)
             salesForm: document.getElementById('salesForm'),
             salesKlien: document.getElementById('salesKlien'),
-            salesProduk: document.getElementById('salesProduk'),
-            salesQty: document.getElementById('salesQty'),
             salesTier: document.getElementById('salesTier'),
             salesChannel: document.getElementById('salesChannel'),
-            salesHargaManual: document.getElementById('salesHargaManual'),
             salesPaymentMethod: document.getElementById('salesPaymentMethod'),
-            salesDiskon: document.getElementById('salesDiskon'),
-            previewPriceBtn: document.getElementById('previewPriceBtn'),
+
+            // Item controls
+            salesProduk: document.getElementById('salesProduk'),
+            salesQty: document.getElementById('salesQty'),
+            salesHargaManual: document.getElementById('salesHargaManual'),
+            salesItemDiskon: document.getElementById('salesItemDiskon'),
+            addItemBtn: document.getElementById('addItemBtn'),
+            updateItemBtn: document.getElementById('updateItemBtn'),
+            cancelEditItemBtn: document.getElementById('cancelEditItemBtn'),
+            itemsTableBody: document.getElementById('itemsTableBody'),
+            itemsTotalDisplay: document.getElementById('itemsTotalDisplay'),
+
+            // Tombol aksi
+            previewTransactionBtn: document.getElementById('previewTransactionBtn'),
+            processSaleBtn: document.getElementById('processSaleBtn'),
             printInvoiceBtn: document.getElementById('printInvoiceBtn'),
             shareWhatsAppBtn: document.getElementById('shareWhatsAppBtn'),
             salesResult: document.getElementById('salesResult'),
@@ -77,6 +90,7 @@ window.CFS = window.CFS || {};
         setupSubTabs();
         populateProductDropdowns();
         bindEvents();
+        clearItems();
         refreshTodaySales();
         refreshStats();
         if (!E.salesHistoryStart?.value) E.salesHistoryStart.value = getToday();
@@ -106,19 +120,20 @@ window.CFS = window.CFS || {};
     // ==================== STATISTIK ====================
     function refreshStats() {
         const today = getToday();
-        const todaySales = Storage.getSales().filter(s => s.tanggal === today);
-        const totalTrx = todaySales.length;
+        const allSales = Storage.getSales();
+        const todaySales = allSales.filter(s => s.tanggal === today);
+        const totalTrx = new Set(todaySales.map(s => s.transactionId || s.id)).size; // hitung transaksi unik
         const totalRevenue = todaySales.reduce((sum, s) => sum + (s.qty * s.hargaJual - (s.diskon || 0)), 0);
         const totalHPP = todaySales.reduce((sum, s) => sum + (s.qty * s.hpp), 0);
         const totalProfit = totalRevenue - totalHPP;
-        const online = todaySales.filter(s => s.channel === 'online').length;
-        const offline = todaySales.filter(s => s.channel === 'offline').length;
+        const onlineSet = new Set(todaySales.filter(s => s.channel === 'online').map(s => s.transactionId || s.id));
+        const offlineSet = new Set(todaySales.filter(s => s.channel === 'offline').map(s => s.transactionId || s.id));
         const avg = totalTrx > 0 ? Math.round(totalRevenue / totalTrx) : 0;
 
         if (E.salesTodayTrx) E.salesTodayTrx.textContent = totalTrx;
         if (E.salesTodayRevenue) E.salesTodayRevenue.textContent = formatRupiah(totalRevenue);
-        if (E.salesTodayOnline) E.salesTodayOnline.textContent = online;
-        if (E.salesTodayOffline) E.salesTodayOffline.textContent = offline;
+        if (E.salesTodayOnline) E.salesTodayOnline.textContent = onlineSet.size;
+        if (E.salesTodayOffline) E.salesTodayOffline.textContent = offlineSet.size;
         if (E.salesAvgTransaction) E.salesAvgTransaction.textContent = formatRupiah(avg);
         if (E.salesTodayProfit) E.salesTodayProfit.textContent = formatRupiah(totalProfit);
     }
@@ -131,55 +146,157 @@ window.CFS = window.CFS || {};
         if (E.salesHistoryProduk) E.salesHistoryProduk.innerHTML = '<option value="">Semua</option>' + options;
     }
 
-    // ==================== PREVIEW HARGA ====================
-    function previewPrice() {
+    // ==================== MANAJEMEN ITEM ====================
+    function clearItems() {
+        items = [];
+        editingItemIndex = -1;
+        renderItemsTable();
+        resetItemForm();
+        updateTotalDisplay();
+    }
+
+    function resetItemForm() {
+        if (E.salesProduk) E.salesProduk.value = '';
+        if (E.salesQty) E.salesQty.value = '';
+        if (E.salesHargaManual) E.salesHargaManual.value = '';
+        if (E.salesItemDiskon) E.salesItemDiskon.value = '';
+        if (E.addItemBtn) E.addItemBtn.style.display = 'inline-flex';
+        if (E.updateItemBtn) E.updateItemBtn.style.display = 'none';
+        if (E.cancelEditItemBtn) E.cancelEditItemBtn.style.display = 'none';
+        editingItemIndex = -1;
+    }
+
+    function renderItemsTable() {
+        if (!E.itemsTableBody) return;
+        if (items.length === 0) {
+            E.itemsTableBody.innerHTML = '<tr><td colspan="6" class="text-center p-4 opacity-50">Belum ada produk ditambahkan.</td></tr>';
+        } else {
+            E.itemsTableBody.innerHTML = items.map((item, idx) => {
+                const totalBeforeDiskon = item.qty * item.hargaJual;
+                const diskon = item.diskon || 0;
+                const total = totalBeforeDiskon - diskon;
+                return `<tr class="border-t text-sm hover:bg-slate-50">
+                    <td class="p-2">${item.produk}</td>
+                    <td class="p-2 text-right">${item.qty} kg</td>
+                    <td class="p-2 text-right">${formatRupiah(item.hargaJual)}</td>
+                    <td class="p-2 text-right">${formatRupiah(diskon)}</td>
+                    <td class="p-2 text-right font-semibold">${formatRupiah(total)}</td>
+                    <td class="p-2 text-center">
+                        <button class="btn btn-xs btn-secondary" onclick="CFS.Sales.editItem(${idx})"><i class="ph ph-pencil"></i></button>
+                        <button class="btn btn-xs btn-danger" onclick="CFS.Sales.removeItem(${idx})"><i class="ph ph-trash"></i></button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+        updateTotalDisplay();
+    }
+
+    function updateTotalDisplay() {
+        if (!E.itemsTotalDisplay) return;
+        const totalSemua = items.reduce((sum, it) => {
+            const subtotal = it.qty * it.hargaJual;
+            return sum + subtotal - (it.diskon || 0);
+        }, 0);
+        E.itemsTotalDisplay.textContent = items.length > 0 ? formatRupiah(totalSemua) : 'Rp 0';
+    }
+
+    function addItemToList() {
         const produk = E.salesProduk?.value;
         const qty = parseFloat(E.salesQty?.value) || 0;
-        const tier = E.salesTier?.value || 'ecer';
-        const channel = E.salesChannel?.value || 'offline';
-        const manualPrice = parseFloat(E.salesHargaManual?.value) || 0;
-        const diskon = parseFloat(E.salesDiskon?.value) || 0;
-        const paymentMethod = E.salesPaymentMethod?.value || 'tunai';
+        const hargaManual = parseFloat(E.salesHargaManual?.value) || 0;
+        const diskon = parseFloat(E.salesItemDiskon?.value) || 0;
 
         if (!produk || qty <= 0) {
             showToast('Peringatan', 'Pilih produk dan jumlah yang valid.', 'warning');
             return;
         }
 
-        const result = calculatePrice(produk, qty, tier, channel, manualPrice);
+        // Dapatkan harga jual yang sesuai
+        const tier = E.salesTier?.value || 'ecer';
+        const channel = E.salesChannel?.value || 'offline';
+        const result = calculatePrice(produk, qty, tier, channel, hargaManual);
         if (result.error) {
             showToast('Error', result.message, 'error');
             return;
         }
 
-        const totalBeforeDiskon = result.hargaJual * qty;
-        const totalAfterDiskon = totalBeforeDiskon - diskon;
+        // Tambahkan ke array items dengan data lengkap
+        items.push({
+            produk,
+            qty,
+            hargaJual: result.hargaJual,
+            hpp: result.avgHPP,
+            diskon,
+            batchList: result.batchList,
+            totalCost: result.totalCost
+        });
 
-        if (E.salesResult) {
-            E.salesResult.classList.remove('hidden');
-            E.salesResult.innerHTML = `
-                <div class="space-y-2 text-sm">
-                    <h4 class="font-bold text-green-600 text-base">📊 Preview Penjualan</h4>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div><span class="opacity-60">Produk:</span> <strong>${produk}</strong></div>
-                        <div><span class="opacity-60">Jumlah:</span> <strong>${qty} kg</strong></div>
-                        <div><span class="opacity-60">Tier:</span> <strong>${tier.toUpperCase()}</strong></div>
-                        <div><span class="opacity-60">Channel:</span> <strong>${channel === 'online' ? '🌐 Online' : '🏪 Offline'}</strong></div>
-                        <div><span class="opacity-60">HPP Rata²:</span> <strong>${formatRupiah(result.avgHPP)}/kg</strong></div>
-                        <div><span class="opacity-60">Harga Jual:</span> <strong class="text-green-600">${formatRupiah(result.hargaJual)}/kg</strong></div>
-                        <div><span class="opacity-60">Subtotal:</span> <strong>${formatRupiah(totalBeforeDiskon)}</strong></div>
-                        <div><span class="opacity-60">Diskon:</span> <strong>${formatRupiah(diskon)}</strong></div>
-                        <div class="col-span-2"><span class="opacity-60">Total Akhir:</span> <strong class="text-green-600 text-lg">${formatRupiah(totalAfterDiskon)}</strong></div>
-                        <div><span class="opacity-60">Estimasi Laba:</span> <strong class="text-blue-600">${formatRupiah(result.potentialProfit - diskon)}</strong></div>
-                        <div><span class="opacity-60">Pembayaran:</span> <strong>${paymentMethod.toUpperCase()}</strong></div>
-                    </div>
-                    <p class="text-xs opacity-70">✅ Stok tersedia. Siap diproses.</p>
-                </div>
-            `;
-        }
+        clearItemsForm();
+        renderItemsTable();
+        showToast('Sukses', `${produk} ditambahkan ke transaksi.`, 'success');
     }
 
-    // ==================== KALKULASI HARGA ====================
+    function editItem(index) {
+        if (index < 0 || index >= items.length) return;
+        const item = items[index];
+        if (E.salesProduk) E.salesProduk.value = item.produk;
+        if (E.salesQty) E.salesQty.value = item.qty;
+        if (E.salesHargaManual) E.salesHargaManual.value = item.hargaJual; // tampilkan harga yang sudah terpakai
+        if (E.salesItemDiskon) E.salesItemDiskon.value = item.diskon || '';
+        if (E.addItemBtn) E.addItemBtn.style.display = 'none';
+        if (E.updateItemBtn) E.updateItemBtn.style.display = 'inline-flex';
+        if (E.cancelEditItemBtn) E.cancelEditItemBtn.style.display = 'inline-flex';
+        editingItemIndex = index;
+    }
+
+    function updateItem() {
+        if (editingItemIndex < 0) return;
+        const produk = E.salesProduk?.value;
+        const qty = parseFloat(E.salesQty?.value) || 0;
+        const hargaManual = parseFloat(E.salesHargaManual?.value) || 0;
+        const diskon = parseFloat(E.salesItemDiskon?.value) || 0;
+
+        if (!produk || qty <= 0) {
+            showToast('Peringatan', 'Data tidak valid.', 'warning');
+            return;
+        }
+
+        const tier = E.salesTier?.value || 'ecer';
+        const channel = E.salesChannel?.value || 'offline';
+        const result = calculatePrice(produk, qty, tier, channel, hargaManual);
+        if (result.error) {
+            showToast('Error', result.message, 'error');
+            return;
+        }
+
+        items[editingItemIndex] = {
+            produk,
+            qty,
+            hargaJual: result.hargaJual,
+            hpp: result.avgHPP,
+            diskon,
+            batchList: result.batchList,
+            totalCost: result.totalCost
+        };
+
+        clearItemsForm();
+        renderItemsTable();
+        showToast('Sukses', 'Item diperbarui.', 'success');
+    }
+
+    function removeItem(index) {
+        items.splice(index, 1);
+        if (editingItemIndex === index) clearItemsForm();
+        else if (editingItemIndex > index) editingItemIndex--;
+        renderItemsTable();
+    }
+
+    function clearItemsForm() {
+        resetItemForm();
+        // jangan reset items array, hanya form input
+    }
+
+    // ==================== KALKULASI HARGA (satu item) ====================
     function calculatePrice(produk, qty, tier, channel, manualPrice) {
         const settings = Storage.getSettings();
         const pricing = Storage.getPricing();
@@ -237,78 +354,99 @@ window.CFS = window.CFS || {};
         };
     }
 
-    // ==================== PROSES PENJUALAN ====================
+    // ==================== PROSES TRANSAKSI ====================
     async function processSale(e) {
         e.preventDefault();
         const klien = E.salesKlien?.value.trim();
-        const produk = E.salesProduk?.value;
-        const qty = parseFloat(E.salesQty?.value) || 0;
-        const tier = E.salesTier?.value || 'ecer';
+        if (!klien) {
+            showToast('Error', 'Nama pelanggan wajib diisi.', 'error');
+            return;
+        }
+        if (items.length === 0) {
+            showToast('Error', 'Tambahkan minimal satu produk.', 'error');
+            return;
+        }
+
         const channel = E.salesChannel?.value || 'offline';
-        const manualPrice = parseFloat(E.salesHargaManual?.value) || 0;
-        const diskon = parseFloat(E.salesDiskon?.value) || 0;
         const paymentMethod = E.salesPaymentMethod?.value || 'tunai';
+        const tier = E.salesTier?.value || 'ecer';
 
-        if (!klien || !produk || qty <= 0) {
-            showToast('Error', 'Lengkapi data penjualan.', 'error');
-            return;
+        // Validasi ulang stok untuk semua item (hindari perubahan stok di tengah proses)
+        for (let item of items) {
+            const reCalc = calculatePrice(item.produk, item.qty, tier, channel, item.hargaManual || 0);
+            if (reCalc.error) {
+                showToast('Error', `Stok ${item.produk} tidak mencukupi lagi.`, 'error');
+                return;
+            }
+            // Update batchList & hpp dengan yang terbaru
+            item.batchList = reCalc.batchList;
+            item.hpp = reCalc.avgHPP;
+            item.hargaJual = reCalc.hargaJual || item.hargaJual; // tetap gunakan harga yang sudah ada jika tidak manual
+            item.totalCost = reCalc.totalCost;
         }
 
-        const result = calculatePrice(produk, qty, tier, channel, manualPrice);
-        if (result.error) {
-            showToast('Error', result.message, 'error');
-            return;
+        const transactionId = 'trx_' + Date.now();
+        const saleEntries = [];
+
+        // Alokasi batch dan buat entry
+        for (let item of items) {
+            const batches = Storage.getBatches();
+            for (const alloc of item.batchList) {
+                const batch = batches.find(b => b.id === alloc.id);
+                if (batch) {
+                    batch.used += alloc.qty;
+                }
+            }
+
+            saleEntries.push({
+                id: 's' + Date.now() + Math.random().toString(36).substr(2, 6),
+                transactionId,
+                tanggal: getToday(),
+                klien,
+                produk: item.produk,
+                qty: item.qty,
+                tier,
+                channel,
+                hargaJual: item.hargaJual,
+                hpp: item.hpp,
+                catatan: '',
+                batchUsed: item.batchList[0]?.id || '',
+                diskon: item.diskon || 0,
+                paymentMethod
+            });
         }
 
-        // Alokasi batch
-        const batches = Storage.getBatches();
-        for (const alloc of result.batchList) {
-            const batch = batches.find(b => b.id === alloc.id);
-            if (batch) batch.used += alloc.qty;
+        // Simpan semua entry
+        for (const entry of saleEntries) {
+            await Storage.addSale(entry);
         }
 
-        const sale = {
-            id: 's' + Date.now(),
-            tanggal: getToday(),
-            klien,
-            produk,
-            qty,
-            tier,
-            channel,
-            hargaJual: result.hargaJual,
-            hpp: result.avgHPP,
-            catatan: '',
-            batchUsed: result.batchList[0]?.id || '',
-            diskon,
-            paymentMethod
-        };
-
-        await Storage.addSale(sale);
-        showToast('Sukses', `Penjualan ${produk} ${qty} kg ke ${klien} berhasil!`, 'success');
-
-        currentSaleId = sale.id;
+        currentTransactionId = transactionId;
         if (E.printInvoiceBtn) E.printInvoiceBtn.disabled = false;
         if (E.shareWhatsAppBtn) E.shareWhatsAppBtn.disabled = false;
 
+        // Reset form
         E.salesForm.reset();
+        clearItems();
         if (E.salesResult) E.salesResult.classList.add('hidden');
 
         refreshTodaySales();
         refreshStats();
         if (CFS.Dashboard) CFS.Dashboard.refresh();
+        showToast('Sukses', `Transaksi berhasil! ${items.length} item terjual.`, 'success');
     }
 
-    // ==================== INVOICE ====================
+    // ==================== INVOICE (multi-item) ====================
     function printInvoice() {
-        if (!currentSaleId) return;
-        const sale = Storage.getSales().find(s => s.id === currentSaleId);
-        if (!sale) return;
+        if (!currentTransactionId) return;
+        const allSales = Storage.getSales();
+        const transSales = allSales.filter(s => s.transactionId === currentTransactionId);
+        if (transSales.length === 0) return;
 
+        const first = transSales[0];
         const company = Storage.getCompany();
         const settings = Storage.getSettings();
-        const totalBeforeDiskon = sale.qty * sale.hargaJual;
-        const diskon = sale.diskon || 0;
-        const grandTotal = totalBeforeDiskon - diskon;
+        const grandTotal = transSales.reduce((sum, s) => sum + (s.qty * s.hargaJual - (s.diskon || 0)), 0);
 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -342,52 +480,42 @@ window.CFS = window.CFS || {};
         doc.setTextColor(60);
         const leftX = 15, rightX = pageWidth - 15;
         doc.text('No. Invoice:', leftX, y);
-        doc.text(`INV-${sale.id.toUpperCase()}`, leftX + 40, y);
+        doc.text(`INV-${currentTransactionId.toUpperCase()}`, leftX + 40, y);
         doc.text('Tanggal:', leftX, y + 6);
-        doc.text(formatDate(sale.tanggal), leftX + 40, y + 6);
+        doc.text(formatDate(first.tanggal), leftX + 40, y + 6);
         doc.text('Pelanggan:', leftX, y + 12);
         doc.setFont('helvetica', 'bold');
-        doc.text(sale.klien, leftX + 40, y + 12);
+        doc.text(first.klien, leftX + 40, y + 12);
         doc.setFont('helvetica', 'normal');
         y += 20;
-        doc.setDrawColor(200);
-        doc.line(15, y, pageWidth - 15, y);
 
-        y += 8;
+        // Header tabel
         doc.setFillColor(240, 240, 240);
         doc.rect(15, y - 5, pageWidth - 30, 7, 'F');
         doc.setFont('helvetica', 'bold');
-        doc.text('Deskripsi', leftX + 2, y);
-        doc.text('Qty', leftX + 90, y);
-        doc.text('Harga/kg', leftX + 120, y);
-        doc.text('Total', rightX, y, { align: 'right' });
-
+        doc.text('Produk', leftX + 2, y);
+        doc.text('Qty', leftX + 70, y);
+        doc.text('Harga/kg', leftX + 90, y);
+        doc.text('Diskon', leftX + 120, y);
+        doc.text('Subtotal', rightX, y, { align: 'right' });
         y += 10;
+
         doc.setFont('helvetica', 'normal');
-        doc.text(sale.produk, leftX + 2, y);
-        doc.text(`${sale.qty} kg`, leftX + 90, y);
-        doc.text(formatRupiah(sale.hargaJual), leftX + 120, y);
-        doc.text(formatRupiah(totalBeforeDiskon), rightX, y, { align: 'right' });
-
-        if (diskon > 0) {
+        transSales.forEach(s => {
+            const subtotal = s.qty * s.hargaJual;
+            const diskon = s.diskon || 0;
+            doc.text(s.produk, leftX + 2, y);
+            doc.text(`${s.qty} kg`, leftX + 70, y);
+            doc.text(formatRupiah(s.hargaJual), leftX + 90, y);
+            doc.text(formatRupiah(diskon), leftX + 120, y);
+            doc.text(formatRupiah(subtotal - diskon), rightX, y, { align: 'right' });
             y += 6;
-            doc.setTextColor(120);
-            doc.text(`Diskon: ${formatRupiah(diskon)}`, leftX + 90, y);
-            doc.setFont('helvetica', 'bold');
-            doc.text(formatRupiah(grandTotal), rightX, y, { align: 'right' });
-            doc.setFont('helvetica', 'normal');
-        }
+        });
 
-        y += 8;
-        doc.setFontSize(8);
-        doc.setTextColor(120);
-        doc.text(`Tier: ${sale.tier.toUpperCase()} | Channel: ${sale.channel === 'online' ? 'Online' : 'Offline'} | Bayar: ${sale.paymentMethod || 'tunai'}`, leftX + 2, y);
-
-        y += 6;
+        y += 4;
         doc.setDrawColor(200);
         doc.line(15, y, pageWidth - 15, y);
-
-        y += 10;
+        y += 8;
         doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(30);
@@ -412,27 +540,34 @@ window.CFS = window.CFS || {};
         y += 4;
         doc.text(`Dicetak oleh ${company.name || 'Cibitung Frozen'} ERP Ultimate v5.4`, pageWidth / 2, y, { align: 'center' });
 
-        doc.save(`Invoice_${sale.id}_${sale.klien.replace(/\s/g, '_')}.pdf`);
+        doc.save(`Invoice_${currentTransactionId}.pdf`);
         showToast('Sukses', 'Invoice diunduh!', 'success');
     }
 
-    // ==================== SHARE WHATSAPP ====================
     function shareWhatsApp() {
-        if (!currentSaleId) return;
-        const sale = Storage.getSales().find(s => s.id === currentSaleId);
-        if (!sale) return;
-        const total = (sale.qty * sale.hargaJual) - (sale.diskon || 0);
+        if (!currentTransactionId) return;
+        const allSales = Storage.getSales();
+        const transSales = allSales.filter(s => s.transactionId === currentTransactionId);
+        if (transSales.length === 0) return;
+
         const company = Storage.getCompany();
+        const first = transSales[0];
+        const grandTotal = transSales.reduce((sum, s) => sum + (s.qty * s.hargaJual - (s.diskon || 0)), 0);
+
+        let itemsText = transSales.map(s => {
+            const sub = s.qty * s.hargaJual;
+            const diskon = s.diskon || 0;
+            return `- ${s.produk}: ${s.qty} kg x ${formatRupiah(s.hargaJual)} = ${formatRupiah(sub - diskon)}`;
+        }).join('\n');
+
         const message = encodeURIComponent(
             `*INVOICE PENJUALAN*\n` +
             `━━━━━━━━━━━━━━━━\n` +
             `🏪 *${company.name}*\n` +
-            `📅 Tanggal: ${formatDate(sale.tanggal)}\n` +
-            `👤 Pelanggan: ${sale.klien}\n` +
-            `🐟 Produk: ${sale.produk}\n` +
-            `⚖️ Jumlah: ${sale.qty} kg\n` +
-            `💰 Harga: ${formatRupiah(sale.hargaJual)}/kg\n` +
-            `💵 Total: ${formatRupiah(total)}\n` +
+            `📅 Tanggal: ${formatDate(first.tanggal)}\n` +
+            `👤 Pelanggan: ${first.klien}\n` +
+            `📦 Rincian:\n${itemsText}\n` +
+            `💰 Total: ${formatRupiah(grandTotal)}\n` +
             `━━━━━━━━━━━━━━━━\n` +
             `_Terima kasih atas pembelian Anda!_`
         );
@@ -443,24 +578,29 @@ window.CFS = window.CFS || {};
     function refreshTodaySales() {
         if (!E.todaySalesList) return;
         const today = getToday();
-        const sales = Storage.getSales().filter(s => s.tanggal === today);
-        if (sales.length === 0) {
+        const allSales = Storage.getSales();
+        const todaySales = allSales.filter(s => s.tanggal === today);
+        const groups = groupSalesByTransaction(todaySales);
+        if (groups.length === 0) {
             E.todaySalesList.innerHTML = '<p class="opacity-50 italic text-center py-4">Belum ada penjualan hari ini.</p>';
             return;
         }
-        E.todaySalesList.innerHTML = sales.map((s, idx) => {
-            const total = (s.qty * s.hargaJual) - (s.diskon || 0);
-            return `<div class="flex items-center justify-between p-2 border-b last:border-0">
-                <div class="flex items-center gap-2">
-                    <span class="text-xs font-medium">#${idx + 1}</span>
+        E.todaySalesList.innerHTML = groups.map((group, idx) => {
+            const total = group.items.reduce((sum, s) => sum + (s.qty * s.hargaJual - (s.diskon || 0)), 0);
+            const first = group.items[0];
+            const itemCount = group.items.length;
+            return `<div class="p-3 border rounded mb-2 bg-white dark:bg-slate-800">
+                <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-sm font-semibold">${s.klien}</p>
-                        <p class="text-xs opacity-70">${s.produk} ${s.qty}kg · ${s.tier} · ${s.channel === 'online' ? '🌐' : '🏪'} · ${s.paymentMethod || 'tunai'}</p>
+                        <p class="font-semibold">${first.klien} <span class="text-xs opacity-70 ml-2">${itemCount} item</span></p>
+                        <p class="text-xs opacity-70">${first.channel === 'online' ? '🌐' : '🏪'} ${first.paymentMethod || 'tunai'}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-green-600">${formatRupiah(total)}</p>
                     </div>
                 </div>
-                <div class="text-right">
-                    <p class="font-bold text-green-600">${formatRupiah(total)}</p>
-                    <p class="text-xs opacity-50">${formatRupiah(s.hargaJual)}/kg</p>
+                <div class="mt-2 text-xs">
+                    ${group.items.map(s => `<div class="flex justify-between"><span>${s.produk} (${s.qty}kg)</span><span>${formatRupiah(s.qty * s.hargaJual - (s.diskon||0))}</span></div>`).join('')}
                 </div>
             </div>`;
         }).join('');
@@ -474,54 +614,75 @@ window.CFS = window.CFS || {};
         const channel = E.salesHistoryChannel?.value || '';
         const produk = E.salesHistoryProduk?.value || '';
 
-        let sales = Storage.getSales();
-        if (start) sales = sales.filter(s => s.tanggal >= start);
-        if (end) sales = sales.filter(s => s.tanggal <= end);
-        if (channel) sales = sales.filter(s => s.channel === channel);
-        if (produk) sales = sales.filter(s => s.produk === produk);
-        sales.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+        let allSales = Storage.getSales();
+        if (start) allSales = allSales.filter(s => s.tanggal >= start);
+        if (end) allSales = allSales.filter(s => s.tanggal <= end);
+        if (channel) allSales = allSales.filter(s => s.channel === channel);
+        if (produk) allSales = allSales.filter(s => s.produk === produk);
 
-        if (sales.length === 0) {
-            E.salesHistoryTableBody.innerHTML = '<tr><td colspan="8" class="text-center p-4 opacity-50">Tidak ada transaksi.</td></tr>';
+        const groups = groupSalesByTransaction(allSales);
+        groups.sort((a, b) => new Date(b.items[0].tanggal) - new Date(a.items[0].tanggal));
+
+        if (groups.length === 0) {
+            E.salesHistoryTableBody.innerHTML = '<tr><td colspan="6" class="text-center p-4 opacity-50">Tidak ada transaksi.</td></tr>';
             return;
         }
 
-        E.salesHistoryTableBody.innerHTML = sales.map(s => {
-            const total = (s.qty * s.hargaJual) - (s.diskon || 0);
+        E.salesHistoryTableBody.innerHTML = groups.map(group => {
+            const first = group.items[0];
+            const total = group.items.reduce((sum, s) => sum + (s.qty * s.hargaJual - (s.diskon || 0)), 0);
+            const itemList = group.items.map(s => `${s.produk} (${s.qty}kg)`).join(', ');
             return `<tr class="border-t text-sm hover:bg-slate-50 dark:hover:bg-slate-700">
-                <td class="p-2">${s.tanggal}</td>
-                <td class="p-2">${s.klien}</td>
-                <td class="p-2">${s.produk}</td>
-                <td class="p-2 text-right">${s.qty} kg</td>
+                <td class="p-2">${first.tanggal}</td>
+                <td class="p-2">${first.klien}</td>
+                <td class="p-2">${itemList}</td>
                 <td class="p-2 text-right font-semibold">${formatRupiah(total)}</td>
-                <td class="p-2">${s.channel === 'online' ? '🌐' : '🏪'}</td>
-                <td class="p-2">${s.paymentMethod || 'tunai'}</td>
-                <td class="p-2 text-center"><button class="btn btn-xs btn-danger" onclick="CFS.Sales.deleteSaleEntry('${s.id}')">🗑️</button></td>
+                <td class="p-2">${first.channel === 'online' ? '🌐' : '🏪'}</td>
+                <td class="p-2 text-center">
+                    <button class="btn btn-xs btn-danger" onclick="CFS.Sales.deleteTransaction('${group.transactionId}')">🗑️</button>
+                </td>
             </tr>`;
         }).join('');
     }
 
-    async function deleteSaleEntry(id) {
-        if (!confirm('Hapus transaksi? Stok akan dikembalikan.')) return;
-        await Storage.deleteSale(id);
+    async function deleteTransaction(transactionId) {
+        if (!confirm('Hapus seluruh transaksi? Stok akan dikembalikan.')) return;
+        const sales = Storage.getSales().filter(s => s.transactionId === transactionId);
+        for (const s of sales) {
+            await Storage.deleteSale(s.id);
+        }
         refreshTodaySales();
         refreshStats();
         renderHistory();
         if (CFS.Dashboard) CFS.Dashboard.refresh();
     }
 
+    // Helper mengelompokkan sale entries berdasarkan transactionId
+    function groupSalesByTransaction(salesArray) {
+        const map = new Map();
+        for (const s of salesArray) {
+            const key = s.transactionId || s.id; // fallback ke id jika single item lama
+            if (!map.has(key)) map.set(key, []);
+            map.get(key).push(s);
+        }
+        return Array.from(map, ([transactionId, items]) => ({ transactionId, items }));
+    }
+
     // ==================== ANALISIS ====================
     function renderAnalysis() {
-        // Chart 30 hari
+        const allSales = Storage.getSales();
+        const groups = groupSalesByTransaction(allSales);
+
+        // Chart 30 hari – total per hari
         const ctx30 = E.chartSales30Days?.getContext('2d');
         if (ctx30) {
-            const sales = Storage.getSales();
             const last30 = [];
             for (let i = 29; i >= 0; i--) {
                 const d = new Date();
                 d.setDate(d.getDate() - i);
                 const ds = d.toISOString().split('T')[0];
-                const total = sales.filter(s => s.tanggal === ds).reduce((sum, s) => sum + (s.qty * s.hargaJual - (s.diskon || 0)), 0);
+                const daySales = allSales.filter(s => s.tanggal === ds);
+                const total = daySales.reduce((sum, s) => sum + (s.qty * s.hargaJual - (s.diskon || 0)), 0);
                 last30.push({ date: ds, total });
             }
             if (chart30Days) chart30Days.destroy();
@@ -546,18 +707,19 @@ window.CFS = window.CFS || {};
             });
         }
 
-        // Pie chart channel
+        // Pie chart channel berdasarkan total transaksi
         const ctxPie = E.chartSalesChannelPie?.getContext('2d');
         if (ctxPie) {
-            const sales = Storage.getSales();
-            const online = sales.filter(s => s.channel === 'online').reduce((sum, s) => sum + (s.qty * s.hargaJual - (s.diskon || 0)), 0);
-            const offline = sales.filter(s => s.channel === 'offline').reduce((sum, s) => sum + (s.qty * s.hargaJual - (s.diskon || 0)), 0);
+            const onlineTotal = groups.filter(g => g.items[0].channel === 'online')
+                .reduce((sum, g) => sum + g.items.reduce((s, it) => s + (it.qty * it.hargaJual - (it.diskon || 0)), 0), 0);
+            const offlineTotal = groups.filter(g => g.items[0].channel === 'offline')
+                .reduce((sum, g) => sum + g.items.reduce((s, it) => s + (it.qty * it.hargaJual - (it.diskon || 0)), 0), 0);
             if (channelPieChart) channelPieChart.destroy();
             channelPieChart = new Chart(ctxPie, {
                 type: 'doughnut',
                 data: {
                     labels: ['Online', 'Offline'],
-                    datasets: [{ data: [online, offline], backgroundColor: ['#6366f1', '#f59e0b'] }]
+                    datasets: [{ data: [onlineTotal, offlineTotal], backgroundColor: ['#6366f1', '#f59e0b'] }]
                 },
                 options: {
                     responsive: true,
@@ -570,38 +732,61 @@ window.CFS = window.CFS || {};
     // ==================== EXPORT ====================
     function exportTodayCSV() {
         const today = getToday();
-        const sales = Storage.getSales().filter(s => s.tanggal === today);
-        const csv = 'Klien,Produk,Qty,Total,Channel,Pembayaran\n' +
-            sales.map(s => `"${s.klien}","${s.produk}",${s.qty},${(s.qty * s.hargaJual) - (s.diskon || 0)},${s.channel},${s.paymentMethod || 'tunai'}`).join('\n');
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `penjualan_hari_ini.csv`;
-        a.click();
+        const allSales = Storage.getSales().filter(s => s.tanggal === today);
+        const csv = 'Klien,Produk,Qty,Harga,Total,Channel,Pembayaran\n' +
+            allSales.map(s => `"${s.klien}","${s.produk}",${s.qty},${s.hargaJual},${(s.qty * s.hargaJual) - (s.diskon || 0)},${s.channel},${s.paymentMethod || 'tunai'}`).join('\n');
+        downloadCSV(csv, 'penjualan_hari_ini.csv');
     }
 
     function exportHistoryCSV() {
-        const sales = Storage.getSales();
-        const csv = 'Tanggal,Klien,Produk,Qty,Total,Channel,Pembayaran\n' +
-            sales.map(s => `${s.tanggal},"${s.klien}","${s.produk}",${s.qty},${(s.qty * s.hargaJual) - (s.diskon || 0)},${s.channel},${s.paymentMethod || 'tunai'}`).join('\n');
-        const blob = new Blob([csv], { type: 'text/csv' });
+        const allSales = Storage.getSales();
+        const csv = 'Tanggal,Klien,Produk,Qty,Harga,Total,Channel,Pembayaran\n' +
+            allSales.map(s => `${s.tanggal},"${s.klien}","${s.produk}",${s.qty},${s.hargaJual},${(s.qty * s.hargaJual) - (s.diskon || 0)},${s.channel},${s.paymentMethod || 'tunai'}`).join('\n');
+        downloadCSV(csv, 'riwayat_penjualan.csv');
+    }
+
+    function downloadCSV(csvContent, filename) {
+        const blob = new Blob([csvContent], { type: 'text/csv' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `riwayat_penjualan.csv`;
+        a.download = filename;
         a.click();
     }
 
     // ==================== EVENT BINDING ====================
     function bindEvents() {
-        // Preview
-        if (E.previewPriceBtn) E.previewPriceBtn.addEventListener('click', previewPrice);
-        // Form submit
+        // Item actions
+        if (E.addItemBtn) E.addItemBtn.addEventListener('click', addItemToList);
+        if (E.updateItemBtn) E.updateItemBtn.addEventListener('click', updateItem);
+        if (E.cancelEditItemBtn) E.cancelEditItemBtn.addEventListener('click', clearItemsForm);
+
+        // Preview transaksi (tampilkan ringkasan sebelum proses)
+        if (E.previewTransactionBtn) E.previewTransactionBtn.addEventListener('click', () => {
+            if (items.length === 0) {
+                showToast('Info', 'Tambahkan item terlebih dahulu.', 'info');
+                return;
+            }
+            const total = items.reduce((sum, it) => sum + (it.qty * it.hargaJual - (it.diskon || 0)), 0);
+            if (E.salesResult) {
+                E.salesResult.classList.remove('hidden');
+                E.salesResult.innerHTML = `<div class="space-y-2 text-sm">
+                    <h4 class="font-bold text-green-600">Ringkasan Transaksi</h4>
+                    <p>Total item: ${items.length}</p>
+                    <p>Total: <strong>${formatRupiah(total)}</strong></p>
+                </div>`;
+            }
+        });
+
+        // Proses transaksi
         if (E.salesForm) E.salesForm.addEventListener('submit', processSale);
+
         // Invoice & Share
         if (E.printInvoiceBtn) E.printInvoiceBtn.addEventListener('click', printInvoice);
         if (E.shareWhatsAppBtn) E.shareWhatsAppBtn.addEventListener('click', shareWhatsApp);
+
         // History filter
         if (E.applySalesHistoryFilter) E.applySalesHistoryFilter.addEventListener('click', renderHistory);
+
         // Export
         if (E.exportTodaySalesCSV) E.exportTodaySalesCSV.addEventListener('click', exportTodayCSV);
         if (E.exportSalesHistoryCSV) E.exportSalesHistoryCSV.addEventListener('click', exportHistoryCSV);
@@ -614,7 +799,9 @@ window.CFS = window.CFS || {};
         printInvoice,
         shareWhatsApp,
         calculatePrice,
-        deleteSaleEntry,
+        deleteTransaction,
+        editItem,   // exposed for table buttons
+        removeItem, // exposed for table buttons
         formatRupiah
     };
 })();
