@@ -1918,10 +1918,14 @@
     <div class="card p-6">
         <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-wallet text-primary-600"></i> Keuangan & Akuntansi</h2>
 
-        <!-- Sub-tab Navigasi -->
+        <!-- Notifikasi Jatuh Tempo Pajak -->
+        <div id="taxDueNotification" class="hidden bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 p-3 rounded-lg mb-4 text-sm text-red-700 dark:text-red-400"></div>
+
+        <!-- Sub-tab Navigasi (diperbanyak) -->
         <div class="flex flex-wrap gap-2 mb-6 border-b pb-3">
             <button class="btn btn-sm btn-primary finance-subtab-btn active" data-finance-tab="finance-overview">📊 Ringkasan</button>
             <button class="btn btn-sm btn-secondary finance-subtab-btn" data-finance-tab="finance-expense">🧾 Beban</button>
+            <button class="btn btn-sm btn-secondary finance-subtab-btn" data-finance-tab="finance-other-income">💰 Pendapatan Lain</button>
             <button class="btn btn-sm btn-secondary finance-subtab-btn" data-finance-tab="finance-journal">📖 Buku Besar</button>
             <button class="btn btn-sm btn-secondary finance-subtab-btn" data-finance-tab="finance-cashflow">💵 Arus Kas</button>
             <button class="btn btn-sm btn-secondary finance-subtab-btn" data-finance-tab="finance-analysis">📈 Analisis</button>
@@ -1936,7 +1940,6 @@
         <!-- ==================== RINGKASAN ==================== -->
         <div id="finance-overview" class="finance-subtab-content">
             <h3 class="font-semibold text-lg mb-4">Ringkasan Keuangan</h3>
-            <!-- Filter periode -->
             <div class="flex flex-wrap gap-3 mb-4 items-end">
                 <div><label class="text-xs">Dari</label><input type="date" id="financePeriodStart" class="w-36 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
                 <div><label class="text-xs">Sampai</label><input type="date" id="financePeriodEnd" class="w-36 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
@@ -1975,6 +1978,26 @@
                         <select id="expenseFilterAkun" class="w-40 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"><option value="">Semua Akun</option></select>
                     </div>
                     <div id="recentExpensesList" class="text-sm space-y-1 max-h-64 overflow-auto"><p class="opacity-50">Belum ada beban.</p></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PENDAPATAN LAIN ==================== -->
+        <div id="finance-other-income" class="finance-subtab-content hidden">
+            <h3 class="font-semibold text-lg mb-4">Pendapatan Lain‑lain</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card p-4">
+                    <form id="otherIncomeForm" class="space-y-3">
+                        <div><label class="text-xs font-medium">Akun Pendapatan</label><select id="otherIncomeAkun" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></select></div>
+                        <div><label class="text-xs font-medium">Jumlah (Rp)</label><input type="number" id="otherIncomeJumlah" required class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                        <div><label class="text-xs font-medium">Tanggal</label><input type="date" id="otherIncomeTanggal" required class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                        <div><label class="text-xs font-medium">Deskripsi</label><input type="text" id="otherIncomeDeskripsi" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                        <button type="submit" class="btn btn-primary w-full">💾 Simpan</button>
+                    </form>
+                </div>
+                <div class="card p-4">
+                    <h4 class="font-semibold mb-2">Riwayat Pendapatan Lain</h4>
+                    <div id="otherIncomeList" class="text-sm space-y-1 max-h-64 overflow-auto"><p class="opacity-50">Belum ada data.</p></div>
                 </div>
             </div>
         </div>
@@ -2050,6 +2073,16 @@
             </div>
             <table id="taxBreakdownTable" class="w-full text-sm"></table>
             <button id="exportTaxPDF" class="btn btn-secondary mt-4">Unduh PDF</button>
+
+            <!-- Kalkulator PPN -->
+            <div class="mt-6 p-4 border rounded-lg bg-slate-50 dark:bg-slate-800">
+                <h4 class="font-semibold text-sm mb-2">Kalkulator PPN</h4>
+                <div class="flex gap-2 items-end">
+                    <div class="flex-1"><label class="text-xs">Jumlah Sebelum PPN (Rp)</label><input type="number" id="ppnCalculatorInput" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                    <button id="ppnCalculatorBtn" class="btn btn-primary btn-sm h-9">Hitung</button>
+                </div>
+                <p id="ppnCalculatorResult" class="font-semibold mt-2">PPN: Rp 0</p>
+            </div>
         </div>
 
         <!-- ==================== COA ==================== -->
@@ -2113,157 +2146,6 @@
                 <button id="exportFinancePDFBtn" class="btn btn-secondary">Laba Rugi (PDF)</button>
                 <button id="exportFinanceNeracaPDFBtn" class="btn btn-secondary">Neraca (PDF)</button>
             </div>
-        </div>
-    </div>
-</div>
-
-       <!-- ==================== TAB PENGIRIMAN (UPGRADE KOMPLEKS) ==================== -->
-<div id="tab-delivery" class="tab-content space-y-6">
-    <div class="card p-6">
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-truck-trailer text-blue-600"></i> Manajemen Pengiriman</h2>
-
-        <!-- Penjelasan -->
-        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6 text-sm flex items-start gap-3">
-            <i class="ph ph-info text-blue-600 text-xl mt-0.5"></i>
-            <div>
-                <p class="font-medium">🚚 Lacak & Kelola Pengiriman</p>
-                <p class="opacity-70 mt-1">
-                    Catat setiap pengiriman dari transaksi penjualan. Pantau status (dikemas, dikirim, sampai) dan lacak dengan nomor resi.
-                    Sistem akan menampilkan estimasi waktu tiba dan Anda dapat memperbarui status kapan saja.
-                </p>
-            </div>
-        </div>
-
-        <!-- Statistik Pengiriman -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6" id="deliveryStats">
-            <div class="card p-3 text-center"><span class="text-xs opacity-60">Total Pengiriman</span><p class="font-bold text-lg" id="delTotalPengiriman">0</p></div>
-            <div class="card p-3 text-center"><span class="text-xs opacity-60">Dikemas</span><p class="font-bold text-lg text-amber-600" id="delStatusDikemas">0</p></div>
-            <div class="card p-3 text-center"><span class="text-xs opacity-60">Dalam Perjalanan</span><p class="font-bold text-lg text-blue-600" id="delStatusDikirim">0</p></div>
-            <div class="card p-3 text-center"><span class="text-xs opacity-60">Sampai</span><p class="font-bold text-lg text-green-600" id="delStatusSampai">0</p></div>
-            <div class="card p-3 text-center"><span class="text-xs opacity-60">Rata-rata Waktu Kirim</span><p class="font-bold text-lg" id="delAvgWaktu">- hari</p></div>
-        </div>
-
-        <!-- Form Tambah Pengiriman -->
-        <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg mb-6">
-            <h3 class="font-semibold mb-3 flex items-center gap-2"><i class="ph ph-plus-circle text-green-600"></i> Catat Pengiriman Baru</h3>
-            <form id="deliveryForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="text-xs font-medium block mb-1">Transaksi Penjualan</label>
-                    <select id="deliverySale" required class="w-full">
-                        <option value="">Pilih Transaksi (ID - Pelanggan)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-xs font-medium block mb-1">Kurir / Ekspedisi</label>
-                    <select id="deliveryCourier" required class="w-full">
-                        <option value="">Pilih Kurir</option>
-                        <option value="JNE">JNE</option>
-                        <option value="J&T">J&T Express</option>
-                        <option value="SiCepat">SiCepat</option>
-                        <option value="GoSend">GoSend</option>
-                        <option value="GrabExpress">GrabExpress</option>
-                        <option value="AnterAja">AnterAja</option>
-                        <option value="POS Indonesia">POS Indonesia</option>
-                        <option value="Lainnya">Lainnya (isi manual)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-xs font-medium block mb-1">Nomor Resi / Tracking</label>
-                    <input type="text" id="deliveryTracking" placeholder="Masukkan nomor resi" class="w-full">
-                </div>
-                <div>
-                    <label class="text-xs font-medium block mb-1">Status</label>
-                    <select id="deliveryStatus" class="w-full">
-                        <option value="dikemas">📦 Dikemas</option>
-                        <option value="dikirim">🚚 Dikirim</option>
-                        <option value="sampai">✅ Sampai</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-xs font-medium block mb-1">Tanggal Kirim</label>
-                    <input type="date" id="deliveryTglKirim" class="w-full">
-                </div>
-                <div>
-                    <label class="text-xs font-medium block mb-1">Estimasi Sampai</label>
-                    <input type="date" id="deliveryEstimate" class="w-full">
-                </div>
-                <div class="col-span-full">
-                    <label class="text-xs font-medium block mb-1">Catatan</label>
-                    <input type="text" id="deliveryNotes" placeholder="Alamat khusus, instruksi, dll." class="w-full">
-                </div>
-                <div class="flex items-end justify-end col-span-full">
-                    <button type="submit" class="btn btn-primary"><i class="ph ph-check-circle"></i> Simpan Pengiriman</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Filter & Pencarian -->
-        <div class="flex flex-wrap gap-3 mb-4 items-end">
-            <div>
-                <label class="text-xs font-medium block mb-1">Dari Tanggal</label>
-                <input type="date" id="deliveryFilterStart" class="w-36">
-            </div>
-            <div>
-                <label class="text-xs font-medium block mb-1">Sampai Tanggal</label>
-                <input type="date" id="deliveryFilterEnd" class="w-36">
-            </div>
-            <div>
-                <label class="text-xs font-medium block mb-1">Status</label>
-                <select id="deliveryFilterStatus" class="w-32">
-                    <option value="">Semua Status</option>
-                    <option value="dikemas">📦 Dikemas</option>
-                    <option value="dikirim">🚚 Dikirim</option>
-                    <option value="sampai">✅ Sampai</option>
-                </select>
-            </div>
-            <div>
-                <label class="text-xs font-medium block mb-1">Kurir</label>
-                <select id="deliveryFilterKurir" class="w-36">
-                    <option value="">Semua Kurir</option>
-                    <option value="JNE">JNE</option>
-                    <option value="J&T">J&T Express</option>
-                    <option value="SiCepat">SiCepat</option>
-                    <option value="GoSend">GoSend</option>
-                    <option value="GrabExpress">GrabExpress</option>
-                    <option value="AnterAja">AnterAja</option>
-                    <option value="POS Indonesia">POS Indonesia</option>
-                    <option value="Lainnya">Lainnya</option>
-                </select>
-            </div>
-            <div>
-                <label class="text-xs font-medium block mb-1">Cari Pelanggan</label>
-                <input type="text" id="deliverySearch" placeholder="Nama pelanggan..." class="w-40">
-            </div>
-            <button id="applyDeliveryFilter" class="btn btn-primary btn-sm h-9">🔍 Tampilkan</button>
-            <button id="exportDeliveryCSV" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-csv"></i> CSV</button>
-        </div>
-
-        <!-- Tabel Riwayat Pengiriman -->
-        <div class="overflow-x-auto max-h-[400px] border rounded-lg bg-white dark:bg-slate-800">
-            <table class="w-full text-sm">
-                <thead class="bg-slate-100 dark:bg-slate-700 sticky top-0 z-10">
-                    <tr>
-                        <th class="p-2 text-left w-20">ID</th>
-                        <th class="p-2 text-left">Pelanggan</th>
-                        <th class="p-2 text-left">Produk</th>
-                        <th class="p-2 text-left">Kurir</th>
-                        <th class="p-2 text-left">Resi</th>
-                        <th class="p-2 text-left">Tgl Kirim</th>
-                        <th class="p-2 text-left">Estimasi</th>
-                        <th class="p-2 text-center">Status</th>
-                        <th class="p-2 text-center w-24">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="deliveryTableBody">
-                    <tr><td colspan="9" class="text-center p-4 opacity-50">Belum ada data pengiriman</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Pagination -->
-        <div class="flex justify-between items-center mt-3 text-sm">
-            <span class="opacity-50" id="deliveryShowingInfo">Menampilkan 0 pengiriman</span>
-            <button id="loadMoreDelivery" class="btn btn-xs btn-secondary hidden">Muat Lebih Banyak</button>
         </div>
     </div>
 </div>
