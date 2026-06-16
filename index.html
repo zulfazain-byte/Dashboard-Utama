@@ -2412,7 +2412,7 @@
         </div>
     </div>
 </div>
-        <!-- ==================== TAB AUDIT TRAIL (UPGRADE KOMPLEKS) ==================== -->
+<!-- ==================== TAB AUDIT TRAIL (PRO) ==================== -->
 <div id="tab-audit" class="tab-content space-y-6">
     <div class="card p-6">
         <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-files text-slate-600"></i> Audit Trail & Log Aktivitas</h2>
@@ -2424,7 +2424,7 @@
                 <p class="font-medium">🔍 Audit Trail Mencatat Semua Perubahan</p>
                 <p class="opacity-70 mt-1">
                     Setiap aksi penting seperti penambahan batch, penjualan, perubahan data, dan penghapusan dicatat di sini.
-                    Gunakan filter dan pencarian untuk melacak aktivitas tertentu. Log disimpan maksimal 500 entri terbaru.
+                    Gunakan filter dan pencarian untuk melacak aktivitas tertentu.
                 </p>
             </div>
         </div>
@@ -2432,65 +2432,130 @@
         <!-- Filter & Pencarian -->
         <div class="flex flex-wrap gap-3 mb-6 items-end">
             <div>
-                <label class="text-xs font-medium block mb-1">Dari Tanggal</label>
-                <input type="date" id="auditStartDate" class="w-36">
+                <label class="text-xs font-medium block mb-1">Dari</label>
+                <input type="date" id="auditStartDate" class="w-36 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
             </div>
             <div>
-                <label class="text-xs font-medium block mb-1">Sampai Tanggal</label>
-                <input type="date" id="auditEndDate" class="w-36">
+                <label class="text-xs font-medium block mb-1">Sampai</label>
+                <input type="date" id="auditEndDate" class="w-36 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
             </div>
             <div>
                 <label class="text-xs font-medium block mb-1">Kategori</label>
-                <select id="auditCategoryFilter" class="w-40">
-                    <option value="all">Semua Kategori</option>
-                    <option value="TAMBAH">Tambah Data</option>
-                    <option value="EDIT">Edit Data</option>
-                    <option value="HAPUS">Hapus Data</option>
-                    <option value="PENJUALAN">Penjualan</option>
-                    <option value="BEBAN">Beban</option>
-                    <option value="BACKUP">Backup</option>
-                    <option value="PENGATURAN">Pengaturan</option>
-                    <option value="RESET">Reset</option>
-                </select>
+                <!-- Container untuk SearchableDropdown -->
+                <div id="auditCategoryContainer" class="searchable-dropdown-wrapper w-48"></div>
             </div>
             <div>
                 <label class="text-xs font-medium block mb-1">Cari</label>
-                <input type="text" id="auditSearch" placeholder="Kata kunci..." class="w-40">
+                <input type="text" id="auditSearch" placeholder="Kata kunci..." class="w-40 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
             </div>
             <button id="applyAuditFilter" class="btn btn-primary btn-sm h-9">🔍 Tampilkan</button>
-            <button id="exportAuditCSV" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-csv"></i> CSV</button>
-            <button id="clearAuditBtn" class="btn btn-danger btn-sm h-9"><i class="ph ph-trash"></i> Bersihkan Log</button>
+            <button id="resetAuditFilter" class="btn btn-secondary btn-sm h-9">🔄 Reset</button>
         </div>
 
-        <!-- Statistik Audit -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="auditStats">
+        <!-- Statistik Audit (5 metrik) -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6" id="auditStats">
             <div class="card p-3 text-center"><span class="text-xs opacity-60">Total Log</span><p class="font-bold text-lg" id="auditTotalLog">0</p></div>
             <div class="card p-3 text-center"><span class="text-xs opacity-60">Hari Ini</span><p class="font-bold text-lg" id="auditTodayLog">0</p></div>
+            <div class="card p-3 text-center"><span class="text-xs opacity-60">Rata‑rata Harian</span><p class="font-bold text-lg" id="auditAvgDaily">0</p></div>
             <div class="card p-3 text-center"><span class="text-xs opacity-60">Aksi Terbanyak</span><p class="font-bold text-lg" id="auditTopAction">-</p></div>
             <div class="card p-3 text-center"><span class="text-xs opacity-60">Terakhir</span><p class="font-bold text-lg" id="auditLastTime">-</p></div>
         </div>
 
-        <!-- Tabel Audit Trail -->
-        <div class="overflow-x-auto max-h-[500px] border rounded-lg bg-white dark:bg-slate-800">
+        <!-- Toolbar: Display toggle, auto refresh, bulk actions -->
+        <div class="flex flex-wrap gap-2 mb-4 items-center">
+            <button id="toggleAuditDisplay" class="btn btn-secondary btn-sm">Tampilan Detail</button>
+            <button id="autoRefreshAuditToggle" class="btn btn-secondary btn-sm"><i class="ph ph-arrow-clockwise"></i> Auto Refresh</button>
+            <div class="flex-grow"></div>
+            <label class="flex items-center gap-1 text-xs cursor-pointer">
+                <input type="checkbox" id="auditSelectAll"> Pilih Semua
+            </label>
+            <button id="auditBulkDelete" class="btn btn-danger btn-xs">🗑️ Hapus</button>
+            <button id="auditBulkPin" class="btn btn-warning btn-xs">📌 Pin</button>
+            <button id="auditBulkExport" class="btn btn-secondary btn-xs">📤 Ekspor</button>
+        </div>
+
+        <!-- Pinned Logs -->
+        <div id="pinnedAuditList" class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg">
+            <h4 class="text-sm font-semibold mb-2"><i class="ph ph-star mr-1"></i> Log yang Dipin</h4>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="card p-3">
+                <h4 class="text-sm font-semibold mb-2">Aktivitas 30 Hari</h4>
+                <canvas id="chartAuditActivity" height="150"></canvas>
+            </div>
+            <div class="card p-3">
+                <h4 class="text-sm font-semibold mb-2">Kategori</h4>
+                <canvas id="chartAuditCategory" height="150"></canvas>
+            </div>
+            <div class="card p-3">
+                <h4 class="text-sm font-semibold mb-2">Per Jam</h4>
+                <canvas id="chartAuditHourly" height="150"></canvas>
+            </div>
+        </div>
+
+        <!-- Table / Timeline Container -->
+        <div class="overflow-x-auto max-h-[500px] border rounded-lg bg-white dark:bg-slate-800 mb-3">
             <table class="w-full text-sm">
                 <thead class="bg-slate-100 dark:bg-slate-700 sticky top-0 z-10">
                     <tr>
+                        <th class="p-2 text-left w-10"><input type="checkbox" id="auditSelectAllHeader" class="audit-select-all"></th>
                         <th class="p-2 text-left w-40">Waktu</th>
                         <th class="p-2 text-left w-32">Kategori</th>
                         <th class="p-2 text-left">Detail</th>
-                        <th class="p-2 text-center w-20">Aksi</th>
+                        <th class="p-2 text-center w-24">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="auditTrailTableBody">
-                    <tr><td colspan="4" class="text-center p-4 opacity-50">Memuat data...</td></tr>
+                    <tr><td colspan="5" class="text-center p-4 opacity-50">Memuat data...</td></tr>
                 </tbody>
             </table>
+            <div id="auditTimelineContainer" class="p-4 hidden"></div>
         </div>
 
         <!-- Pagination -->
-        <div class="flex justify-between items-center mt-3 text-sm">
-            <span class="opacity-50" id="auditShowingInfo">Menampilkan 0 entri</span>
+        <div class="flex justify-between items-center mb-4 text-sm">
+            <div class="flex items-center gap-2">
+                <button id="auditPrevPage" class="btn btn-xs btn-secondary" disabled>← Sebelumnya</button>
+                <span id="auditShowingInfo" class="opacity-50">Menampilkan 0 entri</span>
+                <button id="auditNextPage" class="btn btn-xs btn-secondary" disabled>Selanjutnya →</button>
+            </div>
             <button id="loadMoreAudit" class="btn btn-xs btn-secondary hidden">Muat Lebih Banyak</button>
+        </div>
+
+        <!-- Export & Clear Actions -->
+        <div class="flex flex-wrap gap-2">
+            <button id="exportAuditCSV" class="btn btn-secondary btn-sm"><i class="ph ph-file-csv"></i> CSV</button>
+            <button id="exportAuditExcel" class="btn btn-secondary btn-sm"><i class="ph ph-file-xls"></i> Excel</button>
+            <button id="exportAuditPDF" class="btn btn-secondary btn-sm"><i class="ph ph-file-pdf"></i> PDF</button>
+            <button id="exportAuditJSON" class="btn btn-secondary btn-sm"><i class="ph ph-file"></i> JSON</button>
+            <div class="flex-grow"></div>
+            <button id="clearOldAuditBtn" class="btn btn-warning btn-sm">🗑️ Hapus >30 hari</button>
+            <button id="clearAuditBtn" class="btn btn-danger btn-sm"><i class="ph ph-trash"></i> Bersihkan Semua</button>
+            <button id="undoAuditBtn" class="btn btn-secondary btn-sm">↩️ Undo Hapus Terakhir</button>
+        </div>
+
+        <!-- Detail Modal -->
+        <div id="auditDetailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded shadow-lg w-full max-w-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold">Detail Log</h3>
+                    <button id="auditDetailCloseBtn" class="text-red-500">&times;</button>
+                </div>
+                <div id="auditDetailContent"></div>
+            </div>
+        </div>
+
+        <!-- Diff Modal -->
+        <div id="auditDiffModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded shadow-lg w-full max-w-xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold">Bandingkan Log</h3>
+                    <button id="auditDiffCloseBtn" class="text-red-500">&times;</button>
+                </div>
+                <div id="auditDiffContent"></div>
+            </div>
         </div>
     </div>
 </div>
