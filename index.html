@@ -701,235 +701,380 @@
             </div>
         </div>
 
-        <!-- ==================== TAB PENJUALAN (UPGRADE KOMPLEKS) ==================== -->
-<div id="tab-sales" class="tab-content space-y-6">
-    <div class="card p-6">
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-shopping-cart text-emerald-600"></i> Penjualan</h2>
-        <p class="text-sm opacity-70 mb-4">Catat penjualan offline (toko) dan online (marketplace). Fitur lengkap dengan preview harga, invoice, dan analisis.</p>
+    <!-- ==================== TAB SALES (KASIR PRO) ==================== -->
+<div id="sales-tab-content">
+    <!-- Sub-tab Navigation -->
+    <div class="flex gap-2 mb-4 overflow-x-auto">
+        <button class="sales-subtab-btn btn btn-primary active" data-sales-tab="sales-record">🛒 Kasir</button>
+        <button class="sales-subtab-btn btn btn-secondary" data-sales-tab="sales-today">📋 Hari Ini</button>
+        <button class="sales-subtab-btn btn btn-secondary" data-sales-tab="sales-history">📜 Riwayat</button>
+        <button class="sales-subtab-btn btn btn-secondary" data-sales-tab="sales-analysis">📊 Analisis</button>
+    </div>
 
-        <!-- Statistik Penjualan -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6" id="salesStats">
-            <div class="card p-3 text-center"><span class="text-xs opacity-60">Transaksi Hari Ini</span><p class="font-bold text-lg" id="salesTodayTrx">0</p></div>
-            <div class="card p-3 text-center"><span class="text-xs opacity-60">Pendapatan Hari Ini</span><p class="font-bold text-lg text-green-600" id="salesTodayRevenue">Rp 0</p></div>
-            <div class="card p-3 text-center"><span class="text-xs opacity-60">Online</span><p class="font-bold text-lg text-indigo-600" id="salesTodayOnline">0</p></div>
-            <div class="card p-3 text-center"><span class="text-xs opacity-60">Offline</span><p class="font-bold text-lg text-amber-600" id="salesTodayOffline">0</p></div>
-            <div class="card p-3 text-center"><span class="text-xs opacity-60">Rata‑rata Transaksi</span><p class="font-bold text-lg" id="salesAvgTransaction">Rp 0</p></div>
+    <!-- Statistik Ringkas -->
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
+        <div class="bg-white dark:bg-slate-800 p-3 rounded shadow">
+            <p class="text-xs opacity-70">Transaksi Hari Ini</p>
+            <p class="text-xl font-bold" id="salesTodayTrx">0</p>
         </div>
-
-        <!-- Sub-tab Navigasi -->
-        <div class="flex flex-wrap gap-2 mb-6 border-b pb-3">
-            <button class="btn btn-sm btn-primary sales-subtab-btn active" data-sales-tab="sales-record">💰 Catat Penjualan</button>
-            <button class="btn btn-sm btn-secondary sales-subtab-btn" data-sales-tab="sales-today">📋 Hari Ini</button>
-            <button class="btn btn-sm btn-secondary sales-subtab-btn" data-sales-tab="sales-history">📜 Riwayat</button>
-            <button class="btn btn-sm btn-secondary sales-subtab-btn" data-sales-tab="sales-analysis">📊 Analisis</button>
+        <div class="bg-white dark:bg-slate-800 p-3 rounded shadow">
+            <p class="text-xs opacity-70">Pendapatan</p>
+            <p class="text-xl font-bold" id="salesTodayRevenue">Rp 0</p>
         </div>
-
-        <!-- SUB-TAB: CATAT PENJUALAN (FORM LENGKAP) -->
-        <div id="sales-record" class="sales-subtab-content">
-            <h3 class="font-semibold text-lg mb-4">Form Penjualan</h3>
-            <form id="salesForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="text-xs font-medium">Nama Klien*</label>
-                    <input type="text" id="salesKlien" placeholder="Nama pelanggan" required class="w-full">
-                </div>
-                <div>
-                    <label class="text-xs font-medium">Produk*</label>
-                    <select id="salesProduk" required class="w-full"><option value="">Pilih Produk</option></select>
-                </div>
-                <div>
-                    <label class="text-xs font-medium">Jumlah (kg)*</label>
-                    <input type="number" id="salesQty" placeholder="Jumlah" required step="0.01" class="w-full">
-                </div>
-                <div>
-                    <label class="text-xs font-medium">Tier</label>
-                    <select id="salesTier" class="w-full">
-                        <option value="ecer">Ecer</option>
-                        <option value="grosir">Grosir</option>
-                        <option value="partai">Partai Besar</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-xs font-medium">Channel</label>
-                    <select id="salesChannel" class="w-full">
-                        <option value="offline">🏪 Offline (Toko)</option>
-                        <option value="online">🌐 Online (Marketplace)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-xs font-medium">Harga Jual/kg (opsional)</label>
-                    <input type="number" id="salesHargaManual" placeholder="Kosongkan untuk otomatis" class="w-full">
-                </div>
-                <div>
-                    <label class="text-xs font-medium">Metode Pembayaran</label>
-                    <select id="salesPaymentMethod" class="w-full">
-                        <option value="tunai">Tunai</option>
-                        <option value="transfer">Transfer</option>
-                        <option value="qris">QRIS</option>
-                        <option value="cod">COD</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-xs font-medium">Diskon (Rp)</label>
-                    <input type="number" id="salesDiskon" value="0" class="w-full">
-                </div>
-                <div class="col-span-full flex flex-wrap gap-2">
-                    <button type="button" id="previewPriceBtn" class="btn btn-secondary">🔍 Preview Harga</button>
-                    <button type="submit" class="btn btn-primary">💰 Proses Penjualan</button>
-                    <button type="button" id="printInvoiceBtn" class="btn btn-secondary" disabled>🖨️ Cetak Invoice</button>
-                    <button type="button" id="shareWhatsAppBtn" class="btn btn-success btn-sm" disabled><i class="ph ph-whatsapp-logo"></i> Share WA</button>
-                </div>
-            </form>
-            <!-- Area Preview -->
-            <div id="salesResult" class="mt-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl hidden"></div>
+        <div class="bg-white dark:bg-slate-800 p-3 rounded shadow">
+            <p class="text-xs opacity-70">Online</p>
+            <p class="text-xl font-bold" id="salesTodayOnline">0</p>
         </div>
+        <div class="bg-white dark:bg-slate-800 p-3 rounded shadow">
+            <p class="text-xs opacity-70">Offline</p>
+            <p class="text-xl font-bold" id="salesTodayOffline">0</p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 p-3 rounded shadow">
+            <p class="text-xs opacity-70">Rata-rata Transaksi</p>
+            <p class="text-xl font-bold" id="salesAvgTransaction">Rp 0</p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 p-3 rounded shadow">
+            <p class="text-xs opacity-70">Laba Kotor</p>
+            <p class="text-xl font-bold text-green-600" id="salesTodayProfit">Rp 0</p>
+        </div>
+    </div>
 
-        <!-- SUB-TAB: PENJUALAN HARI INI -->
-        <div id="sales-today" class="sales-subtab-content hidden">
-            <h3 class="font-semibold text-lg mb-4">Penjualan Hari Ini</h3>
-            <div class="flex justify-between items-center mb-3">
-                <span class="text-sm opacity-70" id="todaySalesInfo">Menampilkan transaksi hari ini</span>
-                <button id="exportTodaySalesCSV" class="btn btn-xs btn-secondary"><i class="ph ph-file-csv"></i> CSV</button>
+    <!-- Sub-tab Contents -->
+    <!-- 1. KASIR (Record) -->
+    <div id="sales-record" class="sales-subtab-content">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Bagian Kiri: Form & Item -->
+            <div class="lg:col-span-2 space-y-4">
+                <form id="salesForm" class="space-y-4">
+                    <!-- Pelanggan & Pengaturan -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium">Pelanggan *</label>
+                            <input type="text" id="salesKlien" required class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600" placeholder="Nama pelanggan">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium">Tier Harga</label>
+                            <select id="salesTier" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                                <option value="ecer">Eceran</option>
+                                <option value="grosir">Grosir</option>
+                                <option value="partai">Partai</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium">Channel</label>
+                            <select id="salesChannel" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                                <option value="offline">Offline</option>
+                                <option value="online">Online</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tambah Item -->
+                    <div class="border rounded p-4 bg-gray-50 dark:bg-slate-700/50">
+                        <h4 class="font-semibold mb-2">Tambah Produk</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                            <div>
+                                <label class="text-xs">Produk</label>
+                                <div id="salesProdukContainer" class="searchable-dropdown-wrapper"></div>
+                            </div>
+                            <div>
+                                <label class="text-xs">Jumlah (kg)</label>
+                                <input type="number" id="salesQty" step="0.01" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="text-xs">Harga Manual (opsional)</label>
+                                <input type="number" id="salesHargaManual" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600" placeholder="Otomatis">
+                            </div>
+                            <div>
+                                <label class="text-xs">Diskon (Rp)</label>
+                                <input type="number" id="salesItemDiskon" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600" value="0">
+                            </div>
+                        </div>
+                        <div class="mt-3 flex gap-2">
+                            <button type="button" id="addItemBtn" class="btn btn-primary btn-sm">➕ Tambah</button>
+                            <button type="button" id="updateItemBtn" class="btn btn-warning btn-sm hidden">✏️ Update</button>
+                            <button type="button" id="cancelEditItemBtn" class="btn btn-secondary btn-sm hidden">❌ Batal</button>
+                        </div>
+                    </div>
+
+                    <!-- Tabel Item -->
+                    <div class="border rounded p-4">
+                        <h4 class="font-semibold mb-2">Daftar Belanja</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-100 dark:bg-slate-600">
+                                    <tr>
+                                        <th class="p-2 text-left">Produk</th>
+                                        <th class="p-2 text-right">Qty</th>
+                                        <th class="p-2 text-right">Harga/kg</th>
+                                        <th class="p-2 text-right">Diskon</th>
+                                        <th class="p-2 text-right">Subtotal</th>
+                                        <th class="p-2 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="itemsTableBody"></tbody>
+                            </table>
+                        </div>
+                        <div id="itemsTotalDisplay" class="mt-3 text-right"></div>
+                    </div>
+
+                    <!-- Diskon Global -->
+                    <div class="flex items-end gap-2">
+                        <div>
+                            <label class="text-xs">Diskon Global</label>
+                            <select id="globalDiscountType" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                                <option value="nominal">Nominal (Rp)</option>
+                                <option value="percentage">Persentase (%)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <input type="number" id="globalDiscountValue" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600" value="0" step="0.01">
+                        </div>
+                        <button type="button" id="applyGlobalDiscountBtn" class="btn btn-secondary btn-sm">Terapkan</button>
+                    </div>
+
+                    <!-- Pembayaran Split -->
+                    <div class="border rounded p-4">
+                        <h4 class="font-semibold mb-2">Pembayaran</h4>
+                        <div id="paymentsContainer" class="space-y-1"></div>
+                        <div class="flex justify-between mt-2 text-sm">
+                            <span>Total Dibayar: <strong id="paymentsTotalDisplay">Rp 0</strong></span>
+                            <span>Kembalian: <strong id="changeDueDisplay" class="text-green-600">Rp 0</strong></span>
+                        </div>
+                        <button type="button" id="addPaymentBtn" class="btn btn-secondary btn-sm mt-2">+ Metode Pembayaran</button>
+                    </div>
+
+                    <!-- Loyalty -->
+                    <div class="flex items-end gap-2">
+                        <div>
+                            <label class="text-xs">Poin Loyalty: <strong id="loyaltyPointsDisplay">0 pts</strong></label>
+                            <input type="number" id="loyaltyRedeemInput" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600" placeholder="Tukar (Rp)">
+                        </div>
+                        <button type="button" id="applyLoyaltyRedeemBtn" class="btn btn-info btn-sm">Tukar Poin</button>
+                    </div>
+
+                    <!-- Tombol Aksi Utama -->
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" id="previewTransactionBtn" class="btn btn-info btn-sm">👁️ Preview</button>
+                        <button type="submit" id="processSaleBtn" class="btn btn-success btn-sm">✅ Proses</button>
+                        <button type="button" id="holdTransactionBtn" class="btn btn-warning btn-sm">⏸️ Tahan</button>
+                        <button type="button" id="recallTransactionBtn" class="btn btn-secondary btn-sm">📂 Panggil</button>
+                        <button type="button" id="printInvoiceBtn" class="btn btn-primary btn-sm" disabled>🖨️ Cetak Invoice</button>
+                        <button type="button" id="shareWhatsAppBtn" class="btn btn-green btn-sm" disabled>💬 WhatsApp</button>
+                    </div>
+                </form>
+                <!-- Preview Hasil -->
+                <div id="salesResult" class="hidden p-4 bg-green-50 dark:bg-green-900/30 rounded"></div>
             </div>
-            <div id="todaySalesList" class="space-y-2 max-h-96 overflow-auto">
-                <p class="opacity-50">Belum ada penjualan hari ini.</p>
+
+            <!-- Bagian Kanan: Customer Display -->
+            <div class="lg:col-span-1">
+                <div id="customerDisplayPanel" class="sticky top-4"></div>
             </div>
         </div>
+    </div>
 
-        <!-- SUB-TAB: RIWAYAT PENJUALAN -->
-        <div id="sales-history" class="sales-subtab-content hidden">
-            <h3 class="font-semibold text-lg mb-4">Riwayat Penjualan</h3>
-            <div class="flex flex-wrap gap-3 mb-4 items-end">
-                <div><label class="text-xs font-medium">Dari</label><input type="date" id="salesHistoryStart" class="w-36"></div>
-                <div><label class="text-xs font-medium">Sampai</label><input type="date" id="salesHistoryEnd" class="w-36"></div>
-                <div><label class="text-xs font-medium">Channel</label><select id="salesHistoryChannel" class="w-32"><option value="">Semua</option><option value="offline">Offline</option><option value="online">Online</option></select></div>
-                <div><label class="text-xs font-medium">Produk</label><select id="salesHistoryProduk" class="w-36"><option value="">Semua</option></select></div>
-                <button id="applySalesHistoryFilter" class="btn btn-primary btn-sm h-9">🔍 Tampilkan</button>
-                <button id="exportSalesHistoryCSV" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-csv"></i> CSV</button>
-            </div>
-            <div class="overflow-x-auto max-h-96 border rounded-lg bg-white dark:bg-slate-800">
-                <table class="w-full text-sm">
-                    <thead class="bg-slate-100 dark:bg-slate-700 sticky top-0">
-                        <tr><th class="p-2">Tanggal</th><th>Klien</th><th>Produk</th><th class="text-right">Qty</th><th class="text-right">Total</th><th>Channel</th><th>Pembayaran</th><th class="text-center">Aksi</th></tr>
-                    </thead>
-                    <tbody id="salesHistoryTableBody"></tbody>
-                </table>
-            </div>
+    <!-- 2. HARI INI -->
+    <div id="sales-today" class="sales-subtab-content hidden">
+        <div class="flex justify-between mb-4">
+            <h3 class="text-lg font-bold">Penjualan Hari Ini</h3>
+            <button id="exportTodaySalesCSV" class="btn btn-secondary btn-sm">📥 CSV</button>
         </div>
+        <div id="todaySalesList" class="space-y-2"></div>
+    </div>
 
-        <!-- SUB-TAB: ANALISIS PENJUALAN -->
-        <div id="sales-analysis" class="sales-subtab-content hidden">
-            <h3 class="font-semibold text-lg mb-4">Analisis Penjualan</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div><h4 class="font-semibold mb-2">Tren Penjualan 30 Hari</h4><canvas id="chartSales30Days" height="200"></canvas></div>
-                <div><h4 class="font-semibold mb-2">Komposisi Channel</h4><canvas id="chartSalesChannelPie" height="200"></canvas></div>
+    <!-- 3. RIWAYAT -->
+    <div id="sales-history" class="sales-subtab-content hidden">
+        <div class="flex flex-wrap gap-3 mb-4 items-end">
+            <div>
+                <label class="text-xs">Dari</label>
+                <input type="date" id="salesHistoryStart" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+            </div>
+            <div>
+                <label class="text-xs">Sampai</label>
+                <input type="date" id="salesHistoryEnd" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+            </div>
+            <div>
+                <label class="text-xs">Channel</label>
+                <select id="salesHistoryChannel" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                    <option value="">Semua</option>
+                    <option value="offline">Offline</option>
+                    <option value="online">Online</option>
+                </select>
+            </div>
+            <div>
+                <label class="text-xs">Produk</label>
+                <select id="salesHistoryProduk" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                    <option value="">Semua</option>
+                </select>
+            </div>
+            <button id="applySalesHistoryFilter" class="btn btn-primary btn-sm">🔍 Filter</button>
+            <button id="exportSalesHistoryCSV" class="btn btn-secondary btn-sm">📥 CSV</button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-100 dark:bg-slate-600">
+                    <tr>
+                        <th class="p-2 text-left">Tanggal</th>
+                        <th class="p-2 text-left">Pelanggan</th>
+                        <th class="p-2 text-left">Produk</th>
+                        <th class="p-2 text-right">Total</th>
+                        <th class="p-2 text-center">Channel</th>
+                        <th class="p-2 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="salesHistoryTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 4. ANALISIS -->
+    <div id="sales-analysis" class="sales-subtab-content hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded shadow">
+                <h4 class="font-semibold mb-2">Pendapatan 30 Hari Terakhir</h4>
+                <canvas id="chartSales30Days" height="250"></canvas>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded shadow">
+                <h4 class="font-semibold mb-2">Pendapatan per Channel</h4>
+                <canvas id="chartSalesChannelPie" height="250"></canvas>
             </div>
         </div>
     </div>
 </div>
 
-        <!-- ========== FORM PENJUALAN (MULTI-ITEM) ========== -->
-<div id="sales-record" class="sales-subtab-content">
-    <form id="salesForm" class="space-y-4">
-        <!-- Pelanggan & Pengaturan -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-                <label class="block text-sm font-medium">Nama Pelanggan *</label>
-                <input type="text" id="salesKlien" required class="w-full border p-2 rounded">
-            </div>
-            <div>
-                <label class="block text-sm font-medium">Tier Harga</label>
-                <select id="salesTier" class="w-full border p-2 rounded">
-                    <option value="ecer">Eceran</option>
-                    <option value="grosir">Grosir</option>
-                    <option value="partai">Partai</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium">Channel</label>
-                <select id="salesChannel" class="w-full border p-2 rounded">
-                    <option value="offline">Offline</option>
-                    <option value="online">Online</option>
-                </select>
-            </div>
+<!-- ==================== MODAL RECALL TRANSAKSI DITAHAN ==================== -->
+<div id="recallModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white dark:bg-slate-800 p-6 rounded shadow-lg w-full max-w-lg max-h-[80vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold">Transaksi Ditahan</h3>
+            <button id="closeRecallModal" class="text-red-500 text-xl leading-none">&times;</button>
         </div>
-
-        <!-- Tambah Item -->
-        <div class="border rounded p-4 bg-gray-50 dark:bg-slate-700">
-            <h3 class="font-bold mb-2">Tambah Produk</h3>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div>
-                    <label class="text-xs">Produk</label>
-                    <select id="salesProduk" class="w-full border p-2 rounded">
-                        <option value="">Pilih Produk</option>
-                        <!-- Diisi oleh JavaScript -->
-                    </select>
-                </div>
-                <div>
-                    <label class="text-xs">Jumlah (kg)</label>
-                    <input type="number" id="salesQty" step="0.01" class="w-full border p-2 rounded">
-                </div>
-                <div>
-                    <label class="text-xs">Harga Manual (opsional)</label>
-                    <input type="number" id="salesHargaManual" class="w-full border p-2 rounded" placeholder="Otomatis">
-                </div>
-                <div>
-                    <label class="text-xs">Diskon (Rp)</label>
-                    <input type="number" id="salesItemDiskon" class="w-full border p-2 rounded" value="0">
-                </div>
-            </div>
-            <div class="mt-3 flex gap-2">
-                <button type="button" id="addItemBtn" class="btn btn-primary">➕ Tambah Produk</button>
-                <button type="button" id="updateItemBtn" class="btn btn-warning hidden">✏️ Update Item</button>
-                <button type="button" id="cancelEditItemBtn" class="btn btn-secondary hidden">❌ Batal</button>
-            </div>
-        </div>
-
-        <!-- Tabel Item -->
-        <div class="border rounded p-4">
-            <h3 class="font-bold mb-2">Daftar Belanja</h3>
-            <table class="w-full text-sm">
-                <thead class="bg-gray-100 dark:bg-slate-600">
-                    <tr>
-                        <th class="p-2 text-left">Produk</th>
-                        <th class="p-2 text-right">Qty</th>
-                        <th class="p-2 text-right">Harga/kg</th>
-                        <th class="p-2 text-right">Diskon</th>
-                        <th class="p-2 text-right">Subtotal</th>
-                        <th class="p-2 text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="itemsTableBody"></tbody>
-            </table>
-            <div class="mt-2 text-right font-bold text-lg">
-                Total: <span id="itemsTotalDisplay">Rp 0</span>
-            </div>
-        </div>
-
-        <!-- Pembayaran -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium">Metode Pembayaran</label>
-                <select id="salesPaymentMethod" class="w-full border p-2 rounded">
-                    <option value="tunai">Tunai</option>
-                    <option value="transfer">Transfer</option>
-                    <option value="qris">QRIS</option>
-                    <option value="tempo">Tempo</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Tombol Aksi Utama -->
-        <div class="flex flex-wrap gap-3">
-            <button type="button" id="previewTransactionBtn" class="btn btn-info">👁️ Preview</button>
-            <button type="submit" id="processSaleBtn" class="btn btn-success">✅ Proses Penjualan</button>
-            <button type="button" id="printInvoiceBtn" class="btn btn-primary" disabled>🖨️ Cetak Invoice</button>
-            <button type="button" id="shareWhatsAppBtn" class="btn btn-success" disabled>💬 WhatsApp</button>
-        </div>
-    </form>
-
-    <!-- Area Hasil Preview -->
-    <div id="salesResult" class="mt-4 hidden p-4 bg-green-50 dark:bg-green-900 rounded"></div>
+        <div id="heldTransactionsList" class="space-y-2"></div>
+    </div>
 </div>
+
+<!-- ==================== MODAL REFUND ==================== -->
+<div id="refundModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white dark:bg-slate-800 p-6 rounded shadow-lg w-full max-w-md">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold">Retur / Refund</h3>
+            <button id="closeRefundModal" class="text-red-500 text-xl leading-none">&times;</button>
+        </div>
+        <div class="space-y-3">
+            <input type="hidden" id="refundTransactionId">
+            <div>
+                <label class="text-sm">Pilih Produk</label>
+                <select id="refundItemSelect" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></select>
+            </div>
+            <div>
+                <label class="text-sm">Jumlah Retur (kg)</label>
+                <input type="number" id="refundQty" step="0.01" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600" placeholder="0">
+            </div>
+            <div>
+                <label class="text-sm">Alasan</label>
+                <input type="text" id="refundReason" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600" placeholder="Alasan retur">
+            </div>
+            <button type="button" id="processRefundBtn" class="btn btn-danger w-full">Proses Retur</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== STYLE TAMBAHAN (opsional) ==================== -->
+<style>
+    /* Searchable Dropdown Styles (inject via JS juga, tapi bisa ditambahkan di sini) */
+    .searchable-dropdown {
+        position: relative;
+        width: 100%;
+    }
+    .searchable-dropdown .dropdown-display {
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        padding: 0.5rem 2rem 0.5rem 0.75rem;
+        background: white;
+        cursor: pointer;
+        min-height: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .dark .searchable-dropdown .dropdown-display {
+        background: #334155;
+        border-color: #475569;
+        color: white;
+    }
+    .searchable-dropdown .dropdown-display::after {
+        content: '▾';
+        position: absolute;
+        right: 0.75rem;
+        pointer-events: none;
+    }
+    .searchable-dropdown .dropdown-options {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        max-height: 15rem;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #d1d5db;
+        border-top: none;
+        border-radius: 0 0 0.375rem 0.375rem;
+        z-index: 50;
+        display: none;
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        margin-top: -1px;
+    }
+    .dark .searchable-dropdown .dropdown-options {
+        background: #1e293b;
+        border-color: #475569;
+        color: white;
+    }
+    .searchable-dropdown .dropdown-search {
+        position: sticky;
+        top: 0;
+        background: white;
+        padding: 0.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .dark .searchable-dropdown .dropdown-search {
+        background: #1e293b;
+        border-color: #475569;
+    }
+    .searchable-dropdown .dropdown-search input {
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 0.25rem;
+        padding: 0.25rem 0.5rem;
+        background: white;
+    }
+    .dark .searchable-dropdown .dropdown-search input {
+        background: #334155;
+        border-color: #475569;
+        color: white;
+    }
+    .searchable-dropdown .dropdown-option {
+        padding: 0.5rem 0.75rem;
+        cursor: pointer;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    .dark .searchable-dropdown .dropdown-option {
+        border-bottom-color: #334155;
+    }
+    .searchable-dropdown .dropdown-option:hover {
+        background-color: #f3f4f6;
+    }
+    .dark .searchable-dropdown .dropdown-option:hover {
+        background-color: #334155;
+    }
+    .searchable-dropdown .dropdown-option.selected {
+        background-color: #e0f2fe;
+        font-weight: 500;
+    }
+</style>
 
        <!-- ==================== TAB PEMBELIAN (UPGRADE KOMPLEKS) ==================== -->
 <div id="tab-purchase" class="tab-content space-y-6">
