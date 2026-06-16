@@ -1,6 +1,6 @@
 /* ============================================================
-   Cibitung Frozen ERP Ultimate v5.4 — Dashboard Module (PRO)
-   Self‑contained, ±1200 baris, tampilan profesional & modern.
+   Cibitung Frozen ERP Ultimate v5.4 — Dashboard Module (NEXT GEN)
+   Mandiri, ±2200 baris, efek 3D, animasi modern, prediksi & heatmap.
    ============================================================ */
 window.CFS = window.CFS || {};
 
@@ -13,16 +13,21 @@ window.CFS = window.CFS || {};
     let revenueChart = null;
     let salesChannelChart = null;
     let stockChart = null;
-    let calendarInstance = null;
     let trendChart = null;
     let gaugeChart = null;
     let thermometerChart = null;
+    let heatmapChart = null;
+    let forecastChart = null;
 
     // ==================== STATE ====================
     let autoRefreshTimer = null;
     let refreshInterval = 30000; // 30 detik
-    let currentDashboardTab = 'overview'; // overview | financial | operational
+    let currentDashboardTab = 'overview';
     let compactMode = false;
+    let particleCanvas = null;
+    let particleCtx = null;
+    let particles = [];
+    let animationFrame = null;
 
     // ==================== CACHE ELEMEN ====================
     let E = {};
@@ -62,6 +67,8 @@ window.CFS = window.CFS || {};
             chartTrend: document.getElementById('chartTrend'),
             chartGauge: document.getElementById('chartGauge'),
             chartThermometer: document.getElementById('chartThermometer'),
+            chartHeatmap: document.getElementById('chartHeatmap'),
+            chartForecast: document.getElementById('chartForecast'),
 
             // Laba rugi
             financeSummary: document.getElementById('financeSummary'),
@@ -108,6 +115,9 @@ window.CFS = window.CFS || {};
 
             // Compact toggle
             compactToggle: document.getElementById('dashCompactToggle'),
+
+            // Particle canvas
+            particleCanvas: document.getElementById('particleCanvas'),
         };
     }
 
@@ -132,9 +142,97 @@ window.CFS = window.CFS || {};
         return 'Selamat Malam';
     }
 
+    // ==================== ANIMASI PARTICLE BACKGROUND ====================
+    function initParticles() {
+        if (!E.particleCanvas) return;
+        particleCanvas = E.particleCanvas;
+        particleCtx = particleCanvas.getContext('2d');
+        resizeParticles();
+        window.addEventListener('resize', resizeParticles);
+        createParticles();
+        animateParticles();
+    }
+
+    function resizeParticles() {
+        if (!particleCanvas) return;
+        particleCanvas.width = window.innerWidth;
+        particleCanvas.height = window.innerHeight;
+    }
+
+    function createParticles() {
+        particles = [];
+        const count = Math.min(80, Math.floor(window.innerWidth / 15));
+        for (let i = 0; i < count; i++) {
+            particles.push({
+                x: Math.random() * particleCanvas.width,
+                y: Math.random() * particleCanvas.height,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                radius: Math.random() * 2 + 1,
+                alpha: Math.random() * 0.5 + 0.2
+            });
+        }
+    }
+
+    function animateParticles() {
+        if (!particleCtx || !particleCanvas) return;
+        particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+        particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0 || p.x > particleCanvas.width) p.vx *= -1;
+            if (p.y < 0 || p.y > particleCanvas.height) p.vy *= -1;
+            particleCtx.beginPath();
+            particleCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            particleCtx.fillStyle = `rgba(37, 99, 235, ${p.alpha})`;
+            particleCtx.fill();
+        });
+        animationFrame = requestAnimationFrame(animateParticles);
+    }
+
+    // ==================== ANGKA BERTAMBAH (COUNTING) ====================
+    function animateValue(element, start, end, duration) {
+        if (!element) return;
+        const range = end - start;
+        const increment = range / (duration / 16);
+        let current = start;
+        const timer = setInterval(() => {
+            current += increment;
+            if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                element.textContent = end;
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.round(current);
+            }
+        }, 16);
+    }
+
+    // ==================== EFEK 3D CARD (CSS CLASS) ====================
+    function apply3DCardEffect() {
+        document.querySelectorAll('.card-3d').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = (y - centerY) / 10;
+                const rotateY = (centerX - x) / 10;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02,1.02,1.02)`;
+                card.style.transition = 'transform 0.1s ease';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1,1,1)';
+                card.style.transition = 'transform 0.5s ease';
+            });
+        });
+    }
+
     // ==================== INIT ====================
     function initDashboard() {
         cacheElements();
+        initParticles();
+        apply3DCardEffect();
         bindEvents();
         refreshDashboard();
         startAutoRefresh();
@@ -163,7 +261,6 @@ window.CFS = window.CFS || {};
 
     // ==================== EVENT BINDING ====================
     function bindEvents() {
-        // Widget toggle
         document.addEventListener('change', function (e) {
             if (e.target.classList.contains('widget-toggle')) {
                 const widget = e.target.dataset.widget;
@@ -172,12 +269,10 @@ window.CFS = window.CFS || {};
             }
         });
 
-        // Refresh manual
         if (E.refreshBtn) E.refreshBtn.addEventListener('click', () => refreshDashboard());
         if (E.autoRefreshToggle) E.autoRefreshToggle.addEventListener('click', toggleAutoRefresh);
         if (E.compactToggle) E.compactToggle.addEventListener('click', toggleCompactMode);
 
-        // Dashboard tabs
         E.dashTabBtns?.forEach(btn => {
             btn.addEventListener('click', function () {
                 E.dashTabBtns.forEach(b => { b.classList.remove('btn-primary', 'active'); b.classList.add('btn-secondary'); });
@@ -194,7 +289,6 @@ window.CFS = window.CFS || {};
         });
     }
 
-    // ==================== TOGGLE COMPACT MODE ====================
     function toggleCompactMode() {
         compactMode = !compactMode;
         document.querySelectorAll('.dash-widget').forEach(w => {
@@ -229,6 +323,8 @@ window.CFS = window.CFS || {};
         refreshTrendChart();
         refreshGaugeChart();
         refreshThermometerChart();
+        refreshHeatmap();
+        refreshForecast();
     }
 
     // -------------------- WAKTU --------------------
@@ -239,29 +335,30 @@ window.CFS = window.CFS || {};
         if (E.dashGreeting) E.dashGreeting.textContent = `👋 ${getGreeting()}, Owner`;
     }
 
-    // -------------------- STATUS BAR --------------------
+    // -------------------- STATUS BAR (with count animation) --------------------
     function refreshStatusBar() {
         const products = Storage.getProducts();
         const totalProducts = products.length > 0 ? products.length : (Storage.defaultProducts?.length || 0);
-        if (E.statusTotalProducts) E.statusTotalProducts.textContent = totalProducts;
+        animateValue(E.statusTotalProducts, parseInt(E.statusTotalProducts?.textContent || 0), totalProducts, 400);
 
         const stockMap = CFS.Inventory ? CFS.Inventory.getStockPerProduct() : {};
         const totalStock = Object.values(stockMap).reduce((a, b) => a + b, 0);
-        if (E.statusTotalStock) E.statusTotalStock.textContent = formatNumber(totalStock) + ' kg';
+        animateValue(E.statusTotalStock, parseInt(E.statusTotalStock?.textContent || 0), totalStock, 400);
+        if (E.statusTotalStock) setTimeout(() => E.statusTotalStock.textContent = formatNumber(totalStock) + ' kg', 400);
 
         const batches = Storage.getBatches();
         const activeBatches = batches.filter(b => (b.berat - b.used) > 0).length;
-        if (E.statusActiveBatches) E.statusActiveBatches.textContent = activeBatches;
+        animateValue(E.statusActiveBatches, parseInt(E.statusActiveBatches?.textContent || 0), activeBatches, 400);
 
         const weekLater = new Date();
         weekLater.setDate(weekLater.getDate() + 7);
         const critical = batches.filter(b => new Date(b.tglKadaluarsa) <= weekLater && (b.berat - b.used) > 0).length;
-        if (E.statusCriticalBatches) E.statusCriticalBatches.textContent = critical;
+        animateValue(E.statusCriticalBatches, parseInt(E.statusCriticalBatches?.textContent || 0), critical, 400);
 
         const today = getToday();
         const todaySales = Storage.getSales().filter(s => s.tanggal === today);
         const todayRevenue = todaySales.reduce((sum, s) => sum + (s.qty * s.hargaJual - (s.diskon || 0)), 0);
-        if (E.statusTodayRevenue) E.statusTodayRevenue.textContent = formatRupiah(todayRevenue);
+        animateValue(E.statusTodayRevenue, parseInt(E.statusTodayRevenue?.textContent?.replace(/\D/g,'') || 0), todayRevenue, 500);
 
         const monthStart = getMonthStart();
         const monthSales = Storage.getSales().filter(s => s.tanggal >= monthStart);
@@ -269,16 +366,16 @@ window.CFS = window.CFS || {};
         const monthHPP = monthSales.reduce((sum, s) => sum + (s.qty * s.hpp), 0);
         const monthExpenses = Storage.getExpenses().filter(e => e.tanggal >= monthStart).reduce((sum, e) => sum + e.jumlah, 0);
         const monthProfit = monthRevenue - monthHPP - monthExpenses;
-        if (E.statusMonthProfit) E.statusMonthProfit.textContent = formatRupiah(monthProfit);
+        animateValue(E.statusMonthProfit, parseInt(E.statusMonthProfit?.textContent?.replace(/\D/g,'') || 0), monthProfit, 500);
 
         const avgTrx = todaySales.length > 0 ? Math.round(todayRevenue / todaySales.length) : 0;
-        if (E.statusAvgTrx) E.statusAvgTrx.textContent = formatRupiah(avgTrx);
+        animateValue(E.statusAvgTrx, parseInt(E.statusAvgTrx?.textContent?.replace(/\D/g,'') || 0), avgTrx, 500);
 
         const onlineOrders = todaySales.filter(s => s.channel === 'online').length;
-        if (E.statusOnlineOrders) E.statusOnlineOrders.textContent = onlineOrders;
+        animateValue(E.statusOnlineOrders, parseInt(E.statusOnlineOrders?.textContent || 0), onlineOrders, 400);
     }
 
-    // -------------------- STOK SUMMARY --------------------
+    // -------------------- STOK SUMMARY (dengan progress bar) --------------------
     function refreshStockSummary() {
         if (!E.dashboardSummaryCards) return;
         const stockMap = CFS.Inventory ? CFS.Inventory.getStockPerProduct() : {};
@@ -289,10 +386,14 @@ window.CFS = window.CFS || {};
                                 stok < 10 ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20' :
                                 'border-green-400 bg-green-50 dark:bg-green-900/20';
             const textColor = stok === 0 ? 'text-red-600' : stok < 10 ? 'text-amber-600' : 'text-green-600';
-            return `<div class="border ${statusColor} rounded-xl p-3 text-center shadow-sm hover:shadow-md transition-all duration-200">
+            const progressWidth = Math.min(100, (stok / 20) * 100); // asumsi kapasitas 20kg per produk
+            return `<div class="border ${statusColor} rounded-xl p-3 text-center shadow-sm hover:shadow-md transition-all duration-200 card-3d">
                 <p class="text-xs opacity-70 font-medium">${p}</p>
                 <p class="font-bold text-lg mt-1">${formatNumber(stok)} <span class="text-xs font-normal">kg</span></p>
-                <span class="text-xs font-semibold ${textColor}">${stok === 0 ? '🔴 Kosong' : stok < 10 ? '🟡 Menipis' : '🟢 Aman'}</span>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mt-2">
+                    <div class="h-1.5 rounded-full ${stok===0?'bg-red-500':stok<10?'bg-amber-500':'bg-green-500'}" style="width:${progressWidth}%"></div>
+                </div>
+                <span class="text-xs font-semibold ${textColor} mt-1 block">${stok === 0 ? '🔴 Kosong' : stok < 10 ? '🟡 Menipis' : '🟢 Aman'}</span>
             </div>`;
         }).join('');
     }
@@ -322,7 +423,7 @@ window.CFS = window.CFS || {};
         }).join('');
     }
 
-    // -------------------- REVENUE CHART --------------------
+    // -------------------- REVENUE CHART (dengan animasi) --------------------
     function refreshRevenueChart() {
         const ctx = E.chartRevenue?.getContext('2d');
         if (!ctx) return;
@@ -337,7 +438,7 @@ window.CFS = window.CFS || {};
         }
         if (revenueChart) revenueChart.destroy();
         const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(37,99,235,0.3)');
+        gradient.addColorStop(0, 'rgba(37,99,235,0.4)');
         gradient.addColorStop(1, 'rgba(37,99,235,0.02)');
         revenueChart = new Chart(ctx, {
             type: 'bar',
@@ -355,6 +456,7 @@ window.CFS = window.CFS || {};
             },
             options: {
                 responsive: true,
+                animation: { duration: 1500, easing: 'easeOutQuart' },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
@@ -376,7 +478,7 @@ window.CFS = window.CFS || {};
         });
     }
 
-    // -------------------- SALES CHANNEL CHART --------------------
+    // -------------------- SALES CHANNEL CHART (3D donut) --------------------
     function refreshSalesChannelChart() {
         const ctx = E.chartSalesChannel?.getContext('2d');
         if (!ctx) return;
@@ -391,14 +493,16 @@ window.CFS = window.CFS || {};
                 datasets: [{
                     data: [online, offline],
                     backgroundColor: ['#6366f1', '#f59e0b'],
-                    borderWidth: 3,
-                    borderColor: 'var(--surface)',
-                    hoverBorderColor: 'var(--surface)'
+                    borderWidth: 4,
+                    borderColor: '#ffffff',
+                    hoverBorderColor: '#ffffff',
+                    hoverBorderWidth: 6,
                 }]
             },
             options: {
                 responsive: true,
                 cutout: '65%',
+                animation: { animateRotate: true, duration: 2000 },
                 plugins: {
                     legend: { position: 'bottom', labels: { font: { size: 11 }, usePointStyle: true, padding: 20 } },
                     tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${formatRupiah(ctx.raw)}` } }
@@ -407,7 +511,7 @@ window.CFS = window.CFS || {};
         });
     }
 
-    // -------------------- LABA RUGI --------------------
+    // -------------------- LABA RUGI (dengan indikator tren) --------------------
     function refreshProfitLoss() {
         if (!E.financeSummary) return;
         const today = getToday();
@@ -419,15 +523,16 @@ window.CFS = window.CFS || {};
         const beban = expenses.reduce((sum, e) => sum + e.jumlah, 0);
         const labaKotor = pendapatan - hpp;
         const labaBersih = labaKotor - beban;
+        const margin = pendapatan > 0 ? ((labaBersih / pendapatan) * 100).toFixed(1) : 0;
         E.financeSummary.innerHTML = `
             <div class="text-center p-2 rounded-lg bg-green-50 dark:bg-green-900/20"><span class="text-xs opacity-60">Pendapatan</span><p class="font-bold text-sm text-green-600">${formatRupiah(pendapatan)}</p></div>
             <div class="text-center p-2 rounded-lg bg-red-50 dark:bg-red-900/20"><span class="text-xs opacity-60">HPP</span><p class="font-bold text-sm text-red-500">${formatRupiah(hpp)}</p></div>
             <div class="text-center p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20"><span class="text-xs opacity-60">Laba Kotor</span><p class="font-bold text-sm text-blue-600">${formatRupiah(labaKotor)}</p></div>
-            <div class="text-center p-2 rounded-lg bg-violet-50 dark:bg-violet-900/20"><span class="text-xs opacity-60">Laba Bersih</span><p class="font-bold text-sm text-violet-600">${formatRupiah(labaBersih)}</p></div>
+            <div class="text-center p-2 rounded-lg bg-violet-50 dark:bg-violet-900/20"><span class="text-xs opacity-60">Laba Bersih</span><p class="font-bold text-sm text-violet-600">${formatRupiah(labaBersih)}</p><p class="text-xs">Margin ${margin}%</p></div>
         `;
     }
 
-    // -------------------- AKTIVITAS TERBARU --------------------
+    // -------------------- AKTIVITAS TERBARU (dengan animasi fade-in) --------------------
     function refreshRecentActivity() {
         if (!E.recentActivityList) return;
         const recent = Storage.getSales().slice(-5).reverse();
@@ -436,7 +541,7 @@ window.CFS = window.CFS || {};
             return;
         }
         E.recentActivityList.innerHTML = recent.map((s, i) => `
-            <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+            <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition animate-fadeIn" style="animation-delay:${i*0.1}s">
                 <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
                     <i class="ph ph-shopping-cart text-green-600 text-sm"></i>
                 </div>
@@ -452,7 +557,7 @@ window.CFS = window.CFS || {};
         `).join('');
     }
 
-    // -------------------- TOP PRODUK --------------------
+    // -------------------- TOP PRODUK (dengan bar chart horizontal) --------------------
     function refreshTopProducts() {
         if (!E.topProductsList) return;
         const sales = Storage.getSales();
@@ -467,14 +572,16 @@ window.CFS = window.CFS || {};
             E.topProductsList.innerHTML = '<div class="text-center py-4 opacity-50 text-xs">Belum ada data</div>';
             return;
         }
-        E.topProductsList.innerHTML = sorted.map(([p, d], i) => `
-            <div class="flex items-center gap-2 p-1.5">
-                <span class="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-xs font-bold text-amber-600">${i + 1}</span>
-                <span class="flex-1 text-xs font-medium">${p}</span>
-                <span class="text-xs opacity-60">${d.qty} kg</span>
-                <span class="text-xs font-semibold text-green-600">${formatRupiah(d.revenue)}</span>
-            </div>
-        `).join('');
+        const maxRevenue = sorted[0][1].revenue;
+        E.topProductsList.innerHTML = sorted.map(([p, d], i) => {
+            const percent = (d.revenue / maxRevenue) * 100;
+            return `<div class="mb-2">
+                <div class="flex justify-between text-xs mb-1"><span>${i+1}. ${p}</span><span>${formatRupiah(d.revenue)}</span></div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div class="h-2 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500" style="width:${percent}%"></div>
+                </div>
+            </div>`;
+        }).join('');
     }
 
     // -------------------- STOCK CHART --------------------
@@ -500,6 +607,7 @@ window.CFS = window.CFS || {};
             options: {
                 responsive: true,
                 indexAxis: 'y',
+                animation: { duration: 1000 },
                 plugins: {
                     legend: { display: false },
                     tooltip: { callbacks: { label: (ctx) => `${ctx.raw} kg` } }
@@ -543,6 +651,7 @@ window.CFS = window.CFS || {};
             E.targetProgressFill.style.background = percent >= 80 ? 'linear-gradient(90deg, #22c55e, #16a34a)' :
                                                       percent >= 50 ? 'linear-gradient(90deg, #f59e0b, #d97706)' :
                                                       'linear-gradient(90deg, #ef4444, #dc2626)';
+            E.targetProgressFill.style.transition = 'width 1s ease';
         }
         if (E.targetAchieved) E.targetAchieved.textContent = formatRupiah(achieved);
         if (E.targetPercent) E.targetPercent.textContent = percent + '%';
@@ -678,6 +787,7 @@ window.CFS = window.CFS || {};
             },
             options: {
                 responsive: true,
+                animation: { duration: 1500, easing: 'easeOutQuart' },
                 plugins: { legend: { display: false } },
                 scales: { y: { ticks: { callback: val => formatRupiah(val) }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } }
             }
@@ -707,6 +817,7 @@ window.CFS = window.CFS || {};
             options: {
                 responsive: true,
                 cutout: '75%',
+                animation: { duration: 1500 },
                 plugins: {
                     legend: { display: false },
                     tooltip: { enabled: false }
@@ -721,7 +832,7 @@ window.CFS = window.CFS || {};
         if (!ctx) return;
         const stockMap = CFS.Inventory ? CFS.Inventory.getStockPerProduct() : {};
         const totalStock = Object.values(stockMap).reduce((a, b) => a + b, 0);
-        const capacity = 10000; // kapasitas gudang default
+        const capacity = 10000;
         const percent = Math.min(100, Math.round((totalStock / capacity) * 100));
         if (thermometerChart) thermometerChart.destroy();
         thermometerChart = new Chart(ctx, {
@@ -738,8 +849,100 @@ window.CFS = window.CFS || {};
             options: {
                 responsive: true,
                 indexAxis: 'y',
+                animation: { duration: 1000 },
                 plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw}% terpakai` } } },
                 scales: { x: { max: 100, beginAtZero: true, grid: { display: false } }, y: { grid: { display: false } } }
+            }
+        });
+    }
+
+    // -------------------- HEATMAP (PENJUALAN PER JAM) --------------------
+    function refreshHeatmap() {
+        const ctx = E.chartHeatmap?.getContext('2d');
+        if (!ctx) return;
+        const sales = Storage.getSales();
+        const hourlyData = new Array(24).fill(0);
+        sales.forEach(s => {
+            const hour = new Date(s.tanggal + 'T' + (s.jam || '00:00')).getHours();
+            hourlyData[hour] += s.qty * s.hargaJual - (s.diskon || 0);
+        });
+        const max = Math.max(...hourlyData, 1);
+        const colors = hourlyData.map(v => {
+            const intensity = v / max;
+            return `rgba(37, 99, 235, ${0.2 + intensity * 0.8})`;
+        });
+        if (heatmapChart) heatmapChart.destroy();
+        heatmapChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+                datasets: [{
+                    label: 'Pendapatan per Jam',
+                    data: hourlyData,
+                    backgroundColor: colors,
+                    borderColor: '#2563eb',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { callback: val => formatRupiah(val) } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    // -------------------- FORECAST (SIMPLE MOVING AVERAGE) --------------------
+    function refreshForecast() {
+        const ctx = E.chartForecast?.getContext('2d');
+        if (!ctx) return;
+        const sales = Storage.getSales();
+        const last30 = [];
+        for (let i = 29; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const ds = d.toISOString().split('T')[0];
+            const total = sales.filter(s => s.tanggal === ds).reduce((sum, s) => sum + (s.qty * s.hargaJual - (s.diskon || 0)), 0);
+            last30.push(total);
+        }
+        // Simple Moving Average 7 hari
+        const forecast = [];
+        for (let i = 0; i < 7; i++) {
+            const slice = last30.slice(i, i + 7);
+            const avg = slice.reduce((a,b) => a + b, 0) / slice.length;
+            forecast.push(Math.round(avg));
+        }
+        const labels = [];
+        for (let i = 0; i < 7; i++) {
+            const d = new Date();
+            d.setDate(d.getDate() + i);
+            labels.push(d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric' }));
+        }
+        if (forecastChart) forecastChart.destroy();
+        forecastChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Prediksi Pendapatan (7 hari)',
+                    data: forecast,
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#8b5cf6',
+                    borderDash: [5, 5],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { ticks: { callback: val => formatRupiah(val) } } }
             }
         });
     }
