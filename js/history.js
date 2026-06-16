@@ -1,6 +1,6 @@
 /* ============================================================
    Cibitung Frozen ERP Ultimate v5.4 — History Module (PRO)
-   Mandiri, ±2000 baris, modern & kaya fitur.
+   Fixed & Polished – Ekspor, Chart, Bookmark, Edit, Undo.
    ============================================================ */
 window.CFS = window.CFS || {};
 
@@ -135,14 +135,13 @@ window.CFS = window.CFS || {};
     let E = {};
     function cacheElements() {
         E = {
-            filterForm: document.getElementById('filterTransaksi'),
+            filterStart: document.getElementById('filterStart'),
+            filterEnd: document.getElementById('filterEnd'),
             filterProdukContainer: document.getElementById('filterProdukContainer'),
             filterKlienContainer: document.getElementById('filterKlienContainer'),
             filterChannel: document.getElementById('filterChannel'),
             filterTier: document.getElementById('filterTier'),
             filterPaymentMethod: document.getElementById('filterPaymentMethod'),
-            filterStart: document.getElementById('filterStart'),
-            filterEnd: document.getElementById('filterEnd'),
             applyFilterBtn: document.getElementById('applyHistoryFilter'),
             resetFilterBtn: document.getElementById('resetHistoryFilter'),
 
@@ -352,7 +351,7 @@ window.CFS = window.CFS || {};
             }
         }
 
-        // Render cards (alternate view)
+        // Render cards
         const cardsContainer = document.getElementById('historyCardsContainer');
         if (cardsContainer) {
             cardsContainer.innerHTML = pageSales.map(s => {
@@ -387,8 +386,7 @@ window.CFS = window.CFS || {};
     // ==================== DETAIL MODAL ====================
     function showDetail(id) {
         const sale = Storage.getSales().find(s => s.id === id);
-        if (!sale) return;
-        if (!E.detailModal) return;
+        if (!sale || !E.detailModal) return;
         const total = (sale.qty * sale.hargaJual) - (sale.diskon || 0);
         const margin = total - sale.qty * sale.hpp;
         E.detailContent.innerHTML = `
@@ -598,17 +596,37 @@ window.CFS = window.CFS || {};
     }
 
     // ==================== EXPORT ====================
-    function exportCSV(sales) {
+    function getFilteredSales() {
+        return applyFilter(Storage.getSales(), getFilterParams());
+    }
+
+    function exportCSV() {
+        const sales = getFilteredSales();
+        if (sales.length === 0) {
+            showToast('Info', 'Tidak ada data untuk diekspor.', 'info');
+            return;
+        }
         const rows = [['Tanggal','Klien','Produk','Qty','Total','Channel','Tier','Pembayaran','Diskon','HPP','Margin']];
         sales.forEach(s => {
             const total = s.qty * s.hargaJual - (s.diskon || 0);
             const margin = total - s.qty * s.hpp;
             rows.push([s.tanggal, s.klien, s.produk, s.qty, total, s.channel, s.tier, s.paymentMethod||'tunai', s.diskon||0, s.hpp, margin]);
         });
-        downloadCSV(rows.map(r => r.join(',')).join('\n'), `riwayat_${getToday()}.csv`);
+        const csvContent = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+        downloadBlob(csvContent, `riwayat_${getToday()}.csv`, 'text/csv');
+        showToast('Sukses', 'CSV diunduh.', 'success');
     }
 
-    function exportExcel(sales) {
+    function exportExcel() {
+        if (typeof XLSX === 'undefined') {
+            showToast('Error', 'Library Excel (XLSX) tidak tersedia.', 'error');
+            return;
+        }
+        const sales = getFilteredSales();
+        if (sales.length === 0) {
+            showToast('Info', 'Tidak ada data untuk diekspor.', 'info');
+            return;
+        }
         const data = [['Tanggal','Klien','Produk','Qty','Total','Channel','Tier','Pembayaran','Diskon','HPP','Margin']];
         sales.forEach(s => {
             const total = s.qty * s.hargaJual - (s.diskon || 0);
@@ -619,9 +637,19 @@ window.CFS = window.CFS || {};
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Riwayat');
         XLSX.writeFile(wb, `riwayat_${getToday()}.xlsx`);
+        showToast('Sukses', 'Excel diunduh.', 'success');
     }
 
-    function exportPDF(sales) {
+    function exportPDF() {
+        if (typeof window.jspdf === 'undefined') {
+            showToast('Error', 'Library PDF (jsPDF) tidak tersedia.', 'error');
+            return;
+        }
+        const sales = getFilteredSales();
+        if (sales.length === 0) {
+            showToast('Info', 'Tidak ada data untuk diekspor.', 'info');
+            return;
+        }
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         doc.setFontSize(16);
@@ -630,22 +658,30 @@ window.CFS = window.CFS || {};
         let y = 30;
         sales.slice(0, 100).forEach(s => {
             if (y > 280) { doc.addPage(); y = 20; }
-            doc.text(`${formatDate(s.tanggal)} - ${s.klien} - ${s.produk} - ${formatRupiah(s.qty * s.hargaJual - (s.diskon||0))}`, 15, y);
+            const total = s.qty * s.hargaJual - (s.diskon || 0);
+            doc.text(`${formatDate(s.tanggal)} - ${s.klien} - ${s.produk} - ${formatRupiah(total)}`, 15, y);
             y += 7;
         });
         doc.save(`riwayat_${getToday()}.pdf`);
+        showToast('Sukses', 'PDF diunduh.', 'success');
     }
 
-    function exportJSON(sales) {
+    function exportJSON() {
+        const sales = getFilteredSales();
+        if (sales.length === 0) {
+            showToast('Info', 'Tidak ada data untuk diekspor.', 'info');
+            return;
+        }
         const blob = new Blob([JSON.stringify(sales, null, 2)], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = `riwayat_${getToday()}.json`;
         a.click();
+        showToast('Sukses', 'JSON diunduh.', 'success');
     }
 
-    function downloadCSV(content, filename) {
-        const blob = new Blob([content], { type: 'text/csv' });
+    function downloadBlob(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = filename;
@@ -696,10 +732,10 @@ window.CFS = window.CFS || {};
         if (E.undoBtn) E.undoBtn.addEventListener('click', undoDelete);
         if (E.undoListBtn) E.undoListBtn.addEventListener('click', clearUndoStack);
 
-        if (E.exportCsvBtn) E.exportCsvBtn.addEventListener('click', () => exportCSV(applyFilter(Storage.getSales(), getFilterParams())));
-        if (E.exportExcelBtn) E.exportExcelBtn.addEventListener('click', () => exportExcel(applyFilter(Storage.getSales(), getFilterParams())));
-        if (E.exportPdfBtn) E.exportPdfBtn.addEventListener('click', () => exportPDF(applyFilter(Storage.getSales(), getFilterParams())));
-        if (E.exportJsonBtn) E.exportJsonBtn.addEventListener('click', () => exportJSON(applyFilter(Storage.getSales(), getFilterParams())));
+        if (E.exportCsvBtn) E.exportCsvBtn.addEventListener('click', exportCSV);
+        if (E.exportExcelBtn) E.exportExcelBtn.addEventListener('click', exportExcel);
+        if (E.exportPdfBtn) E.exportPdfBtn.addEventListener('click', exportPDF);
+        if (E.exportJsonBtn) E.exportJsonBtn.addEventListener('click', exportJSON);
 
         if (E.toggleDisplayBtn) E.toggleDisplayBtn.addEventListener('click', () => {
             displayMode = displayMode === 'table' ? 'cards' : 'table';
@@ -725,7 +761,6 @@ window.CFS = window.CFS || {};
         await loadBookmarks();
         bindEvents();
 
-        // Setup searchable dropdowns
         if (E.filterProdukContainer) {
             const products = Storage.getProducts().length ? Storage.getProducts().map(p => p.name) : Storage.defaultProducts;
             new SearchableDropdown(E.filterProdukContainer, [{value:'',label:'Semua Produk'},...products.map(p => ({value:p,label:p}))], { placeholder: 'Pilih Produk' });
@@ -735,7 +770,6 @@ window.CFS = window.CFS || {};
             new SearchableDropdown(E.filterKlienContainer, [{value:'',label:'Semua Pelanggan'},...customers.map(c => ({value:c,label:c}))], { placeholder: 'Pilih Pelanggan' });
         }
 
-        // Default filter 30 hari
         const today = new Date();
         const thirtyDaysAgo = new Date(today);
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
