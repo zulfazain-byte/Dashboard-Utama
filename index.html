@@ -2086,21 +2086,25 @@
         </div>
 
         <!-- ==================== COA ==================== -->
-        <div id="finance-coa" class="finance-subtab-content hidden">
-            <h3 class="font-semibold text-lg mb-4">Chart of Accounts</h3>
-            <div class="flex gap-2 mb-4">
-                <input type="text" id="newCoaKode" placeholder="Kode" class="w-20 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
-                <input type="text" id="newCoaNama" placeholder="Nama Akun" class="flex-1 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
-                <select id="newCoaTipe" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
-                    <option value="aset">Aset</option><option value="kewajiban">Kewajiban</option><option value="ekuitas">Ekuitas</option><option value="pendapatan">Pendapatan</option><option value="beban">Beban</option>
-                </select>
-                <button id="addCoaBtn" class="btn btn-primary">Tambah</button>
-            </div>
-            <table class="w-full text-sm">
-                <thead><tr><th class="p-2">Kode</th><th>Nama</th><th>Tipe</th><th>Aksi</th></tr></thead>
-                <tbody id="coaTableBody"></tbody>
-            </table>
-        </div>
+<div id="finance-coa" class="finance-subtab-content hidden">
+    <h3 class="font-semibold text-lg mb-4">Chart of Accounts</h3>
+    <div class="flex gap-2 mb-4">
+        <input type="text" id="newCoaKode" placeholder="Kode" class="w-20 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+        <input type="text" id="newCoaNama" placeholder="Nama Akun" class="flex-1 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+        <select id="newCoaTipe" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+            <option value="aset">Aset</option>
+            <option value="kewajiban">Kewajiban</option>
+            <option value="ekuitas">Ekuitas</option>
+            <option value="pendapatan">Pendapatan</option>
+            <option value="beban">Beban</option>
+        </select>
+        <button id="addCoaBtn" class="btn btn-primary">Tambah</button>
+    </div>
+    <table class="w-full text-sm">
+        <thead><tr><th class="p-2">Kode</th><th>Nama</th><th>Tipe</th><th>Aksi</th></tr></thead>
+        <tbody id="coaTableBody"></tbody>
+    </table>
+</div>
 
         <!-- ==================== ANGGARAN ==================== -->
         <div id="finance-budget" class="finance-subtab-content hidden">
