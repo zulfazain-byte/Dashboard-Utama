@@ -388,23 +388,29 @@
     <!-- ==================== MAIN CONTENT AREA ==================== -->
     <main class="flex-1 min-w-0">
 
-       <!-- ==================== TAB DASHBOARD (LENGKAP & KOMPAK) ==================== -->
+<!-- ==================== TAB DASHBOARD (NEXT GEN) ==================== -->
 <div id="tab-dashboard" class="tab-content active space-y-4">
+    <!-- Canvas untuk animasi particle background -->
+    <canvas id="particleCanvas" class="fixed top-0 left-0 w-full h-full -z-10 opacity-20 pointer-events-none"></canvas>
+
     <!-- Header Selamat Datang -->
-    <div class="card p-4 flex flex-wrap items-center gap-3">
+    <div class="card p-4 flex flex-wrap items-center gap-3 card-3d">
         <div>
-            <h2 class="text-xl font-bold">👋 Selamat Datang, Owner</h2>
+            <h2 class="text-xl font-bold" id="dashGreeting">👋 Selamat Datang, Owner</h2>
             <p class="text-xs opacity-70">Ringkasan operasional hari ini · Real‑time</p>
         </div>
         <div class="flex flex-wrap gap-2 ml-auto">
             <span class="badge bg-primary-100 text-primary-700 text-xs"><i class="ph ph-calendar mr-1"></i> <span id="dashDate"></span></span>
             <span class="badge bg-green-100 text-green-700 text-xs"><i class="ph ph-check-circle mr-1"></i> Sistem Aktif</span>
             <span class="badge bg-amber-100 text-amber-700 text-xs hide-mobile"><i class="ph ph-clock mr-1"></i> Update: <span id="lastUpdate">sekarang</span></span>
+            <button id="dashRefreshBtn" class="btn btn-xs btn-secondary">🔄 Refresh</button>
+            <button id="dashAutoRefreshToggle" class="btn btn-xs btn-secondary"><i class="ph ph-arrow-clockwise"></i> Auto Refresh: ON</button>
+            <button id="dashCompactToggle" class="btn btn-xs btn-secondary">📐 Compact</button>
         </div>
     </div>
 
     <!-- Status Bar (7 metrik penting) -->
-    <div class="card p-3 grid grid-cols-2 md:grid-cols-7 gap-3 text-sm" id="statusBar">
+    <div class="card p-3 grid grid-cols-2 md:grid-cols-7 gap-3 text-sm card-3d" id="statusBar">
         <div class="text-center"><span class="text-xs opacity-60">Total Produk</span><p class="font-bold text-base" id="statusTotalProducts">9</p></div>
         <div class="text-center"><span class="text-xs opacity-60">Stok Total</span><p class="font-bold text-base" id="statusTotalStock">0 kg</p></div>
         <div class="text-center"><span class="text-xs opacity-60">Batch Aktif</span><p class="font-bold text-base" id="statusActiveBatches">0</p></div>
@@ -415,7 +421,7 @@
     </div>
 
     <!-- Widget Toggles (lebih banyak) -->
-    <div class="card p-2 flex flex-wrap items-center gap-2 text-xs fade-in">
+    <div class="card p-2 flex flex-wrap items-center gap-2 text-xs fade-in card-3d">
         <span class="font-medium opacity-60 mr-1">Widget:</span>
         <label class="widget-toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="stockSummary" checked> Stok</label>
         <label class="widget-toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="expiringBatches" checked> Expired</label>
@@ -432,46 +438,48 @@
         <label class="widget-toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="supplierSummary" checked> Supplier</label>
         <label class="widget-toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="notificationPreview" checked> Notif</label>
         <label class="widget-toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="recentOrders" checked> Order</label>
+        <label class="widget-toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="heatmapWidget" checked> Heatmap</label>
+        <label class="widget-toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" class="widget-toggle" data-widget="forecastWidget" checked> Forecast</label>
     </div>
 
-    <!-- Baris 1: Ringkasan Stok & Batch Expired (compact) -->
+    <!-- Baris 1: Ringkasan Stok & Batch Expired -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div id="widget-stockSummary" class="card p-3 fade-in">
+        <div id="widget-stockSummary" class="card p-3 fade-in card-3d">
             <div class="flex justify-between mb-2">
                 <h3 class="font-semibold text-sm flex items-center gap-1"><i class="ph ph-fish text-primary-600"></i> Stok Ikan</h3>
                 <button onclick="switchTab('tab-stock')" class="text-xs text-primary-600">Detail →</button>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-2" id="dashboardSummaryCards"></div>
         </div>
-        <div id="widget-expiringBatches" class="card p-3 fade-in">
+        <div id="widget-expiringBatches" class="card p-3 fade-in card-3d">
             <h3 class="font-semibold text-sm text-red-600 mb-2"><i class="ph ph-warning"></i> ⚠ Batch Hampir Kadaluarsa</h3>
             <div id="expiringBatches" class="text-xs space-y-1 max-h-24 overflow-auto"></div>
         </div>
     </div>
 
-    <!-- Baris 2: Grafik & Laba Rugi -->
+    <!-- Baris 2: Grafik Pendapatan & Laba Rugi -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div id="widget-revenueChart" class="card p-4 fade-in">
+        <div id="widget-revenueChart" class="card p-4 fade-in card-3d">
             <h3 class="font-semibold text-sm mb-2"><i class="ph ph-chart-line-up text-green-600"></i> Pendapatan 7 Hari</h3>
             <canvas id="chartRevenue" height="160"></canvas>
         </div>
-        <div id="widget-profitLoss" class="card p-4 fade-in">
+        <div id="widget-profitLoss" class="card p-4 fade-in card-3d">
             <h3 class="font-semibold text-sm mb-2"><i class="ph ph-chart-pie text-violet-600"></i> Laba Rugi Bulan Ini</h3>
             <div class="grid grid-cols-2 gap-2" id="financeSummary"></div>
         </div>
     </div>
 
-    <!-- Baris 3: Aktivitas, Top Produk, Aksi Cepat, Grafik Stok (compact grid) -->
+    <!-- Baris 3: Aktivitas, Top Produk, Aksi Cepat, Grafik Stok -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div id="widget-recentActivity" class="card p-3 fade-in">
+        <div id="widget-recentActivity" class="card p-3 fade-in card-3d">
             <h3 class="font-semibold text-sm mb-2"><i class="ph ph-activity text-slate-600"></i> Aktivitas Terbaru</h3>
             <div id="recentActivityList" class="text-xs space-y-1 max-h-32 overflow-auto"><p class="opacity-50">-</p></div>
         </div>
-        <div id="widget-topProducts" class="card p-3 fade-in">
+        <div id="widget-topProducts" class="card p-3 fade-in card-3d">
             <h3 class="font-semibold text-sm mb-2"><i class="ph ph-medal text-amber-600"></i> Top 5 Produk</h3>
             <div id="topProductsList" class="text-xs space-y-1"><p class="opacity-50">-</p></div>
         </div>
-        <div id="widget-quickActions" class="card p-3 fade-in">
+        <div id="widget-quickActions" class="card p-3 fade-in card-3d">
             <h3 class="font-semibold text-sm mb-2"><i class="ph ph-lightning text-amber-600"></i> Aksi Cepat</h3>
             <div class="flex flex-wrap gap-2">
                 <button onclick="switchTab('tab-stock')" class="btn btn-primary btn-xs">+ Stok</button>
@@ -481,23 +489,23 @@
                 <button onclick="switchTab('tab-reports')" class="btn btn-secondary btn-xs">Laporan</button>
             </div>
         </div>
-        <div id="widget-stockChart" class="card p-3 fade-in">
+        <div id="widget-stockChart" class="card p-3 fade-in card-3d">
             <h3 class="font-semibold text-sm mb-2"><i class="ph ph-chart-bar text-blue-600"></i> Grafik Stok</h3>
             <canvas id="chartStockProduct" height="130"></canvas>
         </div>
     </div>
 
-    <!-- Baris 4: Channel Chart, Delivery, Target, Supplier, Notifikasi (compact) -->
+    <!-- Baris 4: Channel Chart, Delivery, Target, Supplier, Notifikasi -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <div id="widget-salesChannelChart" class="card p-3 fade-in">
+        <div id="widget-salesChannelChart" class="card p-3 fade-in card-3d">
             <h3 class="font-semibold text-xs mb-2"><i class="ph ph-storefront text-purple-600"></i> Channel</h3>
             <canvas id="chartSalesChannel" height="110"></canvas>
         </div>
-        <div id="widget-deliveryStatus" class="card p-3 fade-in">
+        <div id="widget-deliveryStatus" class="card p-3 fade-in card-3d">
             <h3 class="font-semibold text-xs mb-2"><i class="ph ph-truck text-blue-600"></i> Pengiriman</h3>
             <div id="deliveryStatusList" class="text-xs space-y-1 max-h-24 overflow-auto"><p class="opacity-50">-</p></div>
         </div>
-        <div id="widget-targetSales" class="card p-3 fade-in">
+        <div id="widget-targetSales" class="card p-3 fade-in card-3d">
             <h3 class="font-semibold text-xs mb-2"><i class="ph ph-target text-red-600"></i> Target</h3>
             <div class="text-xs">
                 <p>Target: <strong id="targetSalesValue">Rp 50jt</strong></p>
@@ -505,19 +513,19 @@
                 <p class="mt-1 opacity-70"><span id="targetAchieved">Rp 0</span> (<span id="targetPercent">0%</span>)</p>
             </div>
         </div>
-        <div id="widget-supplierSummary" class="card p-3 fade-in">
+        <div id="widget-supplierSummary" class="card p-3 fade-in card-3d">
             <h3 class="font-semibold text-xs mb-2"><i class="ph ph-buildings text-cyan-600"></i> Supplier</h3>
             <div id="topSuppliersList" class="text-xs space-y-1"><p class="opacity-50">-</p></div>
         </div>
-        <div id="widget-notificationPreview" class="card p-3 fade-in">
+        <div id="widget-notificationPreview" class="card p-3 fade-in card-3d">
             <h3 class="font-semibold text-xs mb-2"><i class="ph ph-bell text-red-500"></i> Notifikasi</h3>
             <div id="notifPreviewList" class="text-xs space-y-1"><p class="opacity-50">-</p></div>
         </div>
     </div>
 
-    <!-- Baris 5: Tabel Transaksi Hari Ini & Kalender (compact) -->
+    <!-- Baris 5: Tabel Transaksi Hari Ini & Kalender -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div id="widget-recentOrders" class="card p-3 fade-in">
+        <div id="widget-recentOrders" class="card p-3 fade-in card-3d">
             <h3 class="font-semibold text-sm mb-2"><i class="ph ph-list-checks text-emerald-600"></i> Transaksi Hari Ini</h3>
             <div class="overflow-x-auto max-h-36">
                 <table class="w-full text-xs">
@@ -526,18 +534,30 @@
                 </table>
             </div>
         </div>
-        <div id="widget-calendarWidget" class="card p-3 fade-in">
+        <div id="widget-calendarWidget" class="card p-3 fade-in card-3d">
             <h3 class="font-semibold text-sm mb-2"><i class="ph ph-calendar text-purple-600"></i> Kalender</h3>
             <div id="dashboardCalendar" class="text-xs"></div>
         </div>
     </div>
 
+    <!-- Baris 6: Heatmap & Forecast (FITUR BARU NEXT GEN) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div id="widget-heatmapWidget" class="card p-4 fade-in card-3d">
+            <h3 class="font-semibold text-sm mb-2"><i class="ph ph-chart-bar text-orange-500"></i> Heatmap Penjualan per Jam</h3>
+            <canvas id="chartHeatmap" height="150"></canvas>
+        </div>
+        <div id="widget-forecastWidget" class="card p-4 fade-in card-3d">
+            <h3 class="font-semibold text-sm mb-2"><i class="ph ph-trend-up text-indigo-500"></i> Prediksi Pendapatan 7 Hari</h3>
+            <canvas id="chartForecast" height="150"></canvas>
+        </div>
+    </div>
+
     <!-- Tips -->
-    <div class="card p-3 fade-in text-xs opacity-70">
+    <div class="card p-3 fade-in text-xs opacity-70 card-3d">
         <p><i class="ph ph-lightbulb text-yellow-600"></i> <strong>Tips:</strong> Gunakan <strong>Preview Harga</strong> sebelum menjual · Backup mingguan · Pantau <strong>Stock Opname</strong> rutin.</p>
     </div>
 </div>
-
+        
         <!-- ==================== TAB STOK & BATCH (UPGRADE KOMPLEKS) ==================== -->
 <div id="tab-stock" class="tab-content space-y-6">
     <div class="card p-6">
