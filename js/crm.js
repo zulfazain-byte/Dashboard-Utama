@@ -1,6 +1,7 @@
 /* ============================================================
    Cibitung Frozen ERP Ultimate v5.4 — CRM Module (EXTENDED)
    Mandiri, ±2000 baris, mobile‑friendly, fitur kaya.
+   Perbaikan: bulkAction dibuat async untuk menghindari SyntaxError.
    ============================================================ */
 window.CFS = window.CFS || {};
 
@@ -12,14 +13,14 @@ window.CFS = window.CFS || {};
     // ==================== STATE LOKAL ====================
     let currentSubTab = 'crm-list';
     let customerFilter = { name: '', channel: '', status: '', tier: '' };
-    let customerSort = { field: 'totalSpent', order: 'desc' }; // sorting
+    let customerSort = { field: 'totalSpent', order: 'desc' };
     let selectedCustomerNames = new Set();
     let currentPage = 1;
     const PER_PAGE = 30;
 
     // Extended CRM data
-    let customerSegments = [];           // user-defined segments
-    let customerLoyaltyTiers = [];       // configurable loyalty tiers
+    let customerSegments = [];
+    let customerLoyaltyTiers = [];
     let segmentChartInstance = null;
     let channelChartInstance = null;
     let frequencyChartInstance = null;
@@ -31,7 +32,7 @@ window.CFS = window.CFS || {};
     class SearchableDropdown {
         constructor(container, options = [], settings = {}) {
             this.container = container;
-            this.options = options; // [{value, label}]
+            this.options = options;
             this.settings = Object.assign({
                 placeholder: 'Pilih...',
                 searchPlaceholder: 'Cari...',
@@ -141,7 +142,6 @@ window.CFS = window.CFS || {};
             subTabBtns: document.querySelectorAll('.crm-subtab-btn'),
             subTabContents: document.querySelectorAll('.crm-subtab-content'),
 
-            // Stats
             crmTotalCustomers: document.getElementById('crmTotalCustomers'),
             crmTotalRevenue: document.getElementById('crmTotalRevenue'),
             crmActiveCustomers: document.getElementById('crmActiveCustomers'),
@@ -149,7 +149,6 @@ window.CFS = window.CFS || {};
             crmNewThisMonth: document.getElementById('crmNewThisMonth'),
             crmChurnRisk: document.getElementById('crmChurnRisk'),
 
-            // List
             crmSearchName: document.getElementById('crmSearchName'),
             crmFilterChannel: document.getElementById('crmFilterChannel'),
             crmFilterStatus: document.getElementById('crmFilterStatus'),
@@ -175,7 +174,6 @@ window.CFS = window.CFS || {};
             crmBulkStatus: document.getElementById('crmBulkStatus'),
             crmBulkStatusSelect: document.getElementById('crmBulkStatusSelect'),
 
-            // Customer Detail Modal / Quick View
             customerQuickView: document.getElementById('customerQuickView'),
             qvName: document.getElementById('qvName'),
             qvTotal: document.getElementById('qvTotal'),
@@ -186,7 +184,6 @@ window.CFS = window.CFS || {};
             qvPhone: document.getElementById('qvPhone'),
             qvCloseBtn: document.getElementById('qvCloseBtn'),
 
-            // Segmentation
             crmSegTop: document.getElementById('crmSegTop'),
             crmSegRegular: document.getElementById('crmSegRegular'),
             crmSegNew: document.getElementById('crmSegNew'),
@@ -195,7 +192,6 @@ window.CFS = window.CFS || {};
             chartCrmSegment: document.getElementById('chartCrmSegment'),
             crmTop5Table: document.getElementById('crmTop5Table'),
 
-            // Analysis
             chartCrmChannel: document.getElementById('chartCrmChannel'),
             chartCrmFrequency: document.getElementById('chartCrmFrequency'),
             chartCrmRFM: document.getElementById('chartCrmRFM'),
@@ -206,14 +202,12 @@ window.CFS = window.CFS || {};
             anaCrmRepeatRate: document.getElementById('anaCrmRepeatRate'),
             anaCrmAvgDaysBetween: document.getElementById('anaCrmAvgDaysBetween'),
 
-            // Loyalty Tiers config
             loyaltyTierTable: document.getElementById('loyaltyTierTable'),
             newTierName: document.getElementById('newTierName'),
             newTierMinTotal: document.getElementById('newTierMinTotal'),
             newTierColor: document.getElementById('newTierColor'),
             addTierBtn: document.getElementById('addTierBtn'),
 
-            // Custom Segments
             segmentTable: document.getElementById('segmentTable'),
             newSegName: document.getElementById('newSegName'),
             newSegCondition: document.getElementById('newSegCondition'),
@@ -246,8 +240,6 @@ window.CFS = window.CFS || {};
     }
 
     function getExtendedCustomerData(name) {
-        // Data tambahan seperti segmentasi, tier loyalty, dll.
-        // Bisa disimpan via localforage atau di Storage. Kita pakai Storage dengan key khusus.
         const extData = Storage.getKey ? Storage.getKey('crm_extended_data') : {};
         return extData[name] || {};
     }
@@ -282,7 +274,6 @@ window.CFS = window.CFS || {};
     }
 
     function getCustomerTier(customer) {
-        // Menggunakan loyaltyTiers untuk menentukan tier berdasarkan totalSpent
         const tiers = customerLoyaltyTiers.slice().sort((a, b) => b.minTotal - a.minTotal);
         for (let tier of tiers) {
             if ((customer.totalSpent || 0) >= tier.minTotal) return tier.name;
@@ -329,7 +320,7 @@ window.CFS = window.CFS || {};
         const days90ago = getDaysAgo(90);
         const churnRisk = names.filter(n => {
             const last = customers[n].lastPurchase;
-            return last && last >= days90ago && last < days30ago; // declining but not yet churned
+            return last && last >= days90ago && last < days30ago;
         }).length;
 
         if (E.crmTotalCustomers) E.crmTotalCustomers.textContent = total;
@@ -381,7 +372,6 @@ window.CFS = window.CFS || {};
             });
         }
         if (filter.tier) {
-            // tier bisa dari loyalty config
             names = names.filter(n => {
                 const tier = getCustomerTier(customers[n]);
                 return tier === filter.tier;
@@ -419,13 +409,9 @@ window.CFS = window.CFS || {};
         const customers = getCustomers();
         let names = Object.keys(customers);
 
-        // Apply filters
         names = filterCustomers(names, customerFilter);
-
-        // Apply sorting
         names = sortCustomers(names, customerSort);
 
-        // Pagination
         const totalPages = Math.ceil(names.length / PER_PAGE);
         const startIdx = (page - 1) * PER_PAGE;
         const pageNames = names.slice(startIdx, startIdx + PER_PAGE);
@@ -498,7 +484,6 @@ window.CFS = window.CFS || {};
 
     function editCustomer(name) {
         if (typeof CFS.CRMDetail?.editCustomer === 'function') {
-            // Beralih ke modul CRMDetail
             CFS.CRMDetail.editCustomer(name);
         } else {
             showToast('Info', 'Buka detail pelanggan untuk edit', 'info');
@@ -534,27 +519,26 @@ window.CFS = window.CFS || {};
     }
 
     // ==================== BULK ACTIONS ====================
-    function bulkAction(action, param) {
+    async function bulkAction(action, param) {
         const checks = document.querySelectorAll('.crm-checkbox:checked');
         if (checks.length === 0) return showToast('Info', 'Tidak ada yang terpilih', 'info');
         const names = Array.from(checks).map(c => c.dataset.name);
         const customers = getCustomers();
-        names.forEach(async (n) => {
-            if (action === 'delete') await Storage.deleteCustomer(n);
-            else if (action === 'channel' && param) {
+        for (const n of names) {
+            if (action === 'delete') {
+                await Storage.deleteCustomer(n);
+            } else if (action === 'channel' && param) {
                 customers[n].channel = param;
                 await Storage.saveCustomerDetail(n, customers[n]);
             } else if (action === 'tier' && param) {
-                // Simpan tier di extended data
                 const ext = await getExtendedCustomerData(n);
                 ext.tierOverride = param;
                 await saveExtendedCustomerData(n, ext);
             } else if (action === 'status' && param) {
-                // status mungkin bukan field langsung, bisa kita simpan sebagai tag
                 customers[n].statusTag = param;
                 await Storage.saveCustomerDetail(n, customers[n]);
             }
-        });
+        }
         if (action !== 'delete') {
             await Storage.saveAllData();
         }
@@ -610,13 +594,10 @@ window.CFS = window.CFS || {};
                 options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
             });
         }
-
-        // Also show custom segments if any
-        renderCustomSegmentsSummary();
     }
 
     function renderCustomSegmentsSummary() {
-        // Could be embedded in segment view, showing count per custom segment
+        // place holder
     }
 
     // ==================== ANALISIS ====================
@@ -625,7 +606,6 @@ window.CFS = window.CFS || {};
         const names = Object.keys(customers);
         const days30ago = getDaysAgo(30);
 
-        // 1. Channel distribution
         const channelCount = { online: 0, offline: 0 };
         names.forEach(n => {
             const ch = customers[n].channel || 'offline';
@@ -644,7 +624,6 @@ window.CFS = window.CFS || {};
             });
         }
 
-        // 2. Frequency
         const freqBins = { '1x': 0, '2-5x': 0, '6-10x': 0, '>10x': 0 };
         names.forEach(n => {
             const trx = customers[n].transactionCount || 0;
@@ -666,7 +645,6 @@ window.CFS = window.CFS || {};
             });
         }
 
-        // 3. RFM
         const rfmGroups = { 'Best': 0, 'Loyal': 0, 'At Risk': 0, 'Lost': 0 };
         names.forEach(n => {
             const c = customers[n];
@@ -693,7 +671,6 @@ window.CFS = window.CFS || {};
             });
         }
 
-        // 4. Loyalitas (recency chart)
         const recencyBins = { '0-30 hari': 0, '31-90 hari': 0, '91-180 hari': 0, '>180 hari': 0 };
         names.forEach(n => {
             const last = new Date(customers[n].lastPurchase || '1970-01-01');
@@ -716,7 +693,6 @@ window.CFS = window.CFS || {};
             });
         }
 
-        // 5. Churn Trend (last 12 months)
         const churnMonths = [];
         const now = new Date();
         for (let i = 11; i >= 0; i--) {
@@ -743,20 +719,18 @@ window.CFS = window.CFS || {};
             });
         }
 
-        // Additional stats
         const repeatCustomers = names.filter(n => (customers[n].transactionCount || 0) > 1).length;
         const repeatRate = names.length ? ((repeatCustomers / names.length) * 100).toFixed(1) : 0;
         const churnCount = names.filter(n => !customers[n].lastPurchase || new Date(customers[n].lastPurchase) < new Date(days30ago)).length;
         const churnRate = names.length ? ((churnCount / names.length) * 100).toFixed(1) : 0;
         const totalLifetime = names.reduce((sum, n) => sum + (customers[n].totalSpent || 0), 0);
         const avgLifetime = names.length ? Math.round(totalLifetime / names.length) : 0;
-        // Average days between purchases for repeat customers
         let sumDaysBetween = 0, repeatCount = 0;
         names.forEach(n => {
             const c = customers[n];
             if (c.transactionCount > 1 && c.firstPurchase && c.lastPurchase) {
                 const days = (new Date(c.lastPurchase) - new Date(c.firstPurchase)) / (1000 * 60 * 60 * 24);
-                sumDaysBetween += days / (c.transactionCount - 1); // rough average
+                sumDaysBetween += days / (c.transactionCount - 1);
                 repeatCount++;
             }
         });
@@ -828,7 +802,7 @@ window.CFS = window.CFS || {};
 
     async function addSegment() {
         const name = E.newSegName?.value.trim();
-        const condition = E.newSegCondition?.value; // misal: 'totalSpent >', 'trx =', 'lastPurchase >'
+        const condition = E.newSegCondition?.value;
         const value = E.newSegValue?.value.trim();
         if (!name || !condition || !value) return;
         await getSegments();
@@ -911,10 +885,7 @@ window.CFS = window.CFS || {};
 
     // ==================== EVENT BINDING ====================
     function bindEvents() {
-        // Filter
-        E.applyCrmFilter?.addEventListener('click', () => {
-            renderCRMTable(1);
-        });
+        E.applyCrmFilter?.addEventListener('click', () => renderCRMTable(1));
         E.clearCrmFilter?.addEventListener('click', () => {
             if (E.crmSearchName) E.crmSearchName.value = '';
             if (E.crmFilterChannel) E.crmFilterChannel.value = '';
@@ -928,7 +899,6 @@ window.CFS = window.CFS || {};
         E.crmSortBy?.addEventListener('change', () => renderCRMTable(1));
         E.crmSortOrder?.addEventListener('change', () => renderCRMTable(1));
 
-        // Pagination
         E.crmLoadMore?.addEventListener('click', () => renderCRMTable(currentPage + 1));
         if (E.crmGoPage && E.crmPageInput) {
             E.crmGoPage.addEventListener('click', () => {
@@ -938,11 +908,9 @@ window.CFS = window.CFS || {};
             });
         }
 
-        // Bulk actions
         E.crmSelectAll?.addEventListener('change', (e) => {
             document.querySelectorAll('.crm-checkbox').forEach(c => c.checked = e.target.checked);
             updateCheckboxState();
-            // Update set
             const names = Array.from(document.querySelectorAll('.crm-checkbox')).map(c => c.dataset.name);
             if (e.target.checked) names.forEach(n => selectedCustomerNames.add(n));
             else selectedCustomerNames.clear();
@@ -960,18 +928,12 @@ window.CFS = window.CFS || {};
         E.crmBulkTier?.addEventListener('click', () => bulkAction('tier', E.crmBulkTierSelect?.value));
         E.crmBulkStatus?.addEventListener('click', () => bulkAction('status', E.crmBulkStatusSelect?.value));
 
-        // Export/Import
         E.exportCrmCSV?.addEventListener('click', exportCRMCSV);
         E.exportCrmJSON?.addEventListener('click', exportCRMJSON);
         E.importCrmJSON?.addEventListener('click', importCRMJSON);
-
-        // Quick view close
         E.qvCloseBtn?.addEventListener('click', () => E.customerQuickView?.classList.add('hidden'));
 
-        // Loyalty tier
         E.addTierBtn?.addEventListener('click', addTier);
-
-        // Custom segments
         E.addSegmentBtn?.addEventListener('click', addSegment);
     }
 
@@ -985,7 +947,6 @@ window.CFS = window.CFS || {};
 
     // ==================== INIT ====================
     async function initCRMTab() {
-        // Load extended data
         await getLoyaltyTiers();
         await getSegments();
         cacheElements();
