@@ -827,6 +827,110 @@
     </div>
 </div>
 
+        <!-- ========== FORM PENJUALAN (MULTI-ITEM) ========== -->
+<div id="sales-record" class="sales-subtab-content">
+    <form id="salesForm" class="space-y-4">
+        <!-- Pelanggan & Pengaturan -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-medium">Nama Pelanggan *</label>
+                <input type="text" id="salesKlien" required class="w-full border p-2 rounded">
+            </div>
+            <div>
+                <label class="block text-sm font-medium">Tier Harga</label>
+                <select id="salesTier" class="w-full border p-2 rounded">
+                    <option value="ecer">Eceran</option>
+                    <option value="grosir">Grosir</option>
+                    <option value="partai">Partai</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium">Channel</label>
+                <select id="salesChannel" class="w-full border p-2 rounded">
+                    <option value="offline">Offline</option>
+                    <option value="online">Online</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tambah Item -->
+        <div class="border rounded p-4 bg-gray-50 dark:bg-slate-700">
+            <h3 class="font-bold mb-2">Tambah Produk</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div>
+                    <label class="text-xs">Produk</label>
+                    <select id="salesProduk" class="w-full border p-2 rounded">
+                        <option value="">Pilih Produk</option>
+                        <!-- Diisi oleh JavaScript -->
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs">Jumlah (kg)</label>
+                    <input type="number" id="salesQty" step="0.01" class="w-full border p-2 rounded">
+                </div>
+                <div>
+                    <label class="text-xs">Harga Manual (opsional)</label>
+                    <input type="number" id="salesHargaManual" class="w-full border p-2 rounded" placeholder="Otomatis">
+                </div>
+                <div>
+                    <label class="text-xs">Diskon (Rp)</label>
+                    <input type="number" id="salesItemDiskon" class="w-full border p-2 rounded" value="0">
+                </div>
+            </div>
+            <div class="mt-3 flex gap-2">
+                <button type="button" id="addItemBtn" class="btn btn-primary">➕ Tambah Produk</button>
+                <button type="button" id="updateItemBtn" class="btn btn-warning hidden">✏️ Update Item</button>
+                <button type="button" id="cancelEditItemBtn" class="btn btn-secondary hidden">❌ Batal</button>
+            </div>
+        </div>
+
+        <!-- Tabel Item -->
+        <div class="border rounded p-4">
+            <h3 class="font-bold mb-2">Daftar Belanja</h3>
+            <table class="w-full text-sm">
+                <thead class="bg-gray-100 dark:bg-slate-600">
+                    <tr>
+                        <th class="p-2 text-left">Produk</th>
+                        <th class="p-2 text-right">Qty</th>
+                        <th class="p-2 text-right">Harga/kg</th>
+                        <th class="p-2 text-right">Diskon</th>
+                        <th class="p-2 text-right">Subtotal</th>
+                        <th class="p-2 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsTableBody"></tbody>
+            </table>
+            <div class="mt-2 text-right font-bold text-lg">
+                Total: <span id="itemsTotalDisplay">Rp 0</span>
+            </div>
+        </div>
+
+        <!-- Pembayaran -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium">Metode Pembayaran</label>
+                <select id="salesPaymentMethod" class="w-full border p-2 rounded">
+                    <option value="tunai">Tunai</option>
+                    <option value="transfer">Transfer</option>
+                    <option value="qris">QRIS</option>
+                    <option value="tempo">Tempo</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tombol Aksi Utama -->
+        <div class="flex flex-wrap gap-3">
+            <button type="button" id="previewTransactionBtn" class="btn btn-info">👁️ Preview</button>
+            <button type="submit" id="processSaleBtn" class="btn btn-success">✅ Proses Penjualan</button>
+            <button type="button" id="printInvoiceBtn" class="btn btn-primary" disabled>🖨️ Cetak Invoice</button>
+            <button type="button" id="shareWhatsAppBtn" class="btn btn-success" disabled>💬 WhatsApp</button>
+        </div>
+    </form>
+
+    <!-- Area Hasil Preview -->
+    <div id="salesResult" class="mt-4 hidden p-4 bg-green-50 dark:bg-green-900 rounded"></div>
+</div>
+
        <!-- ==================== TAB PEMBELIAN (UPGRADE KOMPLEKS) ==================== -->
 <div id="tab-purchase" class="tab-content space-y-6">
     <div class="card p-6">
