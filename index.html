@@ -1422,122 +1422,118 @@
     </div>
 </div>
 
-        <!-- ==================== TAB CRM PELANGGAN (UPGRADE KOMPLEKS) ==================== -->
+<!-- ==================== TAB CRM PELANGGAN (NEXT GEN) ==================== -->
 <div id="tab-crm" class="tab-content space-y-6">
     <div class="card p-6">
         <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-users text-indigo-600"></i> CRM Pelanggan</h2>
-        <p class="text-sm opacity-70 mb-4">Kelola hubungan pelanggan, segmentasi otomatis, dan analisis transaksi.</p>
+        <p class="text-sm opacity-70 mb-4">Manajemen hubungan pelanggan modern, segmentasi cerdas, loyalitas, dan analitik mendalam.</p>
 
-        <!-- Statistik Utama -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="crmStats">
-            <div class="card p-4 text-center hover-lift">
-                <span class="text-xs opacity-60">Total Pelanggan</span>
-                <p class="text-2xl font-bold" id="crmTotalCustomers">0</p>
-            </div>
-            <div class="card p-4 text-center hover-lift">
-                <span class="text-xs opacity-60">Total Pendapatan</span>
-                <p class="text-2xl font-bold text-green-600" id="crmTotalRevenue">Rp 0</p>
-            </div>
-            <div class="card p-4 text-center hover-lift">
-                <span class="text-xs opacity-60">Pelanggan Aktif (30 hari)</span>
-                <p class="text-2xl font-bold text-blue-600" id="crmActiveCustomers">0</p>
-            </div>
-            <div class="card p-4 text-center hover-lift">
-                <span class="text-xs opacity-60">Rata‑rata Belanja</span>
-                <p class="text-2xl font-bold" id="crmAvgSpent">Rp 0</p>
-            </div>
+        <!-- Statistik Utama (6 metrik) -->
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
+            <div class="card p-3 text-center hover-lift"><span class="text-xs opacity-60">Total Pelanggan</span><p class="text-xl font-bold" id="crmTotalCustomers">0</p></div>
+            <div class="card p-3 text-center hover-lift"><span class="text-xs opacity-60">Total Revenue</span><p class="text-xl font-bold text-green-600" id="crmTotalRevenue">Rp 0</p></div>
+            <div class="card p-3 text-center hover-lift"><span class="text-xs opacity-60">Aktif 30 Hari</span><p class="text-xl font-bold text-blue-600" id="crmActiveCustomers">0</p></div>
+            <div class="card p-3 text-center hover-lift"><span class="text-xs opacity-60">Rata‑rata Belanja</span><p class="text-xl font-bold" id="crmAvgSpent">Rp 0</p></div>
+            <div class="card p-3 text-center hover-lift"><span class="text-xs opacity-60">Pelanggan Baru (Bulan)</span><p class="text-xl font-bold" id="crmNewThisMonth">0</p></div>
+            <div class="card p-3 text-center hover-lift"><span class="text-xs opacity-60">Churn Risk</span><p class="text-xl font-bold text-red-500" id="crmChurnRisk">0</p></div>
         </div>
 
-        <!-- Sub‑tab Navigasi -->
+        <!-- Sub‑tab Navigasi (diperbanyak) -->
         <div class="flex flex-wrap gap-2 mb-6 border-b pb-3">
-            <button class="btn btn-sm btn-primary crm-subtab-btn active" data-crm-tab="crm-list">📋 Daftar Pelanggan</button>
+            <button class="btn btn-sm btn-primary crm-subtab-btn active" data-crm-tab="crm-list">📋 Daftar</button>
             <button class="btn btn-sm btn-secondary crm-subtab-btn" data-crm-tab="crm-segment">🏷️ Segmentasi</button>
             <button class="btn btn-sm btn-secondary crm-subtab-btn" data-crm-tab="crm-analysis">📊 Analisis</button>
+            <button class="btn btn-sm btn-secondary crm-subtab-btn" data-crm-tab="crm-loyalty">🥇 Loyalty Tiers</button>
+            <button class="btn btn-sm btn-secondary crm-subtab-btn" data-crm-tab="crm-custom-segments">✂️ Segmen Kustom</button>
         </div>
 
-        <!-- SUB‑TAB: DAFTAR PELANGGAN -->
+        <!-- ==================== SUB‑TAB: DAFTAR PELANGGAN ==================== -->
         <div id="crm-list" class="crm-subtab-content">
+            <!-- Filter & Sorting -->
             <div class="flex flex-wrap gap-3 mb-4 items-end">
+                <div><label class="text-xs font-medium">Cari Nama</label><input type="text" id="crmSearchName" class="w-44 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs font-medium">Channel</label><select id="crmFilterChannel" class="w-32 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"><option value="">Semua</option><option value="offline">Offline</option><option value="online">Online</option></select></div>
+                <div><label class="text-xs font-medium">Status</label><select id="crmFilterStatus" class="w-32 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"><option value="">Semua</option><option value="top">Top</option><option value="regular">Regular</option><option value="new">New</option><option value="churn">Churn</option><option value="vip">VIP</option></select></div>
+                <div><label class="text-xs font-medium">Tier</label><select id="crmFilterTier" class="w-32 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"><option value="">Semua</option></select></div>
                 <div>
-                    <label class="text-xs font-medium">Cari Nama</label>
-                    <input type="text" id="crmSearchName" placeholder="Nama pelanggan..." class="w-40">
+                    <label class="text-xs font-medium">Urutkan</label>
+                    <div class="flex gap-1">
+                        <select id="crmSortBy" class="w-36 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                            <option value="totalSpent">Total Pembelian</option><option value="name">Nama</option><option value="transactionCount">Transaksi</option><option value="lastPurchase">Terakhir Beli</option>
+                        </select>
+                        <select id="crmSortOrder" class="w-20 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"><option value="desc">Turun</option><option value="asc">Naik</option></select>
+                    </div>
                 </div>
-                <div>
-                    <label class="text-xs font-medium">Channel</label>
-                    <select id="crmFilterChannel" class="w-32">
-                        <option value="">Semua</option>
-                        <option value="offline">🏪 Offline</option>
-                        <option value="online">🌐 Online</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-xs font-medium">Status</label>
-                    <select id="crmFilterStatus" class="w-32">
-                        <option value="">Semua</option>
-                        <option value="top">🏆 Top</option>
-                        <option value="regular">⭐ Regular</option>
-                        <option value="new">🆕 New</option>
-                        <option value="churn">⚠️ Churn</option>
-                    </select>
-                </div>
-                <button id="applyCrmFilter" class="btn btn-primary btn-sm h-9">🔍 Tampilkan</button>
-                <button id="exportCrmCSV" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-csv"></i> CSV</button>
+                <button id="applyCrmFilter" class="btn btn-primary btn-sm h-9">🔍 Filter</button>
+                <button id="clearCrmFilter" class="btn btn-secondary btn-sm h-9">🔄 Reset</button>
             </div>
+
+            <!-- Bulk Actions -->
+            <div class="flex flex-wrap gap-2 mb-4">
+                <label class="flex items-center gap-1 text-xs"><input type="checkbox" id="crmSelectAll"> Pilih Semua</label>
+                <button id="crmBulkDelete" class="btn btn-danger btn-xs">🗑️ Hapus</button>
+                <select id="crmBulkChannelSelect" class="border p-1 rounded text-xs dark:bg-slate-700 dark:border-slate-600"><option value="">Channel...</option><option value="offline">Offline</option><option value="online">Online</option></select>
+                <button id="crmBulkChannel" class="btn btn-secondary btn-xs">Ubah Channel</button>
+                <select id="crmBulkTierSelect" class="border p-1 rounded text-xs dark:bg-slate-700 dark:border-slate-600"><option value="">Tier...</option></select>
+                <button id="crmBulkTier" class="btn btn-secondary btn-xs">Ubah Tier</button>
+                <select id="crmBulkStatusSelect" class="border p-1 rounded text-xs dark:bg-slate-700 dark:border-slate-600"><option value="">Status...</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select>
+                <button id="crmBulkStatus" class="btn btn-secondary btn-xs">Ubah Status</button>
+            </div>
+
+            <!-- Tabel -->
             <div class="overflow-x-auto max-h-96 border rounded-lg bg-white dark:bg-slate-800">
                 <table class="w-full text-sm">
                     <thead class="bg-slate-100 dark:bg-slate-700 sticky top-0">
                         <tr>
+                            <th class="p-2 w-10"><input type="checkbox" id="crmSelectAllHeader" class="crm-select-all"></th>
                             <th class="p-2 text-left">Nama</th>
-                            <th class="p-2 text-right">Total Pembelian</th>
+                            <th class="p-2 text-right">Total</th>
                             <th class="p-2 text-right">Transaksi</th>
-                            <th class="p-2 text-right">Terakhir Beli</th>
+                            <th class="p-2 text-right">Terakhir</th>
                             <th class="p-2 text-center">Channel</th>
-                            <th class="p-2 text-center">Status</th>
+                            <th class="p-2 text-center">Status/Tier</th>
                             <th class="p-2 text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="crmTableBody">
-                        <tr><td colspan="7" class="text-center p-4 opacity-50">Memuat data...</td></tr>
-                    </tbody>
+                    <tbody id="crmTableBody"></tbody>
                 </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex justify-between items-center mt-3">
+                <span id="crmShowingInfo" class="text-sm opacity-70"></span>
+                <div class="flex gap-2 items-center">
+                    <input type="number" id="crmPageInput" class="w-16 border rounded p-1 text-sm dark:bg-slate-700 dark:border-slate-600" min="1" value="1">
+                    <button id="crmGoPage" class="btn btn-secondary btn-xs">Go</button>
+                    <button id="crmLoadMore" class="btn btn-secondary btn-xs">Muat Lagi</button>
+                </div>
+            </div>
+
+            <!-- Export / Import -->
+            <div class="mt-4 flex gap-2">
+                <button id="exportCrmCSV" class="btn btn-secondary btn-sm">📥 CSV</button>
+                <button id="exportCrmJSON" class="btn btn-secondary btn-sm">📥 JSON</button>
+                <button id="importCrmJSON" class="btn btn-secondary btn-sm">📤 Impor JSON</button>
             </div>
         </div>
 
-        <!-- SUB‑TAB: SEGMENTASI -->
+        <!-- ==================== SUB‑TAB: SEGMENTASI ==================== -->
         <div id="crm-segment" class="crm-subtab-content hidden">
-            <h3 class="font-semibold text-lg mb-4">Segmentasi Pelanggan Otomatis</h3>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 text-sm">
-                <div class="card p-3 text-center hover-lift border-l-4 border-amber-500">
-                    <span class="opacity-60">🏆 Top</span>
-                    <p class="font-bold text-2xl" id="crmSegTop">0</p>
-                    <p class="text-xs opacity-50">Pembelian > Rp 10jt</p>
-                </div>
-                <div class="card p-3 text-center hover-lift border-l-4 border-blue-500">
-                    <span class="opacity-60">⭐ Regular</span>
-                    <p class="font-bold text-2xl" id="crmSegRegular">0</p>
-                    <p class="text-xs opacity-50">Rp 2jt - 10jt</p>
-                </div>
-                <div class="card p-3 text-center hover-lift border-l-4 border-green-500">
-                    <span class="opacity-60">🆕 New</span>
-                    <p class="font-bold text-2xl" id="crmSegNew">0</p>
-                    <p class="text-xs opacity-50">Transaksi pertama</p>
-                </div>
-                <div class="card p-3 text-center hover-lift border-l-4 border-red-500">
-                    <span class="opacity-60">⚠️ Churn Risk</span>
-                    <p class="font-bold text-2xl text-red-600" id="crmSegChurn">0</p>
-                    <p class="text-xs opacity-50">Tidak beli 30 hari</p>
-                </div>
+            <h3 class="font-semibold text-lg mb-4">Segmentasi Otomatis</h3>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6 text-sm">
+                <div class="card p-3 text-center border-l-4 border-yellow-500"><span class="opacity-60">👑 VIP</span><p class="font-bold text-2xl" id="crmSegVIP">0</p><p class="text-xs opacity-50">> Rp 50jt</p></div>
+                <div class="card p-3 text-center border-l-4 border-amber-500"><span class="opacity-60">🏆 Top</span><p class="font-bold text-2xl" id="crmSegTop">0</p><p class="text-xs opacity-50">> Rp 10jt</p></div>
+                <div class="card p-3 text-center border-l-4 border-blue-500"><span class="opacity-60">⭐ Regular</span><p class="font-bold text-2xl" id="crmSegRegular">0</p><p class="text-xs opacity-50">Rp 2jt - 10jt</p></div>
+                <div class="card p-3 text-center border-l-4 border-green-500"><span class="opacity-60">🆕 New</span><p class="font-bold text-2xl" id="crmSegNew">0</p><p class="text-xs opacity-50">Transaksi pertama</p></div>
+                <div class="card p-3 text-center border-l-4 border-red-500"><span class="opacity-60">⚠️ Churn</span><p class="font-bold text-2xl text-red-600" id="crmSegChurn">0</p><p class="text-xs opacity-50">Tidak beli 30hr</p></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <h4 class="font-semibold mb-2">Distribusi Segmentasi</h4>
-                    <canvas id="chartCrmSegment" height="200"></canvas>
-                </div>
+                <div><h4 class="font-semibold mb-2">Distribusi Segmentasi</h4><canvas id="chartCrmSegment" height="200"></canvas></div>
                 <div>
                     <h4 class="font-semibold mb-2">Top 5 Pelanggan</h4>
                     <div class="overflow-x-auto max-h-48 border rounded-lg bg-white dark:bg-slate-800">
                         <table class="w-full text-sm">
-                            <thead class="bg-slate-100 dark:bg-slate-700"><tr><th class="p-2">Pelanggan</th><th class="p-2 text-right">Total</th></tr></thead>
+                            <thead class="bg-slate-100 dark:bg-slate-700"><tr><th class="p-2">Nama</th><th class="p-2 text-right">Total</th></tr></thead>
                             <tbody id="crmTop5Table"></tbody>
                         </table>
                     </div>
@@ -1545,28 +1541,93 @@
             </div>
         </div>
 
-        <!-- SUB‑TAB: ANALISIS -->
+        <!-- ==================== SUB‑TAB: ANALISIS ==================== -->
         <div id="crm-analysis" class="crm-subtab-content hidden">
             <h3 class="font-semibold text-lg mb-4">Analisis Pelanggan</h3>
+            <!-- Statistik Ringkas -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="card p-3 text-center"><span class="text-xs opacity-60">Avg Lifetime Value</span><p class="font-bold" id="anaCrmAvgLifetime">Rp 0</p></div>
+                <div class="card p-3 text-center"><span class="text-xs opacity-60">Churn Rate</span><p class="font-bold text-red-500" id="anaCrmChurnRate">0%</p></div>
+                <div class="card p-3 text-center"><span class="text-xs opacity-60">Repeat Rate</span><p class="font-bold text-green-500" id="anaCrmRepeatRate">0%</p></div>
+                <div class="card p-3 text-center"><span class="text-xs opacity-60">Avg Days Between</span><p class="font-bold" id="anaCrmAvgDaysBetween">0 hari</p></div>
+            </div>
+            <!-- Grafik -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div><h4 class="font-semibold mb-2">Channel Distribution</h4><canvas id="chartCrmChannel" height="200"></canvas></div>
+                <div><h4 class="font-semibold mb-2">Frekuensi Pembelian</h4><canvas id="chartCrmFrequency" height="200"></canvas></div>
+                <div><h4 class="font-semibold mb-2">RFM Analysis</h4><canvas id="chartCrmRFM" height="200"></canvas></div>
+                <div><h4 class="font-semibold mb-2">Loyalitas (Recency)</h4><canvas id="chartCrmLoyalty" height="200"></canvas></div>
+                <div class="md:col-span-2"><h4 class="font-semibold mb-2">Churn Trend (12 bulan)</h4><canvas id="chartCrmChurnTrend" height="150"></canvas></div>
+            </div>
+        </div>
+
+        <!-- ==================== SUB‑TAB: LOYALTY TIERS ==================== -->
+        <div id="crm-loyalty" class="crm-subtab-content hidden">
+            <h3 class="font-semibold text-lg mb-4">Konfigurasi Loyalty Tiers</h3>
+            <div class="flex flex-wrap gap-2 mb-4 items-end">
+                <div><label class="text-xs">Nama Tier</label><input type="text" id="newTierName" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600" placeholder="Nama Tier"></div>
+                <div><label class="text-xs">Min. Total (Rp)</label><input type="number" id="newTierMinTotal" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600" placeholder="0"></div>
+                <div><label class="text-xs">Warna</label><input type="color" id="newTierColor" value="#94a3b8" class="h-9 w-12"></div>
+                <button id="addTierBtn" class="btn btn-primary btn-sm h-9">Tambah Tier</button>
+            </div>
+            <div class="overflow-x-auto border rounded-lg bg-white dark:bg-slate-800">
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-100 dark:bg-slate-700"><tr><th class="p-2">Nama</th><th class="p-2 text-right">Min. Total</th><th class="p-2">Warna</th><th class="p-2 text-center">Aksi</th></tr></thead>
+                    <tbody id="loyaltyTierTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ==================== SUB‑TAB: CUSTOM SEGMENTS ==================== -->
+        <div id="crm-custom-segments" class="crm-subtab-content hidden">
+            <h3 class="font-semibold text-lg mb-4">Segmen Kustom</h3>
+            <div class="flex flex-wrap gap-2 mb-4 items-end">
+                <div><label class="text-xs">Nama Segmen</label><input type="text" id="newSegName" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600" placeholder="Nama Segmen"></div>
                 <div>
-                    <h4 class="font-semibold mb-2">Pelanggan per Channel</h4>
-                    <canvas id="chartCrmChannel" height="200"></canvas>
+                    <label class="text-xs">Kondisi</label>
+                    <select id="newSegCondition" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                        <option value="totalSpent >">Total Spent ></option>
+                        <option value="transactionCount >">Transaksi ></option>
+                        <option value="lastPurchase >">Terakhir Beli ></option>
+                    </select>
                 </div>
-                <div>
-                    <h4 class="font-semibold mb-2">Frekuensi Pembelian</h4>
-                    <canvas id="chartCrmFrequency" height="200"></canvas>
-                </div>
+                <div><label class="text-xs">Nilai</label><input type="text" id="newSegValue" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600" placeholder="Nilai"></div>
+                <button id="addSegmentBtn" class="btn btn-primary btn-sm h-9">Tambah Segmen</button>
+            </div>
+            <div class="overflow-x-auto border rounded-lg bg-white dark:bg-slate-800">
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-100 dark:bg-slate-700"><tr><th class="p-2">Nama</th><th class="p-2">Kondisi</th><th class="p-2 text-center">Aksi</th></tr></thead>
+                    <tbody id="segmentTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== QUICK VIEW MODAL ==================== -->
+    <div id="customerQuickView" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white dark:bg-slate-800 p-6 rounded shadow-lg w-96">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold">Detail Cepat</h3>
+                <button id="qvCloseBtn" class="text-red-500 text-xl leading-none">&times;</button>
+            </div>
+            <div class="space-y-2 text-sm">
+                <p><strong>Nama:</strong> <span id="qvName"></span></p>
+                <p><strong>Total Pembelian:</strong> <span id="qvTotal"></span></p>
+                <p><strong>Jumlah Transaksi:</strong> <span id="qvTrx"></span></p>
+                <p><strong>Terakhir:</strong> <span id="qvLast"></span></p>
+                <p><strong>Channel:</strong> <span id="qvChannel"></span></p>
+                <p><strong>Tier:</strong> <span id="qvTier"></span></p>
+                <p><strong>Telepon:</strong> <span id="qvPhone"></span></p>
             </div>
         </div>
     </div>
 </div>
-
-        <!-- ==================== TAB DETAIL PELANGGAN (UPGRADE KOMPLEKS) ==================== -->
+        
+<!-- ==================== TAB DETAIL PELANGGAN (EXTENDED) ==================== -->
 <div id="tab-crm-detail" class="tab-content space-y-6">
     <div class="card p-6">
         <h2 class="text-xl font-bold mb-4"><i class="ph ph-address-book text-indigo-600"></i> Detail Pelanggan Lengkap</h2>
-        <p class="text-sm opacity-70 mb-4">Kelola data pelanggan secara lengkap: profil, riwayat transaksi, statistik, dan preferensi.</p>
+        <p class="text-sm opacity-70 mb-4">Kelola data pelanggan secara lengkap: profil, riwayat transaksi, statistik, preferensi, catatan, dokumen, dan interaksi.</p>
 
         <!-- Statistik Pelanggan -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="custDetailStats">
@@ -1576,71 +1637,217 @@
             <div class="card p-3 text-center"><span class="text-xs opacity-60">Rata² Belanja</span><p class="font-bold text-lg" id="cdRataBelanja">Rp 0</p></div>
         </div>
 
-        <!-- Sub-tab Navigasi -->
+        <!-- Sub-tab Navigasi (diperbanyak) -->
         <div class="flex flex-wrap gap-2 mb-6 border-b pb-3">
-            <button class="btn btn-sm btn-primary custdetail-subtab-btn active" data-custdetail-tab="custdetail-form">📝 Form Pelanggan</button>
-            <button class="btn btn-sm btn-secondary custdetail-subtab-btn" data-custdetail-tab="custdetail-list">📋 Daftar Pelanggan</button>
-            <button class="btn btn-sm btn-secondary custdetail-subtab-btn" data-custdetail-tab="custdetail-history">📜 Riwayat Transaksi</button>
+            <button class="btn btn-sm btn-primary custdetail-subtab-btn active" data-custdetail-tab="custdetail-form">📝 Form</button>
+            <button class="btn btn-sm btn-secondary custdetail-subtab-btn" data-custdetail-tab="custdetail-list">📋 Daftar</button>
+            <button class="btn btn-sm btn-secondary custdetail-subtab-btn" data-custdetail-tab="custdetail-history">📜 Riwayat</button>
             <button class="btn btn-sm btn-secondary custdetail-subtab-btn" data-custdetail-tab="custdetail-analysis">📊 Analisis</button>
+            <button class="btn btn-sm btn-secondary custdetail-subtab-btn" data-custdetail-tab="custdetail-notes">📝 Catatan</button>
+            <button class="btn btn-sm btn-secondary custdetail-subtab-btn" data-custdetail-tab="custdetail-documents">📂 Dokumen</button>
+            <button class="btn btn-sm btn-secondary custdetail-subtab-btn" data-custdetail-tab="custdetail-interactions">💬 Interaksi</button>
+            <button class="btn btn-sm btn-secondary custdetail-subtab-btn" data-custdetail-tab="custdetail-groups">👥 Grup</button>
         </div>
 
-        <!-- SUB-TAB: FORM PELANGGAN -->
+        <!-- ==================== SUB-TAB: FORM PELANGGAN ==================== -->
         <div id="custdetail-form" class="custdetail-subtab-content">
             <h3 class="font-semibold text-lg mb-4">Form Data Pelanggan</h3>
+            <!-- Searchable dropdown untuk cari/edit pelanggan -->
+            <div class="mb-4">
+                <label class="text-xs font-medium">Cari Pelanggan untuk Edit</label>
+                <div id="custDetailCustomerSelect" class="searchable-dropdown-wrapper"></div>
+            </div>
             <form id="customerDetailForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div><label class="text-xs font-medium">Nama Lengkap*</label><input type="text" id="customerFullName" placeholder="Nama lengkap" required class="w-full"></div>
-                <div><label class="text-xs font-medium">Nomor Telepon</label><input type="text" id="customerPhone" placeholder="08xx-xxxx-xxxx" class="w-full"></div>
-                <div><label class="text-xs font-medium">Email</label><input type="email" id="customerEmail" placeholder="email@domain.com" class="w-full"></div>
-                <div><label class="text-xs font-medium">Alamat</label><input type="text" id="customerAddress" placeholder="Alamat lengkap" class="w-full"></div>
-                <div><label class="text-xs font-medium">Nomor KTP</label><input type="text" id="customerKTP" placeholder="Nomor KTP" class="w-full"></div>
-                <div><label class="text-xs font-medium">NPWP (opsional)</label><input type="text" id="customerNPWP" placeholder="NPWP" class="w-full"></div>
-                <div><label class="text-xs font-medium">Tipe Pelanggan</label><select id="customerType" class="w-full"><option value="ecer">Ecer</option><option value="grosir">Grosir</option><option value="partai">Partai</option></select></div>
-                <div><label class="text-xs font-medium">Channel Preferensi</label><select id="customerPreferredChannel" class="w-full"><option value="offline">Offline</option><option value="online">Online</option></select></div>
-                <div class="col-span-full"><label class="text-xs font-medium">Catatan</label><input type="text" id="customerNotes" placeholder="Catatan tambahan" class="w-full"></div>
-                <div class="col-span-full"><button type="submit" class="btn btn-primary">Simpan Pelanggan</button></div>
+                <div><label class="text-xs font-medium">Nama Lengkap*</label><input type="text" id="customerFullName" required class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs font-medium">Telepon</label><input type="text" id="customerPhone" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs font-medium">Email</label><input type="email" id="customerEmail" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs font-medium">Alamat</label><input type="text" id="customerAddress" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs font-medium">KTP</label><input type="text" id="customerKTP" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs font-medium">NPWP</label><input type="text" id="customerNPWP" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs font-medium">Tipe</label><select id="customerType" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"><option value="ecer">Ecer</option><option value="grosir">Grosir</option><option value="partai">Partai</option></select></div>
+                <div>
+                    <label class="text-xs font-medium">Grup</label>
+                    <select id="customerGroup" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                        <option value="">Tanpa Grup</option>
+                        <!-- Diisi dinamis -->
+                    </select>
+                </div>
+                <div><label class="text-xs font-medium">Channel</label><select id="customerPreferredChannel" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"><option value="offline">Offline</option><option value="online">Online</option></select></div>
+                <div><label class="text-xs font-medium">Status</label><select id="customerStatus" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select></div>
+                <div><label class="text-xs font-medium">Tanggal Lahir</label><input type="date" id="customerBirthday" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs font-medium">Loyalty Points</label><input type="number" id="customerLoyaltyPoints" value="0" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs font-medium">Batas Kredit (Rp)</label><input type="number" id="customerCreditLimit" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs font-medium">Referensi</label><input type="text" id="customerReference" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs font-medium">Custom Field 1</label><input type="text" id="customerCustom1" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs font-medium">Catatan</label><input type="text" id="customerNotes" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs font-medium">Tags</label><input type="text" id="customerTags" placeholder="Pisahkan dengan koma" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div class="col-span-full flex gap-2">
+                    <button type="submit" class="btn btn-primary">💾 Simpan</button>
+                    <button type="button" id="custDetailResetBtn" class="btn btn-secondary">🔄 Reset</button>
+                </div>
             </form>
         </div>
 
-        <!-- SUB-TAB: DAFTAR PELANGGAN -->
+        <!-- ==================== SUB-TAB: DAFTAR PELANGGAN ==================== -->
         <div id="custdetail-list" class="custdetail-subtab-content hidden">
             <h3 class="font-semibold text-lg mb-4">Daftar Pelanggan</h3>
-            <div class="flex flex-wrap gap-3 mb-4">
-                <input type="text" id="custDetailSearch" placeholder="Cari nama..." class="w-40">
-                <select id="custDetailFilterChannel" class="w-32"><option value="">Semua Channel</option><option value="offline">Offline</option><option value="online">Online</option></select>
-                <button id="applyCustDetailFilter" class="btn btn-primary btn-sm">🔍 Tampilkan</button>
-                <button id="exportCustDetailCSV" class="btn btn-secondary btn-sm"><i class="ph ph-file-csv"></i> CSV</button>
+            <div class="flex flex-wrap gap-3 mb-4 items-end">
+                <div><label class="text-xs">Cari</label><input type="text" id="custDetailSearch" class="w-40 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs">Channel</label><select id="custDetailFilterChannel" class="w-32 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"><option value="">Semua</option><option value="offline">Offline</option><option value="online">Online</option></select></div>
+                <div><label class="text-xs">Tipe</label><select id="custDetailFilterType" class="w-32 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"><option value="">Semua</option><option value="ecer">Ecer</option><option value="grosir">Grosir</option><option value="partai">Partai</option></select></div>
+                <div><label class="text-xs">Grup</label><select id="custDetailFilterGroup" class="w-32 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"><option value="">Semua</option></select></div>
+                <div><label class="text-xs">Status</label><select id="custDetailFilterStatus" class="w-32 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"><option value="">Semua</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select></div>
+                <button id="applyCustDetailFilter" class="btn btn-primary btn-sm h-9">🔍 Filter</button>
+                <button id="clearCustDetailFilter" class="btn btn-secondary btn-sm h-9">🔄 Reset</button>
+            </div>
+            <!-- Bulk actions -->
+            <div class="flex flex-wrap gap-2 mb-4">
+                <label class="flex items-center gap-1 text-xs"><input type="checkbox" id="custSelectAll"> Pilih Semua</label>
+                <button id="custBulkDelete" class="btn btn-danger btn-xs">🗑️ Hapus</button>
+                <select id="custBulkGroupSelect" class="border p-1 rounded text-xs dark:bg-slate-700 dark:border-slate-600"><option value="">Grup...</option></select>
+                <button id="custBulkGroup" class="btn btn-secondary btn-xs">Ubah Grup</button>
+                <select id="custBulkStatusSelect" class="border p-1 rounded text-xs dark:bg-slate-700 dark:border-slate-600"><option value="">Status...</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select>
+                <button id="custBulkStatus" class="btn btn-secondary btn-xs">Ubah Status</button>
             </div>
             <div class="overflow-x-auto max-h-96 border rounded-lg bg-white dark:bg-slate-800">
                 <table class="w-full text-sm">
-                    <thead class="bg-slate-100 dark:bg-slate-700 sticky top-0"><tr><th class="p-2">Nama</th><th>Telepon</th><th>Email</th><th>KTP</th><th>Tipe</th><th>Channel</th><th>Aksi</th></tr></thead>
+                    <thead class="bg-slate-100 dark:bg-slate-700 sticky top-0">
+                        <tr>
+                            <th class="p-2 w-10"><input type="checkbox" id="custSelectAllHeader" class="cust-select-all"></th>
+                            <th class="p-2">Nama</th>
+                            <th class="p-2">Telepon</th>
+                            <th class="p-2">Grup</th>
+                            <th class="p-2">Tipe</th>
+                            <th class="p-2">Channel</th>
+                            <th class="p-2">Status</th>
+                            <th class="p-2">Tags</th>
+                            <th class="p-2 text-center">Aksi</th>
+                        </tr>
+                    </thead>
                     <tbody id="customerDetailTableBody"></tbody>
                 </table>
             </div>
+            <div class="mt-3 flex gap-2">
+                <button id="exportCustDetailCSV" class="btn btn-secondary btn-sm"><i class="ph ph-file-csv"></i> CSV</button>
+                <button id="exportCustDetailJSON" class="btn btn-secondary btn-sm"><i class="ph ph-file"></i> JSON</button>
+                <button id="importCustDetailJSON" class="btn btn-secondary btn-sm"><i class="ph ph-upload"></i> Impor JSON</button>
+            </div>
         </div>
 
-        <!-- SUB-TAB: RIWAYAT TRANSAKSI -->
+        <!-- ==================== SUB-TAB: RIWAYAT TRANSAKSI ==================== -->
         <div id="custdetail-history" class="custdetail-subtab-content hidden">
             <h3 class="font-semibold text-lg mb-4">Riwayat Transaksi per Pelanggan</h3>
-            <div class="flex flex-wrap gap-3 mb-4">
-                <input type="text" id="custHistorySearch" placeholder="Nama pelanggan..." class="w-40">
-                <input type="date" id="custHistoryStart" class="w-36"> <input type="date" id="custHistoryEnd" class="w-36">
-                <button id="applyCustHistoryFilter" class="btn btn-primary btn-sm">🔍 Tampilkan</button>
+            <div class="flex flex-wrap gap-3 mb-4 items-end">
+                <div><label class="text-xs">Cari</label><input type="text" id="custHistorySearch" class="w-40 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs">Dari</label><input type="date" id="custHistoryStart" class="w-36 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs">Sampai</label><input type="date" id="custHistoryEnd" class="w-36 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs">Pelanggan</label>
+                    <select id="custHistoryCustomer" class="w-44 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                        <option value="">Semua Pelanggan</option>
+                    </select>
+                </div>
+                <button id="applyCustHistoryFilter" class="btn btn-primary btn-sm h-9">🔍 Tampilkan</button>
+                <button id="exportCustHistoryCSV" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-csv"></i> CSV</button>
             </div>
             <div class="overflow-x-auto max-h-96 border rounded-lg bg-white dark:bg-slate-800">
                 <table class="w-full text-sm">
-                    <thead class="bg-slate-100 dark:bg-slate-700 sticky top-0"><tr><th class="p-2">Tanggal</th><th>Pelanggan</th><th>Produk</th><th>Qty</th><th>Total</th><th>Channel</th></tr></thead>
+                    <thead class="bg-slate-100 dark:bg-slate-700 sticky top-0">
+                        <tr><th class="p-2">Tanggal</th><th>Pelanggan</th><th>Produk</th><th>Qty</th><th>Total</th><th>Channel</th></tr>
+                    </thead>
                     <tbody id="custHistoryTableBody"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- SUB-TAB: ANALISIS -->
+        <!-- ==================== SUB-TAB: ANALISIS ==================== -->
         <div id="custdetail-analysis" class="custdetail-subtab-content hidden">
             <h3 class="font-semibold text-lg mb-4">Analisis Pelanggan</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div><canvas id="chartCustChannel" height="180"></canvas></div>
-                <div><canvas id="chartCustTop5" height="180"></canvas></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div><canvas id="chartCustChannel" height="200"></canvas></div>
+                <div><canvas id="chartCustTop5" height="200"></canvas></div>
+                <div class="md:col-span-2"><canvas id="chartCustGrowth" height="200"></canvas></div>
             </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="card p-3 text-center"><span class="text-xs opacity-60">Total Pelanggan</span><p class="font-bold" id="anaCustTotalCustomers">0</p></div>
+                <div class="card p-3 text-center"><span class="text-xs opacity-60">Baru Bulan Ini</span><p class="font-bold" id="anaCustNewThisMonth">0</p></div>
+                <div class="card p-3 text-center"><span class="text-xs opacity-60">Rata² Frekuensi</span><p class="font-bold" id="anaCustAvgFrequency">0</p></div>
+                <div class="card p-3 text-center"><span class="text-xs opacity-60">Rata² Belanja</span><p class="font-bold" id="anaCustAvgSpent">Rp 0</p></div>
+            </div>
+        </div>
+
+        <!-- ==================== SUB-TAB: CATATAN INTERNAL ==================== -->
+        <div id="custdetail-notes" class="custdetail-subtab-content hidden">
+            <h3 class="font-semibold text-lg mb-4">Catatan Internal per Pelanggan</h3>
+            <div class="flex flex-wrap gap-2 mb-4">
+                <div id="custNoteCustomerContainer" class="searchable-dropdown-wrapper w-64"></div>
+                <input type="text" id="custNoteInput" placeholder="Tulis catatan..." class="flex-1 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                <button id="custAddNoteBtn" class="btn btn-primary btn-sm">Tambah</button>
+                <button id="custNoteSortBtn" class="btn btn-secondary btn-sm">↓ Terbaru</button>
+            </div>
+            <div id="custNotesList" class="space-y-2 max-h-80 overflow-y-auto"></div>
+        </div>
+
+        <!-- ==================== SUB-TAB: DOKUMEN ==================== -->
+        <div id="custdetail-documents" class="custdetail-subtab-content hidden">
+            <h3 class="font-semibold text-lg mb-4">Dokumen Pelanggan</h3>
+            <div class="flex flex-wrap gap-2 mb-4">
+                <div id="custDocCustomerContainer" class="searchable-dropdown-wrapper w-64"></div>
+                <input type="file" id="custDocInput" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                <select id="custDocTypeSelect" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                    <option value="pdf">PDF</option>
+                    <option value="image">Gambar</option>
+                    <option value="other">Lainnya</option>
+                </select>
+                <button id="custAddDocBtn" class="btn btn-primary btn-sm">Tambah</button>
+                <select id="custDocFilterSelect" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                    <option value="all">Semua Tipe</option>
+                    <option value="pdf">PDF</option>
+                    <option value="image">Gambar</option>
+                    <option value="other">Lainnya</option>
+                </select>
+            </div>
+            <div id="custDocList" class="space-y-2 max-h-80 overflow-y-auto"></div>
+        </div>
+
+        <!-- ==================== SUB-TAB: INTERAKSI ==================== -->
+        <div id="custdetail-interactions" class="custdetail-subtab-content hidden">
+            <h3 class="font-semibold text-lg mb-4">Log Interaksi Pelanggan</h3>
+            <div class="flex flex-wrap gap-2 mb-4">
+                <div id="interactionCustomerContainer" class="searchable-dropdown-wrapper w-64"></div>
+                <select id="interactionType" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                    <option value="call">Telepon</option>
+                    <option value="email">Email</option>
+                    <option value="meeting">Meeting</option>
+                    <option value="other">Lainnya</option>
+                </select>
+                <input type="date" id="interactionDate" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                <input type="text" id="interactionInput" placeholder="Catatan interaksi..." class="flex-1 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                <button id="addInteractionBtn" class="btn btn-primary btn-sm">Tambah</button>
+                <select id="interactionFilterType" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                    <option value="all">Semua</option>
+                    <option value="call">Telepon</option>
+                    <option value="email">Email</option>
+                    <option value="meeting">Meeting</option>
+                    <option value="other">Lainnya</option>
+                </select>
+            </div>
+            <div id="interactionList" class="space-y-2 max-h-80 overflow-y-auto"></div>
+        </div>
+
+        <!-- ==================== SUB-TAB: GRUP PELANGGAN ==================== -->
+        <div id="custdetail-groups" class="custdetail-subtab-content hidden">
+            <h3 class="font-semibold text-lg mb-4">Grup Pelanggan</h3>
+            <div class="flex flex-wrap gap-2 mb-4">
+                <input type="text" id="newGroupName" placeholder="Nama Grup" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                <input type="number" id="newGroupDiscount" placeholder="Diskon (%)" class="w-28 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                <button id="addGroupBtn" class="btn btn-primary btn-sm">Tambah Grup</button>
+            </div>
+            <table class="w-full text-sm border rounded-lg">
+                <thead class="bg-slate-100 dark:bg-slate-700">
+                    <tr><th class="p-2">Nama</th><th class="p-2">Diskon</th><th class="p-2">Catatan</th><th class="p-2 text-right">Jumlah</th><th class="p-2 text-center">Aksi</th></tr>
+                </thead>
+                <tbody id="groupTableBody"></tbody>
+            </table>
         </div>
     </div>
 </div>
