@@ -1913,7 +1913,7 @@
     </div>
 </div>
 
-       <!-- ==================== TAB KEUANGAN (UPGRADE KOMPLEKS) ==================== -->
+<!-- ==================== TAB KEUANGAN (PRO) ==================== -->
 <div id="tab-finance" class="tab-content space-y-6">
     <div class="card p-6">
         <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-wallet text-primary-600"></i> Keuangan & Akuntansi</h2>
@@ -1921,105 +1921,73 @@
         <!-- Sub-tab Navigasi -->
         <div class="flex flex-wrap gap-2 mb-6 border-b pb-3">
             <button class="btn btn-sm btn-primary finance-subtab-btn active" data-finance-tab="finance-overview">📊 Ringkasan</button>
-            <button class="btn btn-sm btn-secondary finance-subtab-btn" data-finance-tab="finance-expense">🧾 Catat Beban</button>
+            <button class="btn btn-sm btn-secondary finance-subtab-btn" data-finance-tab="finance-expense">🧾 Beban</button>
             <button class="btn btn-sm btn-secondary finance-subtab-btn" data-finance-tab="finance-journal">📖 Buku Besar</button>
             <button class="btn btn-sm btn-secondary finance-subtab-btn" data-finance-tab="finance-cashflow">💵 Arus Kas</button>
             <button class="btn btn-sm btn-secondary finance-subtab-btn" data-finance-tab="finance-analysis">📈 Analisis</button>
+            <button class="btn btn-sm btn-secondary finance-subtab-btn" data-finance-tab="finance-tax">🧾 Pajak</button>
+            <button class="btn btn-sm btn-secondary finance-subtab-btn" data-finance-tab="finance-coa">🗂️ COA</button>
+            <button class="btn btn-sm btn-secondary finance-subtab-btn" data-finance-tab="finance-budget">💰 Anggaran</button>
+            <button class="btn btn-sm btn-secondary finance-subtab-btn" data-finance-tab="finance-projection">🔮 Proyeksi</button>
+            <button class="btn btn-sm btn-secondary finance-subtab-btn" data-finance-tab="finance-ratios">📉 Rasio</button>
             <button class="btn btn-sm btn-secondary finance-subtab-btn" data-finance-tab="finance-export">📦 Ekspor</button>
         </div>
 
-        <!-- SUB-TAB: RINGKASAN -->
+        <!-- ==================== RINGKASAN ==================== -->
         <div id="finance-overview" class="finance-subtab-content">
-            <h3 class="font-semibold text-lg mb-4">Ringkasan Keuangan Bulan Ini</h3>
+            <h3 class="font-semibold text-lg mb-4">Ringkasan Keuangan</h3>
+            <!-- Filter periode -->
+            <div class="flex flex-wrap gap-3 mb-4 items-end">
+                <div><label class="text-xs">Dari</label><input type="date" id="financePeriodStart" class="w-36 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs">Sampai</label><input type="date" id="financePeriodEnd" class="w-36 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <button id="applyFinancePeriod" class="btn btn-primary btn-sm h-9">Tampilkan</button>
+            </div>
             <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-                <div class="card p-3 text-center bg-green-50 dark:bg-green-900/20 border border-green-200">
-                    <span class="text-xs opacity-60">Pendapatan</span>
-                    <p class="font-bold text-lg text-green-600" id="finPendapatan">Rp 0</p>
-                </div>
-                <div class="card p-3 text-center bg-red-50 dark:bg-red-900/20 border border-red-200">
-                    <span class="text-xs opacity-60">HPP</span>
-                    <p class="font-bold text-lg text-red-500" id="finHPP">Rp 0</p>
-                </div>
-                <div class="card p-3 text-center bg-blue-50 dark:bg-blue-900/20 border border-blue-200">
-                    <span class="text-xs opacity-60">Laba Kotor</span>
-                    <p class="font-bold text-lg text-blue-600" id="finLabaKotor">Rp 0</p>
-                </div>
-                <div class="card p-3 text-center bg-amber-50 dark:bg-amber-900/20 border border-amber-200">
-                    <span class="text-xs opacity-60">Beban</span>
-                    <p class="font-bold text-lg text-amber-600" id="finBeban">Rp 0</p>
-                </div>
-                <div class="card p-3 text-center bg-violet-50 dark:bg-violet-900/20 border border-violet-200">
-                    <span class="text-xs opacity-60">Laba Bersih</span>
-                    <p class="font-bold text-lg text-violet-600" id="finLabaBersih">Rp 0</p>
-                </div>
+                <div class="card p-3 text-center bg-green-50 dark:bg-green-900/20"><span class="text-xs opacity-60">Pendapatan</span><p class="font-bold text-lg text-green-600" id="finPendapatan">Rp 0</p></div>
+                <div class="card p-3 text-center bg-red-50 dark:bg-red-900/20"><span class="text-xs opacity-60">HPP</span><p class="font-bold text-lg text-red-500" id="finHPP">Rp 0</p></div>
+                <div class="card p-3 text-center bg-blue-50 dark:bg-blue-900/20"><span class="text-xs opacity-60">Laba Kotor</span><p class="font-bold text-lg text-blue-600" id="finLabaKotor">Rp 0</p></div>
+                <div class="card p-3 text-center bg-amber-50 dark:bg-amber-900/20"><span class="text-xs opacity-60">Beban</span><p class="font-bold text-lg text-amber-600" id="finBeban">Rp 0</p></div>
+                <div class="card p-3 text-center bg-violet-50 dark:bg-violet-900/20"><span class="text-xs opacity-60">Laba Bersih</span><p class="font-bold text-lg text-violet-600" id="finLabaBersih">Rp 0</p></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <h4 class="font-semibold mb-2">Laba Rugi Bulanan</h4>
-                    <canvas id="chartFinanceMonthlyPL" height="180"></canvas>
-                </div>
-                <div>
-                    <h4 class="font-semibold mb-2">Komposisi Beban</h4>
-                    <canvas id="chartExpenseComposition" height="180"></canvas>
-                </div>
+                <div><h4 class="font-semibold mb-2">Laba Rugi Bulanan</h4><canvas id="chartFinanceMonthlyPL" height="180"></canvas></div>
+                <div><h4 class="font-semibold mb-2">Komposisi Beban</h4><canvas id="chartExpenseComposition" height="180"></canvas></div>
             </div>
-            <div>
-                <h4 class="font-semibold mb-2">Margin per Produk</h4>
-                <canvas id="chartMarginPerProduct" height="180"></canvas>
-            </div>
+            <div><h4 class="font-semibold mb-2">Margin per Produk</h4><canvas id="chartMarginPerProduct" height="180"></canvas></div>
         </div>
 
-        <!-- SUB-TAB: CATAT BEBAN -->
+        <!-- ==================== BEBAN ==================== -->
         <div id="finance-expense" class="finance-subtab-content hidden">
             <h3 class="font-semibold text-lg mb-4">Catat Beban Operasional</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="card p-4">
                     <form id="expenseForm" class="space-y-3">
-                        <div>
-                            <label class="text-xs font-medium">Akun Beban</label>
-                            <select id="expenseAkun" class="w-full">
-                                <option value="Beban Operasional">Beban Operasional</option>
-                                <option value="Beban Listrik">Beban Listrik</option>
-                                <option value="Beban Sewa">Beban Sewa</option>
-                                <option value="Beban Gaji">Beban Gaji</option>
-                                <option value="Beban Transport">Beban Transport</option>
-                                <option value="Beban Marketing">Beban Marketing</option>
-                                <option value="Beban Admin Bank">Beban Admin Bank</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-xs font-medium">Jumlah (Rp)</label>
-                            <input type="number" id="expenseJumlah" placeholder="Jumlah" required class="w-full">
-                        </div>
-                        <div>
-                            <label class="text-xs font-medium">Tanggal</label>
-                            <input type="date" id="expenseTanggal" required class="w-full">
-                        </div>
-                        <div>
-                            <label class="text-xs font-medium">Deskripsi</label>
-                            <input type="text" id="expenseDeskripsi" placeholder="Opsional" class="w-full">
-                        </div>
-                        <button type="submit" class="btn btn-primary w-full">💾 Simpan Beban</button>
+                        <div><label class="text-xs font-medium">Akun Beban</label><select id="expenseAkun" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></select></div>
+                        <div><label class="text-xs font-medium">Jumlah (Rp)</label><input type="number" id="expenseJumlah" required class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                        <div><label class="text-xs font-medium">Tanggal</label><input type="date" id="expenseTanggal" required class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                        <div><label class="text-xs font-medium">Deskripsi</label><input type="text" id="expenseDeskripsi" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                        <button type="submit" class="btn btn-primary w-full">💾 Simpan</button>
                     </form>
                 </div>
                 <div class="card p-4">
-                    <h4 class="font-semibold mb-2">10 Beban Terakhir</h4>
-                    <div id="recentExpensesList" class="text-sm space-y-1 max-h-64 overflow-auto">
-                        <p class="opacity-50">Belum ada beban tercatat.</p>
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="expenseSearch" placeholder="Cari..." class="flex-1 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                        <select id="expenseFilterAkun" class="w-40 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"><option value="">Semua Akun</option></select>
                     </div>
+                    <div id="recentExpensesList" class="text-sm space-y-1 max-h-64 overflow-auto"><p class="opacity-50">Belum ada beban.</p></div>
                 </div>
             </div>
         </div>
 
-        <!-- SUB-TAB: BUKU BESAR -->
+        <!-- ==================== BUKU BESAR ==================== -->
         <div id="finance-journal" class="finance-subtab-content hidden">
-            <h3 class="font-semibold text-lg mb-4">Buku Besar (Jurnal)</h3>
+            <h3 class="font-semibold text-lg mb-4">Buku Besar (Double-Entry)</h3>
             <div class="flex flex-wrap gap-3 mb-4 items-end">
-                <div><label class="text-xs font-medium">Dari</label><input type="date" id="journalStartDate" class="w-36"></div>
-                <div><label class="text-xs font-medium">Sampai</label><input type="date" id="journalEndDate" class="w-36"></div>
-                <div><label class="text-xs font-medium">Akun</label><select id="journalFilterAkun" class="w-40"><option value="">Semua</option><option value="Kas">Kas</option><option value="HPP">HPP</option><option value="Beban Operasional">Beban Operasional</option><option value="Beban Listrik">Listrik</option><option value="Beban Sewa">Sewa</option><option value="Beban Gaji">Gaji</option><option value="Beban Transport">Transport</option></select></div>
+                <div><label class="text-xs">Dari</label><input type="date" id="journalStartDate" class="w-36 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs">Sampai</label><input type="date" id="journalEndDate" class="w-36 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs">Akun</label><select id="journalFilterAkun" class="w-40 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"><option value="">Semua</option></select></div>
                 <button id="applyJournalFilter" class="btn btn-primary btn-sm h-9">🔍 Tampilkan</button>
-                <button id="exportJournalExcel" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-xls"></i> Excel</button>
+                <button id="exportJournalExcel" class="btn btn-secondary btn-sm h-9">Excel</button>
             </div>
             <div class="overflow-x-auto max-h-96 border rounded-lg">
                 <table class="w-full text-sm">
@@ -2028,18 +1996,18 @@
                 </table>
             </div>
             <div class="flex justify-between mt-2 text-sm">
-                <span class="opacity-50" id="journalShowingInfo"></span>
+                <span id="journalShowingInfo" class="opacity-50"></span>
                 <button id="loadMoreJournal" class="btn btn-xs btn-secondary hidden">Muat Lebih</button>
             </div>
         </div>
 
-        <!-- SUB-TAB: ARUS KAS -->
+        <!-- ==================== ARUS KAS ==================== -->
         <div id="finance-cashflow" class="finance-subtab-content hidden">
             <h3 class="font-semibold text-lg mb-4">Arus Kas</h3>
             <div class="flex flex-wrap gap-3 mb-4 items-end">
-                <div><label class="text-xs font-medium">Bulan</label><select id="cashflowMonth" class="w-32"><option value="0">Januari</option><option value="1">Februari</option><option value="2">Maret</option><option value="3">April</option><option value="4">Mei</option><option value="5">Juni</option><option value="6">Juli</option><option value="7">Agustus</option><option value="8">September</option><option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option></select></div>
-                <div><label class="text-xs font-medium">Tahun</label><input type="number" id="cashflowYear" value="2025" class="w-24"></div>
-                <button id="applyCashflowFilter" class="btn btn-primary btn-sm h-9">🔍 Tampilkan</button>
+                <div><label class="text-xs">Bulan</label><select id="cashflowMonth" class="w-32 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">/* opsi bulan 0-11 */</select></div>
+                <div><label class="text-xs">Tahun</label><input type="number" id="cashflowYear" class="w-24 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <button id="applyCashflowFilter" class="btn btn-primary btn-sm h-9">Tampilkan</button>
             </div>
             <div class="grid grid-cols-3 gap-4 mb-6">
                 <div class="card p-3 text-center bg-green-50"><span class="text-xs">Kas Masuk</span><p class="font-bold text-green-600" id="cfKasMasuk">Rp 0</p></div>
@@ -2049,28 +2017,101 @@
             <canvas id="chartCashflow" height="180"></canvas>
         </div>
 
-        <!-- SUB-TAB: ANALISIS -->
+        <!-- ==================== ANALISIS ==================== -->
         <div id="finance-analysis" class="finance-subtab-content hidden">
-            <h3 class="font-semibold text-lg mb-4">Analisis Kinerja Keuangan</h3>
-            <div class="grid grid-cols-3 gap-4 mb-6">
-                <div class="card p-4 text-center"><span class="text-xs opacity-60">Margin Laba Kotor</span><p class="text-2xl font-bold text-green-600" id="anaMarginKotor">0%</p></div>
-                <div class="card p-4 text-center"><span class="text-xs opacity-60">Margin Laba Bersih</span><p class="text-2xl font-bold text-blue-600" id="anaMarginBersih">0%</p></div>
-                <div class="card p-4 text-center"><span class="text-xs opacity-60">Rasio Beban</span><p class="text-2xl font-bold text-red-500" id="anaRasioBeban">0%</p></div>
+            <h3 class="font-semibold text-lg mb-4">Analisis Kinerja</h3>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                <div class="card p-3 text-center"><span class="text-xs">Margin Kotor</span><p id="anaMarginKotor" class="font-bold">0%</p></div>
+                <div class="card p-3 text-center"><span class="text-xs">Margin Bersih</span><p id="anaMarginBersih" class="font-bold">0%</p></div>
+                <div class="card p-3 text-center"><span class="text-xs">Rasio Beban</span><p id="anaRasioBeban" class="font-bold">0%</p></div>
+                <div class="card p-3 text-center"><span class="text-xs">ROA</span><p id="anaROA" class="font-bold">0%</p></div>
+                <div class="card p-3 text-center"><span class="text-xs">ROE</span><p id="anaROE" class="font-bold">0%</p></div>
             </div>
             <div class="card p-4">
                 <h4 class="font-semibold mb-2">Rekomendasi</h4>
-                <ul class="list-disc list-inside text-sm space-y-2" id="analysisRecommendations"></ul>
+                <ul id="analysisRecommendations" class="list-disc list-inside text-sm space-y-2"></ul>
             </div>
         </div>
 
-        <!-- SUB-TAB: EKSPOR -->
+        <!-- ==================== PAJAK ==================== -->
+        <div id="finance-tax" class="finance-subtab-content hidden">
+            <h3 class="font-semibold text-lg mb-4">Perkiraan Pajak</h3>
+            <div class="flex gap-3 mb-4 items-end">
+                <div><label class="text-xs">Dari</label><input type="date" id="taxPeriodStart" class="w-36 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs">Sampai</label><input type="date" id="taxPeriodEnd" class="w-36 border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <button id="applyTaxFilter" class="btn btn-primary btn-sm h-9">Hitung</button>
+            </div>
+            <div class="grid grid-cols-5 gap-4 mb-6">
+                <div class="card p-3 text-center"><span class="text-xs">DPP</span><p id="taxDPP" class="font-bold">Rp 0</p></div>
+                <div class="card p-3 text-center"><span class="text-xs">PPN</span><p id="taxPPN" class="font-bold">Rp 0</p></div>
+                <div class="card p-3 text-center"><span class="text-xs">PPh 25</span><p id="taxPPH25" class="font-bold">Rp 0</p></div>
+                <div class="card p-3 text-center"><span class="text-xs">PPh 21</span><p id="taxPPH21" class="font-bold">Rp 0</p></div>
+                <div class="card p-3 text-center"><span class="text-xs">Total</span><p id="taxTotalPajak" class="font-bold">Rp 0</p></div>
+            </div>
+            <table id="taxBreakdownTable" class="w-full text-sm"></table>
+            <button id="exportTaxPDF" class="btn btn-secondary mt-4">Unduh PDF</button>
+        </div>
+
+        <!-- ==================== COA ==================== -->
+        <div id="finance-coa" class="finance-subtab-content hidden">
+            <h3 class="font-semibold text-lg mb-4">Chart of Accounts</h3>
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="newCoaKode" placeholder="Kode" class="w-20 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                <input type="text" id="newCoaNama" placeholder="Nama Akun" class="flex-1 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                <select id="newCoaTipe" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                    <option value="aset">Aset</option><option value="kewajiban">Kewajiban</option><option value="ekuitas">Ekuitas</option><option value="pendapatan">Pendapatan</option><option value="beban">Beban</option>
+                </select>
+                <button id="addCoaBtn" class="btn btn-primary">Tambah</button>
+            </div>
+            <table class="w-full text-sm">
+                <thead><tr><th class="p-2">Kode</th><th>Nama</th><th>Tipe</th><th>Aksi</th></tr></thead>
+                <tbody id="coaTableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- ==================== ANGGARAN ==================== -->
+        <div id="finance-budget" class="finance-subtab-content hidden">
+            <h3 class="font-semibold text-lg mb-4">Anggaran vs Realisasi</h3>
+            <div class="flex gap-2 mb-4 items-end">
+                <select id="budgetAkun" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></select>
+                <input type="month" id="budgetBulan" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                <input type="number" id="budgetJumlah" placeholder="Jumlah" class="w-32 border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                <button id="addBudgetBtn" class="btn btn-primary">Tambah</button>
+            </div>
+            <table class="w-full text-sm mb-6">
+                <thead><tr><th class="p-2">Akun</th><th>Bulan</th><th class="text-right">Jumlah</th><th>Aksi</th></tr></thead>
+                <tbody id="budgetTableBody"></tbody>
+            </table>
+            <canvas id="chartBudgetVsActual" height="180"></canvas>
+        </div>
+
+        <!-- ==================== PROYEKSI ==================== -->
+        <div id="finance-projection" class="finance-subtab-content hidden">
+            <h3 class="font-semibold text-lg mb-4">Proyeksi Pendapatan</h3>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="card p-4"><span class="text-xs">Proyeksi Pendapatan Bulan Depan</span><p id="projectionRevenue" class="text-xl font-bold">Rp 0</p></div>
+                <div class="card p-4"><span class="text-xs">Estimasi Laba</span><p id="projectionProfit" class="text-xl font-bold">Rp 0</p></div>
+            </div>
+            <canvas id="chartProjection" height="180"></canvas>
+        </div>
+
+        <!-- ==================== RASIO ==================== -->
+        <div id="finance-ratios" class="finance-subtab-content hidden">
+            <h3 class="font-semibold text-lg mb-4">Rasio Keuangan</h3>
+            <table class="w-full text-sm">
+                <thead><tr><th class="p-2">Rasio</th><th class="p-2 text-right">Nilai</th></tr></thead>
+                <tbody id="ratioTableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- ==================== EKSPOR ==================== -->
         <div id="finance-export" class="finance-subtab-content hidden">
             <h3 class="font-semibold text-lg mb-4">Ekspor Data Keuangan</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button id="exportFinanceExcelBtn" class="btn btn-success"><i class="ph ph-file-xls"></i> Ekspor Jurnal (Excel)</button>
-                <button id="exportFinanceFullExcelBtn" class="btn btn-success"><i class="ph ph-file-xls"></i> Ekspor Data Penjualan Lengkap (Excel)</button>
-                <button id="exportFinancePDFBtn" class="btn btn-secondary"><i class="ph ph-file-pdf"></i> Ekspor Laba Rugi (PDF)</button>
-                <button id="exportFinanceNeracaPDFBtn" class="btn btn-secondary"><i class="ph ph-file-pdf"></i> Ekspor Neraca (PDF)</button>
+                <button id="exportFinanceExcelBtn" class="btn btn-success">Jurnal (Excel)</button>
+                <button id="exportFinanceFullExcelBtn" class="btn btn-success">Data Penjualan Lengkap (Excel)</button>
+                <button id="exportFinancePDFBtn" class="btn btn-secondary">Laba Rugi (PDF)</button>
+                <button id="exportFinanceNeracaPDFBtn" class="btn btn-secondary">Neraca (PDF)</button>
             </div>
         </div>
     </div>
@@ -2482,7 +2523,7 @@
     </div>
 </div>
 
-        <!-- ==================== TAB RIWAYAT (UPGRADE KOMPLEKS) ==================== -->
+<!-- ==================== TAB RIWAYAT (PRO) ==================== -->
 <div id="tab-history" class="tab-content space-y-6">
     <div class="card p-6">
         <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph ph-clock-counter-clockwise text-amber-600"></i> Riwayat Transaksi Lengkap</h2>
@@ -2493,8 +2534,7 @@
             <div>
                 <p class="font-medium">📜 Pusat Riwayat Transaksi</p>
                 <p class="opacity-70 mt-1">
-                    Semua transaksi penjualan tercatat di sini. Gunakan filter di bawah untuk mencari transaksi spesifik.
-                    Klik ikon 🔍 untuk melihat detail, 🖨️ untuk cetak invoice, atau 🗑️ untuk menghapus transaksi.
+                    Semua transaksi penjualan tercatat di sini. Gunakan filter di bawah, tandai (bookmark) transaksi penting, edit, hapus, dan ekspor ke berbagai format.
                 </p>
             </div>
         </div>
@@ -2504,38 +2544,46 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
                 <div>
                     <label class="text-xs font-medium block mb-1">Dari Tanggal</label>
-                    <input type="date" id="historyStartDate" class="w-full">
+                    <input type="date" id="filterStart" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                 </div>
                 <div>
                     <label class="text-xs font-medium block mb-1">Sampai Tanggal</label>
-                    <input type="date" id="historyEndDate" class="w-full">
+                    <input type="date" id="filterEnd" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                 </div>
                 <div>
                     <label class="text-xs font-medium block mb-1">Produk</label>
-                    <select id="historyFilterProduk" class="w-full">
-                        <option value="">Semua Produk</option>
-                    </select>
+                    <div id="filterProdukContainer" class="searchable-dropdown-wrapper"></div>
+                </div>
+                <div>
+                    <label class="text-xs font-medium block mb-1">Pelanggan</label>
+                    <div id="filterKlienContainer" class="searchable-dropdown-wrapper"></div>
                 </div>
                 <div>
                     <label class="text-xs font-medium block mb-1">Channel</label>
-                    <select id="historyFilterChannel" class="w-full">
-                        <option value="">Semua Channel</option>
+                    <select id="filterChannel" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                        <option value="">Semua</option>
                         <option value="online">🌐 Online</option>
                         <option value="offline">🏪 Offline</option>
                     </select>
                 </div>
                 <div>
                     <label class="text-xs font-medium block mb-1">Tier</label>
-                    <select id="historyFilterTier" class="w-full">
-                        <option value="">Semua Tier</option>
+                    <select id="filterTier" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                        <option value="">Semua</option>
                         <option value="ecer">Ecer</option>
                         <option value="grosir">Grosir</option>
-                        <option value="partai">Partai Besar</option>
+                        <option value="partai">Partai</option>
                     </select>
                 </div>
                 <div>
-                    <label class="text-xs font-medium block mb-1">Klien</label>
-                    <input type="text" id="historyFilterKlien" placeholder="Nama klien..." class="w-full">
+                    <label class="text-xs font-medium block mb-1">Pembayaran</label>
+                    <select id="filterPaymentMethod" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                        <option value="">Semua</option>
+                        <option value="tunai">Tunai</option>
+                        <option value="transfer">Transfer</option>
+                        <option value="qris">QRIS</option>
+                        <option value="tempo">Tempo</option>
+                    </select>
                 </div>
                 <div class="flex items-end gap-2">
                     <button id="applyHistoryFilter" class="btn btn-primary btn-sm h-9">🔍 Tampilkan</button>
@@ -2544,81 +2592,150 @@
                 <div class="flex items-end gap-2 justify-end">
                     <button id="exportHistoryCSV" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-csv"></i> CSV</button>
                     <button id="exportHistoryExcel" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-xls"></i> Excel</button>
+                    <button id="exportHistoryPDF" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file-pdf"></i> PDF</button>
+                    <button id="exportHistoryJSON" class="btn btn-secondary btn-sm h-9"><i class="ph ph-file"></i> JSON</button>
                 </div>
             </div>
             <p class="text-xs opacity-50 mt-2" id="historyFilterInfo">Menampilkan semua transaksi</p>
         </div>
 
+        <!-- Bookmark & Toolbar -->
+        <div class="flex flex-wrap gap-2 mb-4 items-center">
+            <button id="historyBookmarkToggle" class="btn btn-secondary btn-sm">⭐ Bookmark</button>
+            <button id="historyBulkBookmark" class="btn btn-secondary btn-sm">📌 Tandai Terpilih</button>
+            <button id="toggleHistoryDisplay" class="btn btn-secondary btn-sm">🔄 Tampilan Kartu</button>
+            <button id="autoRefreshHistoryToggle" class="btn btn-secondary btn-sm"><i class="ph ph-arrow-clockwise"></i> Auto Refresh</button>
+            <div class="flex-grow"></div>
+            <label class="flex items-center gap-1 text-xs cursor-pointer">
+                <input type="checkbox" id="historySelectAll"> Pilih Semua
+            </label>
+            <button id="historyBulkDelete" class="btn btn-danger btn-xs">🗑️ Hapus</button>
+            <button id="undoHistoryBtn" class="btn btn-warning btn-xs">↩️ Undo</button>
+            <button id="undoHistoryListBtn" class="btn btn-secondary btn-xs">🗑️ Bersihkan Undo</button>
+        </div>
+
+        <!-- Bookmark List -->
+        <div id="historyBookmarkList" class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg">
+            <h4 class="text-sm font-semibold mb-2"><i class="ph ph-star mr-1"></i> Transaksi yang Ditandai</h4>
+        </div>
+
         <!-- Statistik Riwayat 6 Kartu -->
         <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6" id="historyStats">
-            <div class="card p-3 text-center hover-lift">
-                <span class="text-xs opacity-60">Total Transaksi</span>
-                <p class="font-bold text-lg" id="historyTotalTrx">0</p>
+            <div class="card p-3 text-center hover-lift"><span class="text-xs opacity-60">Total Transaksi</span><p class="font-bold text-lg" id="historyTotalTrx">0</p></div>
+            <div class="card p-3 text-center hover-lift"><span class="text-xs opacity-60">Total Pendapatan</span><p class="font-bold text-lg text-green-600" id="historyTotalRevenue">Rp 0</p></div>
+            <div class="card p-3 text-center hover-lift"><span class="text-xs opacity-60">Rata-rata/hari</span><p class="font-bold text-lg" id="historyAvgDaily">Rp 0</p></div>
+            <div class="card p-3 text-center hover-lift"><span class="text-xs opacity-60">Transaksi Hari Ini</span><p class="font-bold text-lg" id="historyTodayTrx">0</p></div>
+            <div class="card p-3 text-center hover-lift"><span class="text-xs opacity-60">Online</span><p class="font-bold text-lg text-indigo-600" id="historyOnlineTrx">0</p></div>
+            <div class="card p-3 text-center hover-lift"><span class="text-xs opacity-60">Offline</span><p class="font-bold text-lg text-amber-600" id="historyOfflineTrx">0</p></div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div class="card p-3">
+                <h4 class="font-semibold text-sm mb-2">Tren Pendapatan 30 Hari</h4>
+                <canvas id="chartHistoryRevenue" height="150"></canvas>
             </div>
-            <div class="card p-3 text-center hover-lift">
-                <span class="text-xs opacity-60">Total Pendapatan</span>
-                <p class="font-bold text-lg text-green-600" id="historyTotalRevenue">Rp 0</p>
+            <div class="card p-3">
+                <h4 class="font-semibold text-sm mb-2">Pendapatan per Produk</h4>
+                <canvas id="chartHistoryByProduct" height="150"></canvas>
             </div>
-            <div class="card p-3 text-center hover-lift">
-                <span class="text-xs opacity-60">Rata-rata/hari</span>
-                <p class="font-bold text-lg" id="historyAvgDaily">Rp 0</p>
+            <div class="card p-3">
+                <h4 class="font-semibold text-sm mb-2">Pendapatan per Pelanggan</h4>
+                <canvas id="chartHistoryByCustomer" height="150"></canvas>
             </div>
-            <div class="card p-3 text-center hover-lift">
-                <span class="text-xs opacity-60">Transaksi Hari Ini</span>
-                <p class="font-bold text-lg" id="historyTodayTrx">0</p>
-            </div>
-            <div class="card p-3 text-center hover-lift">
-                <span class="text-xs opacity-60">Online</span>
-                <p class="font-bold text-lg text-indigo-600" id="historyOnlineTrx">0</p>
-            </div>
-            <div class="card p-3 text-center hover-lift">
-                <span class="text-xs opacity-60">Offline</span>
-                <p class="font-bold text-lg text-amber-600" id="historyOfflineTrx">0</p>
+            <div class="card p-3">
+                <h4 class="font-semibold text-sm mb-2">Pendapatan per Jam</h4>
+                <canvas id="chartHistoryHourly" height="150"></canvas>
             </div>
         </div>
 
-        <!-- Grafik Riwayat Pendapatan 30 Hari -->
-        <div class="mb-6">
-            <h3 class="font-semibold mb-2 flex items-center gap-2"><i class="ph ph-chart-line text-blue-500"></i> Tren Pendapatan 30 Hari Terakhir</h3>
-            <canvas id="chartHistoryRevenue" height="180"></canvas>
-        </div>
-
-        <!-- Tabel Riwayat Transaksi -->
-        <div class="overflow-x-auto max-h-[500px] border rounded-lg bg-white dark:bg-slate-800">
+        <!-- Tampilan Tabel (default) -->
+        <div id="historyTableContainer" class="overflow-x-auto max-h-[500px] border rounded-lg bg-white dark:bg-slate-800">
             <table class="w-full text-sm">
                 <thead class="bg-slate-100 dark:bg-slate-700 sticky top-0 z-10">
                     <tr>
-                        <th class="p-2 text-left w-24">Tanggal</th>
+                        <th class="p-2 text-left w-10"><input type="checkbox" id="historySelectAllHeader" class="history-select-all"></th>
+                        <th class="p-2 text-left">Tanggal</th>
                         <th class="p-2 text-left">Klien</th>
                         <th class="p-2 text-left">Produk</th>
                         <th class="p-2 text-right">Qty</th>
-                        <th class="p-2 text-right">Harga/kg</th>
                         <th class="p-2 text-right">Total</th>
-                        <th class="p-2 text-right">HPP/kg</th>
                         <th class="p-2 text-center">Channel</th>
                         <th class="p-2 text-center">Tier</th>
-                        <th class="p-2 text-center w-28">Aksi</th>
+                        <th class="p-2 text-center w-32">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="historyTableBody">
-                    <tr><td colspan="10" class="text-center p-4 opacity-50">Memuat data...</td></tr>
+                    <tr><td colspan="9" class="text-center p-4 opacity-50">Memuat data...</td></tr>
                 </tbody>
             </table>
         </div>
 
+        <!-- Tampilan Kartu (hidden by default) -->
+        <div id="historyCardsContainer" class="hidden space-y-2 max-h-[500px] overflow-y-auto"></div>
+
         <!-- Pagination & Info -->
         <div class="flex justify-between items-center mt-3 text-sm">
-            <span class="opacity-50" id="historyShowingInfo">Menampilkan 0 transaksi</span>
-            <button id="loadMoreHistory" class="btn btn-xs btn-secondary hidden">Muat Lebih Banyak</button>
+            <span id="historyShowingInfo" class="opacity-50">Menampilkan 0 transaksi</span>
+            <div class="flex items-center gap-2">
+                <input type="number" id="historyPageInput" class="w-16 border rounded p-1 text-sm dark:bg-slate-700 dark:border-slate-600" min="1" value="1">
+                <button id="historyGoPageBtn" class="btn btn-xs btn-secondary">Go</button>
+                <button id="loadMoreHistory" class="btn btn-xs btn-secondary hidden">Muat Lebih</button>
+            </div>
         </div>
 
-        <!-- Tombol Hapus Semua Riwayat -->
+        <!-- Tombol Bawah -->
         <div class="mt-6 flex justify-between items-center">
             <button id="clearAllHistoryBtn" class="btn btn-danger btn-sm"><i class="ph ph-trash"></i> Hapus Semua Riwayat</button>
             <span class="text-xs opacity-40">* Menghapus riwayat tidak mengembalikan stok batch</span>
         </div>
     </div>
+
+    <!-- Modal Detail -->
+    <div id="historyDetailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white dark:bg-slate-800 p-6 rounded shadow-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg">🔍 Detail Transaksi</h3>
+                <button id="historyDetailCloseBtn" class="text-red-500 text-xl leading-none">&times;</button>
+            </div>
+            <div id="historyDetailContent" class="space-y-2 text-sm"></div>
+        </div>
+    </div>
+
+    <!-- Modal Edit -->
+    <div id="historyEditModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white dark:bg-slate-800 p-6 rounded shadow-lg w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg">✏️ Edit Transaksi</h3>
+                <button id="historyEditCloseBtn" class="text-red-500 text-xl leading-none">&times;</button>
+            </div>
+            <form id="historyEditForm" class="space-y-3">
+                <input type="hidden" id="historyEditId">
+                <div><label class="text-xs">Klien</label><input type="text" id="historyEditKlien" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs">Produk</label><input type="text" id="historyEditProduk" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs">Qty (kg)</label><input type="number" id="historyEditQty" step="0.01" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs">Harga/kg</label><input type="number" id="historyEditHarga" step="0.01" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs">Diskon</label><input type="number" id="historyEditDiskon" step="0.01" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <div><label class="text-xs">Channel</label><select id="historyEditChannel" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"><option value="offline">Offline</option><option value="online">Online</option></select></div>
+                <div><label class="text-xs">Tier</label><select id="historyEditTier" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"><option value="ecer">Ecer</option><option value="grosir">Grosir</option><option value="partai">Partai</option></select></div>
+                <div><label class="text-xs">Pembayaran</label><input type="text" id="historyEditPayment" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600"></div>
+                <button type="submit" class="btn btn-primary w-full">Simpan Perubahan</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Diff (Compare) -->
+    <div id="historyDiffModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white dark:bg-slate-800 p-6 rounded shadow-lg w-full max-w-xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg">🔁 Bandingkan Transaksi</h3>
+                <button id="historyDiffCloseBtn" class="text-red-500 text-xl leading-none">&times;</button>
+            </div>
+            <div id="historyDiffContent"></div>
+        </div>
+    </div>
 </div>
+        
 <!-- ==================== TAB AUDIT TRAIL (PRO) ==================== -->
 <div id="tab-audit" class="tab-content space-y-6">
     <div class="card p-6">
