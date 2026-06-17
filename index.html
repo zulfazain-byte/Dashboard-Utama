@@ -3240,7 +3240,7 @@
     </div>
 </div>
         
-        <!-- ==================== TAB PENGATURAN (UPGRADE KOMPLEKS) ==================== -->
+<!-- ==================== TAB PENGATURAN (PRO) ==================== -->
 <div id="tab-settings" class="tab-content space-y-6">
     <div class="card p-6">
         <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="ph ph-gear text-slate-600"></i> Pengaturan Bisnis & Kustomisasi</h2>
@@ -3267,11 +3267,11 @@
                             Nama Bisnis
                             <span class="tooltip"><i class="ph ph-info text-xs text-slate-400"></i><span class="tooltip-text">Nama yang akan muncul di invoice dan header aplikasi</span></span>
                         </label>
-                        <input type="text" id="setNamaBisnis" value="Cibitung Frozen" class="w-full">
+                        <input type="text" id="setNamaBisnis" value="Cibitung Frozen" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                     <div>
                         <label class="text-sm font-medium">Mata Uang</label>
-                        <select id="setMataUang" class="w-full">
+                        <select id="setMataUang" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                             <option value="IDR">IDR - Rupiah Indonesia</option>
                             <option value="USD">USD - US Dollar</option>
                             <option value="SGD">SGD - Singapore Dollar</option>
@@ -3279,7 +3279,7 @@
                     </div>
                     <div>
                         <label class="text-sm font-medium">Zona Waktu</label>
-                        <select id="setZonaWaktu" class="w-full">
+                        <select id="setZonaWaktu" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                             <option value="Asia/Jakarta">Asia/Jakarta (WIB)</option>
                             <option value="Asia/Makassar">Asia/Makassar (WITA)</option>
                             <option value="Asia/Jayapura">Asia/Jayapura (WIT)</option>
@@ -3287,7 +3287,7 @@
                     </div>
                     <div>
                         <label class="text-sm font-medium">Format Tanggal</label>
-                        <select id="setFormatTanggal" class="w-full">
+                        <select id="setFormatTanggal" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                             <option value="DD/MM/YYYY">DD/MM/YYYY</option>
                             <option value="MM/DD/YYYY">MM/DD/YYYY</option>
                             <option value="YYYY-MM-DD">YYYY-MM-DD (ISO)</option>
@@ -3300,15 +3300,15 @@
                             Target Penjualan Bulanan (Rp)
                             <span class="tooltip"><i class="ph ph-info text-xs text-slate-400"></i><span class="tooltip-text">Target yang akan dilacak di dashboard</span></span>
                         </label>
-                        <input type="number" id="setTargetBulanan" value="50000000" class="w-full">
+                        <input type="number" id="setTargetBulanan" value="50000000" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                     <div>
                         <label class="text-sm font-medium">Minimal Stok Peringatan (kg)</label>
-                        <input type="number" id="setMinStokWarning" value="10" class="w-full">
+                        <input type="number" id="setMinStokWarning" value="10" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                     <div>
                         <label class="text-sm font-medium">Satuan Default</label>
-                        <select id="setSatuanDefault" class="w-full">
+                        <select id="setSatuanDefault" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                             <option value="kg">Kilogram (kg)</option>
                             <option value="gram">Gram (g)</option>
                             <option value="ton">Ton</option>
@@ -3329,40 +3329,37 @@
                 <div class="space-y-4">
                     <div>
                         <label class="text-sm font-medium">PPN (%)</label>
-                        <input type="number" id="setPPN" value="12" class="w-full" step="0.1">
-                        <p class="text-xs opacity-50 mt-1">Pajak Pertambahan Nilai yang berlaku</p>
+                        <input type="number" id="setPPN" value="12" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600" step="0.1">
                     </div>
                     <div>
                         <label class="text-sm font-medium">PPh 25 (%)</label>
-                        <input type="number" id="setPPh25" value="2" class="w-full" step="0.1">
-                        <p class="text-xs opacity-50 mt-1">Pajak Penghasilan Pasal 25</p>
+                        <input type="number" id="setPPh25" value="2" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600" step="0.1">
                     </div>
                     <div>
                         <label class="text-sm font-medium">PPh 21 (%)</label>
-                        <input type="number" id="setPPh21" value="5" class="w-full" step="0.1">
+                        <input type="number" id="setPPh21" value="5" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600" step="0.1">
                     </div>
                     <div>
                         <label class="text-sm font-medium">PT Share (%)</label>
-                        <input type="number" id="setPTShare" value="60" class="w-full" step="0.1">
-                        <p class="text-xs opacity-50 mt-1">Persentase kepemilikan PT (untuk laporan)</p>
+                        <input type="number" id="setPTShare" value="60" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600" step="0.1">
                     </div>
                 </div>
                 <div class="space-y-4">
                     <div>
                         <label class="text-sm font-medium">NPWP Perusahaan</label>
-                        <input type="text" id="setNPWP" placeholder="00.000.000.0-000.000" class="w-full">
+                        <input type="text" id="setNPWP" placeholder="00.000.000.0-000.000" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                     <div>
                         <label class="text-sm font-medium">Nomor SIUP</label>
-                        <input type="text" id="setSIUP" placeholder="Nomor Surat Izin Usaha" class="w-full">
+                        <input type="text" id="setSIUP" placeholder="Nomor Surat Izin Usaha" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                     <div>
                         <label class="text-sm font-medium">Nomor NIB</label>
-                        <input type="text" id="setNIB" placeholder="Nomor Induk Berusaha" class="w-full">
+                        <input type="text" id="setNIB" placeholder="Nomor Induk Berusaha" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                     <div>
                         <label class="text-sm font-medium">Tahun Pajak Aktif</label>
-                        <input type="number" id="setTahunPajak" value="2025" class="w-full">
+                        <input type="number" id="setTahunPajak" value="2025" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                 </div>
             </div>
@@ -3375,37 +3372,33 @@
                 <div class="space-y-4">
                     <div>
                         <label class="text-sm font-medium">Margin Default (Rp/kg)</label>
-                        <input type="number" id="setMarginDefault" value="15000" class="w-full">
-                        <p class="text-xs opacity-50 mt-1">Keuntungan dasar yang ditambahkan di atas HPP</p>
+                        <input type="number" id="setMarginDefault" value="15000" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                     <div>
                         <label class="text-sm font-medium">Margin Minimum (Rp/kg)</label>
-                        <input type="number" id="setMarginMin" value="5000" class="w-full">
-                        <p class="text-xs opacity-50 mt-1">Batas bawah margin agar tidak rugi</p>
+                        <input type="number" id="setMarginMin" value="5000" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                     <div>
                         <label class="text-sm font-medium">Min Grosir (kg)</label>
-                        <input type="number" id="setMinGrosir" value="10" class="w-full">
+                        <input type="number" id="setMinGrosir" value="10" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                     <div>
                         <label class="text-sm font-medium">Min Partai (kg)</label>
-                        <input type="number" id="setMinPartai" value="500" class="w-full">
+                        <input type="number" id="setMinPartai" value="500" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                 </div>
                 <div class="space-y-4">
                     <div>
                         <label class="text-sm font-medium">Selisih Grosir dari Ecer (Rp)</label>
-                        <input type="number" id="setSelisihGrosir" value="5000" class="w-full">
-                        <p class="text-xs opacity-50 mt-1">Potongan harga untuk pembelian grosir</p>
+                        <input type="number" id="setSelisihGrosir" value="5000" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                     <div>
                         <label class="text-sm font-medium">Komisi Marketplace Default (%)</label>
-                        <input type="number" id="setMarketplaceFee" value="5" class="w-full" step="0.1">
-                        <p class="text-xs opacity-50 mt-1">Biaya komisi untuk penjualan online (Shopee, Tokopedia, dll)</p>
+                        <input type="number" id="setMarketplaceFee" value="5" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600" step="0.1">
                     </div>
                     <div>
                         <label class="text-sm font-medium">Harga Pembulatan</label>
-                        <select id="setPembulatan" class="w-full">
+                        <select id="setPembulatan" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                             <option value="100">Kelipatan 100</option>
                             <option value="500">Kelipatan 500</option>
                             <option value="1000">Kelipatan 1.000</option>
@@ -3423,14 +3416,14 @@
                 <div class="space-y-4">
                     <div>
                         <label class="text-sm font-medium">Alokasi Stok</label>
-                        <select id="setFifoMethod" class="w-full">
+                        <select id="setFifoMethod" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                             <option value="fefo">FEFO (Kadaluarsa Terdekat)</option>
                             <option value="fifo">FIFO (Masuk Pertama)</option>
                         </select>
                     </div>
                     <div>
                         <label class="text-sm font-medium">Metode Biaya Gudang</label>
-                        <select id="setStorageMethod" class="w-full">
+                        <select id="setStorageMethod" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                             <option value="none">Tidak Ada</option>
                             <option value="flat_monthly">Flat Bulanan</option>
                             <option value="per_kg_day">Harian per Kg</option>
@@ -3438,25 +3431,25 @@
                     </div>
                     <div id="storageFlatInput">
                         <label class="text-sm font-medium">Biaya Sewa Gudang Bulanan (Rp)</label>
-                        <input type="number" id="setStorageFlat" value="0" class="w-full">
+                        <input type="number" id="setStorageFlat" value="0" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                     <div id="storagePerKgInput" class="hidden">
                         <label class="text-sm font-medium">Biaya per Kg per Hari (Rp)</label>
-                        <input type="number" id="setStoragePerKg" value="0" class="w-full">
+                        <input type="number" id="setStoragePerKg" value="0" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                 </div>
                 <div class="space-y-4">
                     <div>
                         <label class="text-sm font-medium">Nama Gudang Utama</label>
-                        <input type="text" id="setNamaGudangUtama" value="Gudang Utama" class="w-full">
+                        <input type="text" id="setNamaGudangUtama" value="Gudang Utama" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                     <div>
                         <label class="text-sm font-medium">Nama Cold Storage</label>
-                        <input type="text" id="setNamaColdStorage" value="Cold Storage" class="w-full">
+                        <input type="text" id="setNamaColdStorage" value="Cold Storage" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                     <div>
                         <label class="text-sm font-medium">Kapasitas Maksimal Cold Storage (kg)</label>
-                        <input type="number" id="setKapasitasCold" value="5000" class="w-full">
+                        <input type="number" id="setKapasitasCold" value="5000" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                     <div class="flex items-center gap-3">
                         <label class="text-sm font-medium">Peringatan Kapasitas Gudang</label>
@@ -3466,85 +3459,60 @@
             </div>
         </div>
 
-<!-- KONTEN SUB-TAB: BACKUP & DATA (PRO) -->
-<div id="settings-backup" class="settings-tab-content hidden">
-    <h3 class="font-semibold text-lg mb-4 flex items-center gap-2">
-        <i class="ph ph-cloud-arrow-up-down text-purple-600"></i> Backup & Restore Data
-    </h3>
-    <p class="text-sm opacity-70 mb-6">Lindungi bisnis Anda dengan backup rutin dan pulihkan data kapan saja.</p>
-
-    <!-- Backup & Restore Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <!-- Backup -->
-        <div class="card p-6 flex flex-col items-center text-center bg-gradient-to-b from-blue-50 to-white dark:from-blue-900/20 dark:to-slate-800 border border-blue-200 dark:border-blue-800 rounded-xl">
-            <i class="ph ph-cloud-arrow-up text-4xl text-blue-600 mb-3"></i>
-            <h4 class="font-semibold text-lg">Backup Data</h4>
-            <p class="text-xs opacity-70 mb-4">Unduh semua data (penjualan, stok, keuangan, pelanggan) sebagai file .json</p>
-            <button onclick="CFS.Settings.backupData()" class="btn btn-primary w-full">
-                <i class="ph ph-download-simple mr-1"></i> Unduh Backup
-            </button>
-        </div>
-
-        <!-- Restore -->
-        <div class="card p-6 flex flex-col items-center text-center bg-gradient-to-b from-amber-50 to-white dark:from-amber-900/20 dark:to-slate-800 border border-amber-200 dark:border-amber-800 rounded-xl">
-            <i class="ph ph-cloud-arrow-down text-4xl text-amber-600 mb-3"></i>
-            <h4 class="font-semibold text-lg">Restore Data</h4>
-            <p class="text-xs opacity-70 mb-4">Pilih file backup (.json) untuk mengembalikan data. Data saat ini akan ditimpa.</p>
-            <input type="file" id="restoreFileInput" accept=".json" class="w-full mb-3 text-sm border border-amber-300 dark:border-amber-700 rounded-lg p-2 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-amber-400">
-            <button onclick="CFS.Settings.restoreData()" class="btn btn-warning w-full">
-                <i class="ph ph-upload-simple mr-1"></i> Pulihkan Data
-            </button>
-        </div>
-    </div>
-
-    <!-- Pengaturan Backup Otomatis -->
-    <div class="border-t pt-6">
-        <h4 class="font-semibold text-base mb-4 flex items-center gap-2">
-            <i class="ph ph-gear text-slate-600"></i> Pengaturan Tambahan
-        </h4>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-4">
-                <div>
-                    <label class="text-sm font-medium">Interval Auto Backup (hari)</label>
-                    <input type="number" id="setAutoBackup" value="7" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
-                    <p class="text-xs opacity-50 mt-1">0 = nonaktifkan</p>
+        <!-- KONTEN SUB-TAB: BACKUP & DATA -->
+        <div id="settings-backup" class="settings-tab-content hidden">
+            <h3 class="font-semibold text-lg mb-4 flex items-center gap-2"><i class="ph ph-cloud-arrow-up-down text-purple-600"></i> Backup & Restore Data</h3>
+            <p class="text-sm opacity-70 mb-6">Lindungi bisnis Anda dengan backup rutin dan pulihkan data kapan saja.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="card p-6 flex flex-col items-center text-center bg-gradient-to-b from-blue-50 to-white dark:from-blue-900/20 dark:to-slate-800 border border-blue-200 dark:border-blue-800 rounded-xl">
+                    <i class="ph ph-cloud-arrow-up text-4xl text-blue-600 mb-3"></i>
+                    <h4 class="font-semibold text-lg">Backup Data</h4>
+                    <p class="text-xs opacity-70 mb-4">Unduh semua data sebagai file .json</p>
+                    <button id="btnBackupManual" class="btn btn-primary w-full"><i class="ph ph-download-simple mr-1"></i> Unduh Backup</button>
                 </div>
-                <div class="flex items-center gap-3">
-                    <label class="text-sm font-medium">Kompresi Backup</label>
-                    <div class="toggle-wrapper">
-                        <input type="checkbox" id="setBackupKompresi" class="toggle-checkbox">
-                        <div class="toggle-label"></div>
-                    </div>
-                </div>
-                <div>
-                    <label class="text-sm font-medium">Lokasi Penyimpanan</label>
-                    <select id="setStorageBackend" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
-                        <option value="indexeddb">IndexedDB (Browser)</option>
-                        <option value="localstorage">LocalStorage</option>
-                    </select>
+                <div class="card p-6 flex flex-col items-center text-center bg-gradient-to-b from-amber-50 to-white dark:from-amber-900/20 dark:to-slate-800 border border-amber-200 dark:border-amber-800 rounded-xl">
+                    <i class="ph ph-cloud-arrow-down text-4xl text-amber-600 mb-3"></i>
+                    <h4 class="font-semibold text-lg">Restore Data</h4>
+                    <p class="text-xs opacity-70 mb-4">Pilih file backup (.json) untuk memulihkan data.</p>
+                    <input type="file" id="restoreFileInput" accept=".json" class="w-full mb-3 text-sm border border-amber-300 dark:border-amber-700 rounded-lg p-2 bg-white dark:bg-slate-700">
+                    <button id="btnRestore" class="btn btn-warning w-full"><i class="ph ph-upload-simple mr-1"></i> Pulihkan Data</button>
                 </div>
             </div>
-            <div class="space-y-4">
-                <div class="flex items-center gap-3">
-                    <label class="text-sm font-medium">Hapus Data Kuno</label>
-                    <div class="toggle-wrapper">
-                        <input type="checkbox" id="setAutoClean" class="toggle-checkbox">
-                        <div class="toggle-label"></div>
+            <div class="border-t pt-6">
+                <h4 class="font-semibold text-base mb-4">Pengaturan Tambahan</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-sm font-medium">Interval Auto Backup (hari)</label>
+                            <input type="number" id="setAutoBackup" value="7" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                            <p class="text-xs opacity-50 mt-1">0 = nonaktifkan</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="text-sm font-medium">Kompresi Backup</label>
+                            <div class="toggle-wrapper"><input type="checkbox" id="setBackupKompresi" class="toggle-checkbox"><div class="toggle-label"></div></div>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium">Lokasi Penyimpanan</label>
+                            <select id="setStorageBackend" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                                <option value="indexeddb">IndexedDB (Browser)</option>
+                                <option value="localstorage">LocalStorage</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3">
+                            <label class="text-sm font-medium">Hapus Data Kuno</label>
+                            <div class="toggle-wrapper"><input type="checkbox" id="setAutoClean" class="toggle-checkbox"><div class="toggle-label"></div></div>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium">Batas Umur Data (bulan)</label>
+                            <input type="number" id="setMaxDataAge" value="12" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <label class="text-sm font-medium">Batas Umur Data (bulan)</label>
-                    <input type="number" id="setMaxDataAge" value="12" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
-                    <p class="text-xs opacity-50 mt-1">Data lebih tua akan dihapus otomatis</p>
-                </div>
             </div>
+            <p class="text-xs opacity-50 mt-6">⚠️ <strong>Peringatan:</strong> Restore akan menimpa seluruh data saat ini dan tidak dapat dibatalkan.</p>
         </div>
-    </div>
-
-    <p class="text-xs opacity-50 mt-6 text-center md:text-left">
-        ⚠️ <strong>Peringatan:</strong> Restore akan menimpa seluruh data saat ini dan tidak dapat dibatalkan. Lakukan backup terlebih dahulu.
-    </p>
-</div>
 
         <!-- KONTEN SUB-TAB: TAMPILAN -->
         <div id="settings-tampilan" class="settings-tab-content hidden">
@@ -3553,7 +3521,7 @@
                 <div class="space-y-4">
                     <div>
                         <label class="text-sm font-medium">Tema Default</label>
-                        <select id="setTemaDefault" class="w-full">
+                        <select id="setTemaDefault" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                             <option value="light">Terang</option>
                             <option value="dark">Gelap</option>
                             <option value="auto">Otomatis (Sistem)</option>
@@ -3561,7 +3529,7 @@
                     </div>
                     <div>
                         <label class="text-sm font-medium">Ukuran Font</label>
-                        <select id="setFontSize" class="w-full">
+                        <select id="setFontSize" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                             <option value="small">Kecil</option>
                             <option value="normal" selected>Normal</option>
                             <option value="large">Besar</option>
@@ -3583,7 +3551,7 @@
                     </div>
                     <div>
                         <label class="text-sm font-medium">Jumlah Baris per Halaman</label>
-                        <input type="number" id="setRowsPerPage" value="20" class="w-full">
+                        <input type="number" id="setRowsPerPage" value="20" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                     </div>
                 </div>
             </div>
@@ -3593,15 +3561,15 @@
         <div id="settings-profil" class="settings-tab-content hidden">
             <h3 class="font-semibold text-lg mb-4 flex items-center gap-2"><i class="ph ph-storefront text-indigo-600"></i> Profil Usaha untuk Invoice</h3>
             <form id="companyProfileForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="text" id="companyName" placeholder="Nama Usaha*" value="Cibitung Frozen" required>
-                <input type="text" id="companyAddress" placeholder="Alamat Lengkap*" value="Jl. Industri No.1, Bekasi" required>
-                <input type="text" id="companyPhone" placeholder="Telepon*" value="0812-3456-7890" required>
-                <input type="email" id="companyEmail" placeholder="Email" value="info@cibitungfrozen.com">
-                <input type="text" id="companyWebsite" placeholder="Website (opsional)">
-                <input type="text" id="companyLogo" placeholder="URL Logo (opsional)">
+                <input type="text" id="companyName" placeholder="Nama Usaha*" value="Cibitung Frozen" required class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                <input type="text" id="companyAddress" placeholder="Alamat Lengkap*" value="Jl. Industri No.1, Bekasi" required class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                <input type="text" id="companyPhone" placeholder="Telepon*" value="0812-3456-7890" required class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                <input type="email" id="companyEmail" placeholder="Email" value="info@cibitungfrozen.com" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                <input type="text" id="companyWebsite" placeholder="Website (opsional)" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                <input type="text" id="companyLogo" placeholder="URL Logo (opsional)" class="border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
                 <div class="col-span-full">
                     <label class="text-sm font-medium">Catatan Kaki Invoice</label>
-                    <input type="text" id="companyFooterNote" placeholder="Misal: Terima kasih atas kepercayaan Anda." value="Terima kasih atas kepercayaan Anda.">
+                    <input type="text" id="companyFooterNote" placeholder="Misal: Terima kasih atas kepercayaan Anda." value="Terima kasih atas kepercayaan Anda." class="border p-2 rounded w-full dark:bg-slate-700 dark:border-slate-600">
                 </div>
                 <button type="button" id="saveCompanyBtn" class="btn btn-primary col-span-full sm:col-span-1">Simpan Profil</button>
             </form>
@@ -3613,17 +3581,12 @@
             <div class="space-y-4">
                 <div class="card p-4 border-red-200 dark:border-red-800 bg-red-50/30 dark:bg-red-900/10">
                     <h4 class="font-semibold mb-2 text-red-700 dark:text-red-400"><i class="ph ph-trash mr-2"></i> Reset Semua Data</h4>
-                    <p class="text-sm text-red-700/80 dark:text-red-400/80 mb-3">
-                        Menghapus <strong>seluruh data</strong>: batch, transaksi, jurnal, pelanggan, supplier, dan pengaturan. 
-                        Data yang dihapus <strong>tidak dapat dikembalikan</strong>. Pastikan Anda sudah melakukan backup.
-                    </p>
+                    <p class="text-sm text-red-700/80 dark:text-red-400/80 mb-3">Menghapus <strong>seluruh data</strong>: batch, transaksi, jurnal, pelanggan, supplier, dan pengaturan.</p>
                     <button id="resetAllDataBtn" class="btn btn-danger"><i class="ph ph-trash"></i> Reset Semua Data</button>
                 </div>
                 <div class="card p-4 border-amber-200 dark:border-amber-800 bg-amber-50/30 dark:bg-amber-900/10">
                     <h4 class="font-semibold mb-2 text-amber-700 dark:text-amber-400"><i class="ph ph-arrows-clockwise mr-2"></i> Reset ke Pengaturan Default</h4>
-                    <p class="text-sm text-amber-700/80 dark:text-amber-400/80 mb-3">
-                        Mengembalikan pengaturan ke nilai awal tanpa menghapus data transaksi, batch, atau pelanggan.
-                    </p>
+                    <p class="text-sm text-amber-700/80 dark:text-amber-400/80 mb-3">Mengembalikan pengaturan ke nilai awal tanpa menghapus data transaksi.</p>
                     <button id="resetSettingsBtn" class="btn btn-warning"><i class="ph ph-arrows-clockwise"></i> Reset Pengaturan Saja</button>
                 </div>
                 <div class="card p-4 border-blue-200 dark:border-blue-800 bg-blue-50/30 dark:bg-blue-900/10">
@@ -3637,10 +3600,11 @@
             </div>
         </div>
 
-        <!-- Tombol Simpan Utama -->
-        <div class="mt-8 border-t pt-4 flex gap-3">
+        <!-- Tombol Simpan Utama + Status -->
+        <div class="mt-8 border-t pt-4 flex flex-wrap items-center gap-3">
             <button id="saveSettingsBtn" class="btn btn-primary"><i class="ph ph-floppy-disk"></i> Simpan Semua Pengaturan</button>
             <button id="discardSettingsBtn" class="btn btn-secondary"><i class="ph ph-x-circle"></i> Batal</button>
+            <span id="saveStatus" class="text-xs text-green-600">✅ Semua tersimpan</span>
         </div>
     </div>
 </div>
