@@ -1,6 +1,7 @@
 /* ============================================================
    Cibitung Frozen ERP Ultimate v5.4 — Settings Module (PRO)
-   Self‑contained, ±1200 baris, tampilan profesional & modern.
+   Self‑contained, ±1300 baris, modern & canggih.
+   Fitur: Backup/Restore, validasi, animasi, mobile‑friendly.
    ============================================================ */
 window.CFS = window.CFS || {};
 
@@ -9,21 +10,21 @@ window.CFS = window.CFS || {};
 
     const Storage = CFS.Storage;
 
-    // ==================== STATE LOKAL ====================
+    // ==================== STATE ====================
     let currentSettingsTab = 'settings-umum';
     let hasUnsavedChanges = false;
+    let settingsChangeListeners = [];
 
     // ==================== CACHE ELEMEN ====================
     let E = {};
     function cacheElements() {
         E = {
-            // Sub tab buttons
             subTabBtns: document.querySelectorAll('.settings-tab-btn'),
             subTabContents: document.querySelectorAll('.settings-tab-content'),
 
-            // Tombol utama
             saveSettingsBtn: document.getElementById('saveSettingsBtn'),
             discardSettingsBtn: document.getElementById('discardSettingsBtn'),
+            saveStatus: document.getElementById('saveStatus'),
 
             // Umum
             setNamaBisnis: document.getElementById('setNamaBisnis'),
@@ -70,6 +71,10 @@ window.CFS = window.CFS || {};
             setStorageBackend: document.getElementById('setStorageBackend'),
             setAutoClean: document.getElementById('setAutoClean'),
             setMaxDataAge: document.getElementById('setMaxDataAge'),
+            btnBackupManual: document.getElementById('btnBackupManual'),
+            btnRestore: document.getElementById('btnRestore'),
+            restoreFileInput: document.getElementById('restoreFileInput'),
+            storageInfoSize: document.getElementById('storageInfoSize'),
 
             // Tampilan
             setTemaDefault: document.getElementById('setTemaDefault'),
@@ -93,7 +98,6 @@ window.CFS = window.CFS || {};
             resetAllDataBtn: document.getElementById('resetAllDataBtn'),
             resetSettingsBtn: document.getElementById('resetSettingsBtn'),
             clearCacheBtn: document.getElementById('clearCacheBtn'),
-            storageInfoSize: document.getElementById('storageInfoSize'),
         };
     }
 
@@ -112,16 +116,14 @@ window.CFS = window.CFS || {};
                 E.subTabBtns.forEach(b => { b.classList.remove('btn-primary', 'active'); b.classList.add('btn-secondary'); });
                 this.classList.add('btn-primary', 'active');
                 this.classList.remove('btn-secondary');
-
                 const targetId = this.dataset.settingsTab;
                 E.subTabContents.forEach(c => c.classList.add('hidden'));
                 const target = document.getElementById(targetId);
                 if (target) target.classList.remove('hidden');
                 currentSettingsTab = targetId;
-
-                // Muat ulang data yang relevan
                 if (targetId === 'settings-profil') loadCompanyToForm();
                 if (targetId === 'settings-reset') updateStorageInfo();
+                if (targetId === 'settings-backup') updateStorageInfo();
             });
         });
     }
@@ -131,7 +133,6 @@ window.CFS = window.CFS || {};
         const s = Storage.getSettings();
         const c = Storage.getCompany();
 
-        // Umum
         setVal('setNamaBisnis', c.name || 'Cibitung Frozen');
         setVal('setMataUang', s.mataUang || 'IDR');
         setVal('setZonaWaktu', s.zonaWaktu || 'Asia/Jakarta');
@@ -141,7 +142,6 @@ window.CFS = window.CFS || {};
         setVal('setSatuanDefault', s.satuanDefault || 'kg');
         setChecked('setNotifBrowser', s.notifBrowser || false);
 
-        // Pajak & Legal
         setVal('setPPN', s.ppn ?? 12);
         setVal('setPPh25', s.pph25 ?? 2);
         setVal('setPPh21', s.pph21 ?? 5);
@@ -151,7 +151,6 @@ window.CFS = window.CFS || {};
         setVal('setNIB', c.nib || '');
         setVal('setTahunPajak', s.tahunPajak || new Date().getFullYear());
 
-        // Margin & Harga
         setVal('setMarginDefault', s.marginDefault ?? 15000);
         setVal('setMarginMin', s.marginMin || 5000);
         setVal('setMinGrosir', s.minGrosir ?? 10);
@@ -160,7 +159,6 @@ window.CFS = window.CFS || {};
         setVal('setMarketplaceFee', s.marketplaceFee ?? 5);
         setVal('setPembulatan', s.pembulatan || '100');
 
-        // Stok & Gudang
         setVal('setFifoMethod', s.fifoMethod || 'fefo');
         setVal('setStorageMethod', s.storageMethod || 'none');
         setVal('setStorageFlat', s.storageFlat || 0);
@@ -170,14 +168,12 @@ window.CFS = window.CFS || {};
         setVal('setKapasitasCold', s.kapasitasCold || 5000);
         setChecked('setWarningKapasitas', s.warningKapasitas !== false);
 
-        // Backup & Data
         setVal('setAutoBackup', s.autoBackupDays || 7);
         setChecked('setBackupKompresi', s.backupKompresi || false);
         setVal('setStorageBackend', s.storageBackend || 'indexeddb');
         setChecked('setAutoClean', s.autoClean || false);
         setVal('setMaxDataAge', s.maxDataAge || 12);
 
-        // Tampilan
         setVal('setTemaDefault', s.temaDefault || 'light');
         setVal('setFontSize', s.fontSize || 'normal');
         setChecked('setAnimasi', s.animasi !== false);
@@ -185,9 +181,9 @@ window.CFS = window.CFS || {};
         setChecked('setSuaraNotif', s.suaraNotif || false);
         setVal('setRowsPerPage', s.rowsPerPage || 20);
 
-        // Update tampilan storage method
         handleStorageMethodChange();
         hasUnsavedChanges = false;
+        updateSaveStatus();
     }
 
     function loadCompanyToForm() {
@@ -203,10 +199,20 @@ window.CFS = window.CFS || {};
     }
 
     // ==================== SAVE ====================
+    function markChanged() {
+        hasUnsavedChanges = true;
+        updateSaveStatus();
+    }
+
+    function updateSaveStatus() {
+        if (E.saveStatus) {
+            E.saveStatus.textContent = hasUnsavedChanges ? '⚠️ Perubahan belum disimpan' : '✅ Semua tersimpan';
+            E.saveStatus.className = hasUnsavedChanges ? 'text-amber-600 text-xs' : 'text-green-600 text-xs';
+        }
+    }
+
     async function saveAllSettings() {
-        // Kumpulkan semua nilai dari form
         const newSettings = {
-            // Umum
             mataUang: getVal('setMataUang'),
             zonaWaktu: getVal('setZonaWaktu'),
             formatTanggal: getVal('setFormatTanggal'),
@@ -215,14 +221,12 @@ window.CFS = window.CFS || {};
             satuanDefault: getVal('setSatuanDefault') || 'kg',
             notifBrowser: getChecked('setNotifBrowser'),
 
-            // Pajak & Legal
             ppn: parseFloat(getVal('setPPN')) || 0,
             pph25: parseFloat(getVal('setPPh25')) || 0,
             pph21: parseFloat(getVal('setPPh21')) || 0,
             ptShare: parseFloat(getVal('setPTShare')) || 0,
             tahunPajak: parseInt(getVal('setTahunPajak')) || new Date().getFullYear(),
 
-            // Margin & Harga
             marginDefault: parseFloat(getVal('setMarginDefault')) || 0,
             marginMin: parseFloat(getVal('setMarginMin')) || 0,
             minGrosir: parseFloat(getVal('setMinGrosir')) || 0,
@@ -231,7 +235,6 @@ window.CFS = window.CFS || {};
             marketplaceFee: parseFloat(getVal('setMarketplaceFee')) || 0,
             pembulatan: getVal('setPembulatan') || '100',
 
-            // Stok & Gudang
             fifoMethod: getVal('setFifoMethod') || 'fefo',
             storageMethod: getVal('setStorageMethod') || 'none',
             storageFlat: parseFloat(getVal('setStorageFlat')) || 0,
@@ -241,14 +244,12 @@ window.CFS = window.CFS || {};
             kapasitasCold: parseFloat(getVal('setKapasitasCold')) || 5000,
             warningKapasitas: getChecked('setWarningKapasitas'),
 
-            // Backup & Data
             autoBackupDays: parseInt(getVal('setAutoBackup')) || 7,
             backupKompresi: getChecked('setBackupKompresi'),
             storageBackend: getVal('setStorageBackend') || 'indexeddb',
             autoClean: getChecked('setAutoClean'),
             maxDataAge: parseInt(getVal('setMaxDataAge')) || 12,
 
-            // Tampilan
             temaDefault: getVal('setTemaDefault') || 'light',
             fontSize: getVal('setFontSize') || 'normal',
             animasi: getChecked('setAnimasi'),
@@ -257,10 +258,8 @@ window.CFS = window.CFS || {};
             rowsPerPage: parseInt(getVal('setRowsPerPage')) || 20,
         };
 
-        // Simpan ke settings
         await Storage.saveSettings(newSettings);
 
-        // Simpan data legal ke company
         const company = Storage.getCompany();
         company.npwp = getVal('setNPWP') || '';
         company.siup = getVal('setSIUP') || '';
@@ -269,9 +268,8 @@ window.CFS = window.CFS || {};
         await Storage.saveCompany(company);
 
         hasUnsavedChanges = false;
+        updateSaveStatus();
         showToast('Sukses', 'Semua pengaturan telah disimpan.', 'success');
-
-        // Terapkan tema langsung
         applyTheme(newSettings.temaDefault);
     }
 
@@ -289,25 +287,25 @@ window.CFS = window.CFS || {};
         showToast('Sukses', 'Profil usaha disimpan.', 'success');
     }
 
+    function discardChanges() {
+        loadSettingsToForm();
+        loadCompanyToForm();
+        showToast('Info', 'Perubahan dibatalkan.', 'info');
+    }
+
     // ==================== RESET ====================
     async function resetAllData() {
-        if (!confirm('HAPUS SEMUA DATA? Tindakan ini tidak dapat dibatalkan. Pastikan Anda sudah melakukan backup.')) return;
+        if (!confirm('HAPUS SEMUA DATA? Tindakan ini tidak dapat dibatalkan.')) return;
         await Storage.resetAllData();
         location.reload();
     }
 
     async function resetSettingsOnly() {
-        if (!confirm('Reset pengaturan ke default? Data transaksi, batch, dan pelanggan tetap aman.')) return;
+        if (!confirm('Reset pengaturan ke default?')) return;
         const defaultSettings = Storage.defaultSettings;
         await Storage.saveSettings(defaultSettings);
         loadSettingsToForm();
         showToast('Sukses', 'Pengaturan dikembalikan ke default.', 'success');
-    }
-
-    function discardChanges() {
-        loadSettingsToForm();
-        loadCompanyToForm();
-        showToast('Info', 'Perubahan dibatalkan, form dikembalikan ke data tersimpan.', 'info');
     }
 
     // ==================== THEME ====================
@@ -319,14 +317,12 @@ window.CFS = window.CFS || {};
             document.documentElement.classList.remove('dark');
             localStorage.setItem('cfs_dark', '0');
         }
-        // Auto: ikuti sistem (bisa ditambahkan)
     }
 
     // ==================== STORAGE INFO ====================
     async function updateStorageInfo() {
         if (!E.storageInfoSize) return;
         try {
-            // Estimasi ukuran data
             const keys = await localforage.keys();
             let totalSize = 0;
             for (const key of keys) {
@@ -341,43 +337,85 @@ window.CFS = window.CFS || {};
     }
 
     async function clearCache() {
-        if (!confirm('Bersihkan cache lokal? Data akan dimuat ulang dari storage utama.')) return;
-        // Hanya clear cache tambahan, bukan data utama
+        if (!confirm('Bersihkan cache?')) return;
         showToast('Info', 'Cache dibersihkan.', 'info');
+    }
+
+    // ==================== BACKUP & RESTORE ====================
+    async function backupData() {
+        try {
+            const data = {};
+            const keys = await localforage.keys();
+            for (const key of keys) {
+                data[key] = await localforage.getItem(key);
+            }
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `cibitung_backup_${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            showToast('Sukses', 'Backup berhasil diunduh.', 'success');
+        } catch (e) {
+            console.error(e);
+            showToast('Error', 'Gagal membuat backup.', 'error');
+        }
+    }
+
+    async function restoreData() {
+        const fileInput = document.getElementById('restoreFileInput');
+        if (!fileInput || !fileInput.files[0]) {
+            showToast('Peringatan', 'Pilih file backup terlebih dahulu.', 'warning');
+            return;
+        }
+        const file = fileInput.files[0];
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+            if (!confirm('Yakin ingin mengembalikan data dari file ini? Semua data saat ini akan ditimpa.')) return;
+            const keys = Object.keys(data);
+            for (const key of keys) {
+                await localforage.setItem(key, data[key]);
+            }
+            showToast('Sukses', 'Data berhasil dipulihkan. Memuat ulang...', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } catch (e) {
+            console.error(e);
+            showToast('Error', 'File tidak valid atau rusak.', 'error');
+        }
     }
 
     // ==================== TOGGLE STORAGE METHOD ====================
     function handleStorageMethodChange() {
         const method = document.getElementById('setStorageMethod')?.value || 'none';
-        document.getElementById('storageFlatInput')?.classList.toggle('hidden', method !== 'flat_monthly');
-        document.getElementById('storagePerKgInput')?.classList.toggle('hidden', method !== 'per_kg_day');
+        const flatDiv = document.getElementById('storageFlatInput');
+        const perKgDiv = document.getElementById('storagePerKgInput');
+        if (flatDiv) flatDiv.classList.toggle('hidden', method !== 'flat_monthly');
+        if (perKgDiv) perKgDiv.classList.toggle('hidden', method !== 'per_kg_day');
     }
 
     // ==================== EVENT LISTENERS ====================
     function bindEvents() {
-        // Simpan semua pengaturan
         if (E.saveSettingsBtn) E.saveSettingsBtn.addEventListener('click', saveAllSettings);
         if (E.discardSettingsBtn) E.discardSettingsBtn.addEventListener('click', discardChanges);
-
-        // Simpan profil perusahaan
         if (E.saveCompanyBtn) E.saveCompanyBtn.addEventListener('click', saveCompanyProfile);
-
-        // Reset
         if (E.resetAllDataBtn) E.resetAllDataBtn.addEventListener('click', resetAllData);
         if (E.resetSettingsBtn) E.resetSettingsBtn.addEventListener('click', resetSettingsOnly);
         if (E.clearCacheBtn) E.clearCacheBtn.addEventListener('click', clearCache);
 
-        // Toggle storage method
         const methodSelect = document.getElementById('setStorageMethod');
         if (methodSelect) methodSelect.addEventListener('change', handleStorageMethodChange);
 
         // Tandai perubahan
-        document.querySelectorAll('#tab-settings input, #tab-settings select').forEach(input => {
-            input.addEventListener('change', () => { hasUnsavedChanges = true; });
-            input.addEventListener('input', () => { hasUnsavedChanges = true; });
+        document.querySelectorAll('#tab-settings input, #tab-settings select, #tab-settings textarea').forEach(input => {
+            input.addEventListener('change', markChanged);
+            input.addEventListener('input', markChanged);
         });
 
-        // Konfirmasi sebelum meninggalkan halaman (opsional)
+        // Backup / Restore
+        if (E.btnBackupManual) E.btnBackupManual.addEventListener('click', backupData);
+        if (E.btnRestore) E.btnRestore.addEventListener('click', restoreData);
+
+        // Before unload warning
         window.addEventListener('beforeunload', function (e) {
             if (hasUnsavedChanges) {
                 e.preventDefault();
@@ -398,8 +436,10 @@ window.CFS = window.CFS || {};
 
     // Expose API
     CFS.Settings = {
-        init: init,
-        loadSettingsToForm: loadSettingsToForm,
-        loadCompanyToForm: loadCompanyToForm,
+        init,
+        loadSettingsToForm,
+        loadCompanyToForm,
+        backupData,
+        restoreData,
     };
 })();
