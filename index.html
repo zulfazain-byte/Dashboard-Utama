@@ -3466,42 +3466,85 @@
             </div>
         </div>
 
-        <!-- KONTEN SUB-TAB: BACKUP & DATA -->
-        <div id="settings-backup" class="settings-tab-content hidden">
-            <h3 class="font-semibold text-lg mb-4 flex items-center gap-2"><i class="ph ph-cloud-arrow-up text-purple-600"></i> Pengaturan Backup & Data</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-sm font-medium">Interval Auto Backup (hari)</label>
-                        <input type="number" id="setAutoBackup" value="7" class="w-full">
-                        <p class="text-xs opacity-50 mt-1">0 = nonaktifkan backup otomatis</p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <label class="text-sm font-medium">Kompresi Backup</label>
-                        <div class="toggle-wrapper"><input type="checkbox" id="setBackupKompresi" class="toggle-checkbox"><div class="toggle-label"></div></div>
-                    </div>
-                    <div>
-                        <label class="text-sm font-medium">Lokasi Penyimpanan</label>
-                        <select id="setStorageBackend" class="w-full">
-                            <option value="indexeddb">IndexedDB (Browser)</option>
-                            <option value="localstorage">LocalStorage</option>
-                        </select>
+<!-- KONTEN SUB-TAB: BACKUP & DATA (PRO) -->
+<div id="settings-backup" class="settings-tab-content hidden">
+    <h3 class="font-semibold text-lg mb-4 flex items-center gap-2">
+        <i class="ph ph-cloud-arrow-up-down text-purple-600"></i> Backup & Restore Data
+    </h3>
+    <p class="text-sm opacity-70 mb-6">Lindungi bisnis Anda dengan backup rutin dan pulihkan data kapan saja.</p>
+
+    <!-- Backup & Restore Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- Backup -->
+        <div class="card p-6 flex flex-col items-center text-center bg-gradient-to-b from-blue-50 to-white dark:from-blue-900/20 dark:to-slate-800 border border-blue-200 dark:border-blue-800 rounded-xl">
+            <i class="ph ph-cloud-arrow-up text-4xl text-blue-600 mb-3"></i>
+            <h4 class="font-semibold text-lg">Backup Data</h4>
+            <p class="text-xs opacity-70 mb-4">Unduh semua data (penjualan, stok, keuangan, pelanggan) sebagai file .json</p>
+            <button onclick="CFS.Settings.backupData()" class="btn btn-primary w-full">
+                <i class="ph ph-download-simple mr-1"></i> Unduh Backup
+            </button>
+        </div>
+
+        <!-- Restore -->
+        <div class="card p-6 flex flex-col items-center text-center bg-gradient-to-b from-amber-50 to-white dark:from-amber-900/20 dark:to-slate-800 border border-amber-200 dark:border-amber-800 rounded-xl">
+            <i class="ph ph-cloud-arrow-down text-4xl text-amber-600 mb-3"></i>
+            <h4 class="font-semibold text-lg">Restore Data</h4>
+            <p class="text-xs opacity-70 mb-4">Pilih file backup (.json) untuk mengembalikan data. Data saat ini akan ditimpa.</p>
+            <input type="file" id="restoreFileInput" accept=".json" class="w-full mb-3 text-sm border border-amber-300 dark:border-amber-700 rounded-lg p-2 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-amber-400">
+            <button onclick="CFS.Settings.restoreData()" class="btn btn-warning w-full">
+                <i class="ph ph-upload-simple mr-1"></i> Pulihkan Data
+            </button>
+        </div>
+    </div>
+
+    <!-- Pengaturan Backup Otomatis -->
+    <div class="border-t pt-6">
+        <h4 class="font-semibold text-base mb-4 flex items-center gap-2">
+            <i class="ph ph-gear text-slate-600"></i> Pengaturan Tambahan
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm font-medium">Interval Auto Backup (hari)</label>
+                    <input type="number" id="setAutoBackup" value="7" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                    <p class="text-xs opacity-50 mt-1">0 = nonaktifkan</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <label class="text-sm font-medium">Kompresi Backup</label>
+                    <div class="toggle-wrapper">
+                        <input type="checkbox" id="setBackupKompresi" class="toggle-checkbox">
+                        <div class="toggle-label"></div>
                     </div>
                 </div>
-                <div class="space-y-4">
-                    <div class="flex items-center gap-3">
-                        <label class="text-sm font-medium">Hapus Data Kuno Otomatis</label>
-                        <div class="toggle-wrapper"><input type="checkbox" id="setAutoClean" class="toggle-checkbox"><div class="toggle-label"></div></div>
+                <div>
+                    <label class="text-sm font-medium">Lokasi Penyimpanan</label>
+                    <select id="setStorageBackend" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                        <option value="indexeddb">IndexedDB (Browser)</option>
+                        <option value="localstorage">LocalStorage</option>
+                    </select>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center gap-3">
+                    <label class="text-sm font-medium">Hapus Data Kuno</label>
+                    <div class="toggle-wrapper">
+                        <input type="checkbox" id="setAutoClean" class="toggle-checkbox">
+                        <div class="toggle-label"></div>
                     </div>
-                    <div>
-                        <label class="text-sm font-medium">Batas Umur Data (bulan)</label>
-                        <input type="number" id="setMaxDataAge" value="12" class="w-full">
-                        <p class="text-xs opacity-50 mt-1">Data lebih tua akan dihapus otomatis</p>
-                    </div>
-                    <button onclick="CFS.App.backupData()" class="btn btn-primary w-full"><i class="ph ph-download-simple"></i> Backup Manual Sekarang</button>
+                </div>
+                <div>
+                    <label class="text-sm font-medium">Batas Umur Data (bulan)</label>
+                    <input type="number" id="setMaxDataAge" value="12" class="w-full border p-2 rounded dark:bg-slate-700 dark:border-slate-600">
+                    <p class="text-xs opacity-50 mt-1">Data lebih tua akan dihapus otomatis</p>
                 </div>
             </div>
         </div>
+    </div>
+
+    <p class="text-xs opacity-50 mt-6 text-center md:text-left">
+        ⚠️ <strong>Peringatan:</strong> Restore akan menimpa seluruh data saat ini dan tidak dapat dibatalkan. Lakukan backup terlebih dahulu.
+    </p>
+</div>
 
         <!-- KONTEN SUB-TAB: TAMPILAN -->
         <div id="settings-tampilan" class="settings-tab-content hidden">
